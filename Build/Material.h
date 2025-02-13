@@ -45,7 +45,7 @@ public:
 	float		shininess;
 	int			noDiffuseTex;
 	int			noNormalTex;
-	int			noArmTex;
+	int			noSpecularTex;
 
 
 	void SetDifPath(string path);

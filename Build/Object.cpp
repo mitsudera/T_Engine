@@ -2,6 +2,8 @@
 
 Object::Object()
 {
+
+
 }
 
 Object::~Object()
@@ -36,3 +38,9 @@ Object::Type Object::GetType(void)
 {
 	return type;
 }
+
+unsigned long Object::GetID(void)
+{
+	return ID;
+}
+

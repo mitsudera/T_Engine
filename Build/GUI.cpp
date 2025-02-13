@@ -15,32 +15,16 @@
 #include "DX11Texture.h"
 #include "TerrainComponent.h"
 #include "EditerCamera.h"
+#include "AnimationControlerComponent.h"
+#include "SaveSystem.h"
+#include "SceneManager.h"
+#include "SceneAssetsData.h"
 
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND g_hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
 constexpr float radianToDegree = (180.0f / XM_PI);
 constexpr float degreeToRadian = (XM_PI / 180.0f);
 
-//初期化されたImguizo用行列
-static const float identityMatrix[16] =
-{ 1.0f, 0.0f, 0.0f, 0.0f,
-  0.0f, 1.0f, 0.0f, 0.0f,
-  0.0f, 0.0f, 1.0f, 0.0f,
-  0.0f, 0.0f, 0.0f, 1.0f };
-
-//Imguizo用プロジェクション行列
-static float prjMatrix[16] =
-{ 1.0f, 0.0f, 0.0f, 0.0f,
-  0.0f, 1.0f, 0.0f, 0.0f,
-  0.0f, 0.0f, 1.0f, 0.0f,
-  0.0f, 0.0f, 0.0f, 1.0f };
-
-//Imguizo用ビュー行列
-static float viewMatrix[16] =
-{ 1.0f, 0.0f, 0.0f, 0.0f,
-  0.0f, 1.0f, 0.0f, 0.0f,
-  0.0f, 0.0f, 1.0f, 0.0f,
-  0.0f, 0.0f, 0.0f, 1.0f };
 
 
 GUI::GUI(World* world)
@@ -53,6 +37,8 @@ GUI::GUI(World* world)
     pProjectSetting = pGameEngine->GetProjectSetting();
     pAssetsManager = pGameEngine->GetAssetsManager();
     pEditerCamera = pWorld->GetEditerCamera();
+    pSaveSystem = pGameEngine->GetSaveSystem();
+    pSceneManager = pWorld->GetSceneManager();
     ID3D11Device* pDevice = pRenderer->GetDevice();
     ID3D11DeviceContext* pImmediateContext = pRenderer->GetDeviceContext();
     HWND hwnd = pGameEngine->GetWindowHandle();
@@ -117,8 +103,10 @@ void GUI::Update(void)
     }
 
 
+    XMStoreFloat4x4(&proj, pEditerCamera->GetProjectionMatrix());
+    XMStoreFloat4x4(&view, pEditerCamera->GetViewMatrix());
 
-
+    UpdateToolWindow();
     UpdateHierarchyWindow();
     UpdateAssetsWindow();
     UpdateInspectorWindow();
@@ -132,6 +120,30 @@ void GUI::Draw(void)
     ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
 
     ImGui::EndFrame();
+}
+
+void GUI::UpdateToolWindow(void)
+{
+    XMFLOAT2 screen = pGameEngine->GetWindowSize();
+    // ウィンドウサイズの取得
+    float sizeX = screen.x * 0.6f;
+    float sizeY = screen.y * 0.1f;
+
+    ImGui::SetNextWindowPos(ImVec2(screen.x*0.2f, 0), ImGuiCond_Once);
+    ImGui::SetNextWindowSize(ImVec2(sizeX, sizeY), ImGuiCond_Once);
+    ImGui::Begin("Tool", NULL, ImGuiWindowFlags_MenuBar);
+
+    if (ImGui::BeginMenuBar()) {
+
+        if (ImGui::MenuItem("Play"))
+        {
+
+            pGameEngine->TestPlay();
+        }
+        ImGui::EndMenuBar();
+    }
+    ImGui::End();
+
 }
 
 void GUI::UpdateHierarchyWindow(void)
@@ -209,7 +221,41 @@ void GUI::UpdateHierarchyWindow(void)
         }
 
     }
+    else
+    {
+        if (ImGui::BeginMenuBar()) {
+            if (ImGui::BeginMenu("LoadScene"))
+            {
+                {
+                    string text = loadSceneName;
+                    vector<char> inputText(text.begin(), text.end());
+                    inputText.resize(128);
 
+                    if (ImGui::InputText("##FileName", inputText.data(), inputText.size()))
+                    {
+                        text = inputText.data();
+                        loadSceneName = text;
+                    }
+
+                }
+
+                if (ImGui::MenuItem("Load"))
+                {
+                    pSceneManager->LoadScene(loadSceneName);
+
+
+                    loadSceneName = "";
+                }
+
+
+                ImGui::EndMenu();
+            }
+
+
+            ImGui::EndMenuBar();
+        }
+
+    }
 
 
 
@@ -268,10 +314,28 @@ void GUI::UpdateInspectorWindow(void)
             text = inputText.data();
             selectedObject->SetName(text);
         }
+
+        string idText = "ID:" + to_string(selectedObject->GetID());
+        ImGui::Text(idText.c_str());
+
+
     }
     if (selectedObject->GetType() == Object::Type::Scene)
     {
         Scene* scene = static_cast<Scene*>(selectedObject);
+
+        if (ImGui::BeginMenuBar()) {
+
+
+            if (ImGui::MenuItem("SaveScene"))
+            {
+                pSaveSystem->SaveScene(scene);
+
+            }
+
+            ImGui::EndMenuBar();
+        }
+
 
     }
 
@@ -331,6 +395,25 @@ void GUI::UpdateInspectorWindow(void)
                     loadFileName = "";
 
                 }
+
+
+                ImGui::EndMenu();
+            }
+
+            if (ImGui::BeginMenu("AddComponent"))
+            {
+                for (string typeName : pProjectSetting->GetComponentNameArray())
+                {
+                    string removeName = "class ";
+                    string showName = typeName;
+                    showName.erase(0, removeName.size() - 1);
+                    if (ImGui::MenuItem(showName.c_str()))
+                    {
+                        gameObject->AddComponentByTypeName(typeName);
+                    }
+
+                }
+
 
 
                 ImGui::EndMenu();
@@ -408,8 +491,6 @@ void GUI::UpdateAssetsWindow(void)
 void GUI::UpdateGizmo(void)
 {
 
-    XMMATRIX prjMtx = pEditerCamera->GetProjectionMatrix();
-    XMMATRIX viewMtx = pEditerCamera->GetViewMatrix();
 
 
     // GameObjectのマニピュレータ
@@ -419,9 +500,6 @@ void GUI::UpdateGizmo(void)
 
         XMFLOAT4X4 Ftransform;
         XMStoreFloat4x4(&Ftransform, transform->GetWorldMtx());
-        XMFLOAT4X4 proj, view;
-        XMStoreFloat4x4(&proj, pEditerCamera->GetProjectionMatrix());
-        XMStoreFloat4x4(&view, pEditerCamera->GetViewMatrix());
 
 
 
@@ -547,6 +625,19 @@ void GUI::ShowComponent(Component* com)
         }
     }
 
+    if (AnimationControlerComponent* aniCom = dynamic_cast<AnimationControlerComponent*>(com))
+    {
+        string showName = typeid(AnimationControlerComponent).name();
+        showName.erase(0, removeName.size() - 1);
+
+        if (ImGui::TreeNode(showName.c_str()))
+        {
+            ShowAnimationControlerComponent(aniCom);
+            ImGui::TreePop();
+
+        }
+    }
+
 
 }
 
@@ -592,16 +683,59 @@ void GUI::ShowTransformCom(TransformComponent* com)
 
 
 }
+void GUI::ShowAnimationControlerComponent(AnimationControlerComponent* com)
+{
+    {
+        string text = com->GetLoadFileName();
+        vector<char> inputText(text.begin(), text.end());
+        inputText.resize(128);
+
+        if (ImGui::InputText("##FileName", inputText.data(), inputText.size()))
+        {
+            text = inputText.data();
+            com->SetLoadFileName(text);
+        }
+
+    }
+
+    if (ImGui::MenuItem("LoadDefaultAnim"))
+    {
+        com->LoadDefaulAnimation(com->GetLoadFileName(), com->GetLoadFileName());
+        com->SetLoadFileName("");
+    }
+
+
+    for (AnimationNode* node : com->GetAnimNodeList())
+    {
+        if (ImGui::TreeNode(node->GetName().c_str()))
+        {
+
+
+
+            ImGui::TreePop();
+
+        }
+
+    }
+
+}
+
+
 void GUI::ShowAssets(Assets* assets)
 {
 
     if (assets->GetAssetsType() == Assets::AssetsType::Material)
     {
-        Material* mat = static_cast<Material*>(selectedObject);
+        Material* mat = static_cast<Material*>(assets);
 
         ShowMaterial(mat);
     }
 
+    if (assets->GetAssetsType() == Assets::AssetsType::Scene)
+    {
+        SceneAssetsData* sceneData = static_cast<SceneAssetsData*>(assets);
+
+    }
 
 
 
@@ -743,6 +877,22 @@ void GUI::ShowMaterial(Material* mat)
 
     }
 
+
+
+}
+void GUI::ShowSceneAssets(SceneAssetsData* sad)
+{
+    string text = sad->GetName();
+    vector<char> inputText(text.begin(), text.end());
+    inputText.resize(128);
+
+    ImGui::Text("Name:");
+    ImGui::SameLine();
+    if (ImGui::InputText("##Name", inputText.data(), inputText.size()))
+    {
+        text = inputText.data();
+        sad->SetName(text);
+    }
 
 
 }

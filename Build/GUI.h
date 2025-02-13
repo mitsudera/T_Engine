@@ -20,7 +20,11 @@ class TerrainMaterial;
 class Material;
 class Assets;
 class TerrainComponent;
+class AnimationControlerComponent;
 class EditerCamera;
+class SaveSystem;
+class SceneManager;
+class SceneAssetsData;
 
 class GUI
 {
@@ -34,6 +38,7 @@ public:
 
 private:
 
+	void UpdateToolWindow(void);
 	void UpdateHierarchyWindow(void);
 	void UpdateInspectorWindow(void);
 	void UpdateAssetsWindow(void);
@@ -45,9 +50,11 @@ private:
 	void ShowTransformCom(TransformComponent* com);
 	void ShowCamCom(CameraComponent* com);
 	void ShowTerrainComponent(TerrainComponent* com);
+	void ShowAnimationControlerComponent(AnimationControlerComponent* com);
 
 	void ShowAssets(Assets* assets);
 	void ShowMaterial(Material* mat);
+	void ShowSceneAssets(SceneAssetsData* sad);
 	void ShowTerrainMaterial(TerrainMaterial* mat);
 
 	World* pWorld;
@@ -56,14 +63,21 @@ private:
 	ProjectSetting* pProjectSetting;
 	AssetsManager* pAssetsManager;
 	EditerCamera* pEditerCamera;
+	SaveSystem* pSaveSystem;
+	SceneManager* pSceneManager;
+
 	BOOL showGui;
 	ImGuiIO guiIO;
-	bool show_demo_window;
-	bool show_another_window;
 	ImVec4 clear_color; 
 	Object* selectedObject;  // 選択されたオブジェクトを保存するメンバ変数
 	ImGuizmo::OPERATION gizmoOperation;// ギズモのモード
 
 	string loadFileName;
+	string loadSceneName;
+	XMFLOAT4X4 proj;
+	XMFLOAT4X4 view;
+
+	
+
 };
 

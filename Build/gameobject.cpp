@@ -72,6 +72,7 @@ void GameObject::Awake(void)
 	tag = ObjectTag::Default;
 	notAnim = FALSE;
 	type = Type::GameObject;
+	
 
 	this->layer = Layer::Default;
 	if (parent)
@@ -82,7 +83,8 @@ void GameObject::Awake(void)
 		this->layer = parent->GetLayer();
 
 	}
-
+	SetID();
+	pScene->AddAllGameObject(this);
 }
 
 void GameObject::InitAllComponent(void)
@@ -96,20 +98,38 @@ void GameObject::InitAllComponent(void)
 
 void GameObject::Destroy(void)
 {
-	for (int i = 0; i < this->componentList.size(); i++)
+	
+
+	for (Component* com: this->componentList)
 	{
-		componentList[i]->Uninit();
-		delete componentList[i];
+		com->Uninit();
+		delete com;
 	}
 	this->componentList.clear();
 
-	for (int i = 0; i < childList.size(); i++)
+	for (GameObject* child: childList)
 	{
-		childList[i]->Destroy();
-		delete childList[i];
+		child->Destroy();
+		delete child;
 
 	}
 	this->childList.clear();
+}
+
+void GameObject::DeleteChild(GameObject* gameObject)
+{
+	childList.remove(gameObject);
+
+	gameObject->Destroy();
+	delete gameObject;
+
+}
+
+void GameObject::DeleteComponnt(Component* com)
+{
+	componentList.remove(com);
+	com->Uninit();
+	delete com;
 }
 
 
@@ -200,7 +220,17 @@ GameObject* GameObject::GetRootObject(void)
 
 GameObject* GameObject::GetChild(int index)
 {
-	return this->childList[index];
+	int cnt = 0;
+	for (GameObject* child : childList)
+	{
+
+		if (cnt == index)
+		{
+			return child;
+		}
+		cnt++;
+	}
+	return nullptr;
 }
 
 GameObject* GameObject::GetChild(string name)
@@ -216,7 +246,7 @@ GameObject* GameObject::GetChild(string name)
 	return nullptr;
 }
 
-vector<GameObject*>& GameObject::GetChild()
+list<GameObject*>& GameObject::GetChild()
 {
 	return this->childList;
 }
@@ -240,7 +270,7 @@ GameObject* GameObject::SerchAllChild(string name)
 	return ans;
 }
 
-vector<Component*>& GameObject::GetComponentList(void)
+list<Component*>& GameObject::GetComponentList(void)
 {
 	return this->componentList;
 }
@@ -249,13 +279,13 @@ Component* GameObject::GetComponentAttrbute(Component::Attribute attr, int n)
 {
 	int cnt = 0;
 
-	for (int i = 0; i < componentList.size(); i++)
+	for (Component* com:componentList)
 	{
-		if (componentList[i]->GetAttribute()==attr)
+		if (com->GetAttribute()==attr)
 		{
 			if (cnt==n)
 			{
-				return componentList[i];
+				return com;
 
 			}
 			else
@@ -265,6 +295,16 @@ Component* GameObject::GetComponentAttrbute(Component::Attribute attr, int n)
 		}
 	}
 	return nullptr;
+}
+
+Component* GameObject::AddComponentByTypeName(string typeName)
+{
+	return pProjectSetting->AddComponentByTypeName(typeName, this);
+}
+
+Component* GameObject::DynamicAddComponentByTypeName(string typeName)
+{
+	return pProjectSetting->DynamicAddComponentByTypeName(typeName, this);
 }
 
 void GameObject::SetHasShadowAll(BOOL b)
@@ -330,6 +370,7 @@ void GameObject::AddChild(GameObject* child)
 	child->SetParent(this);
 
 }
+
 
 void GameObject::SetParent(GameObject* parent)
 {
@@ -649,5 +690,17 @@ void GameObject::SetName(string name)
 {
 	SetName(name, 0);
 }
+
+void GameObject::SetID(void)
+{
+	this->ID = pScene->GetNotUseId();
+}
+
+void GameObject::SetID(unsigned long id)
+{
+	this->ID = id;
+}
+
+
 
 

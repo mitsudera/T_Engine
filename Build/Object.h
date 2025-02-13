@@ -1,5 +1,8 @@
 #pragma once
 #include "Coreminimal.h"
+
+class World;
+
 class Object
 {
 public:
@@ -17,14 +20,17 @@ public:
 
 	virtual void SetName(string name, int count);
 	virtual void SetName(string name);
-	string GetName(void);
+	virtual string GetName(void);
 	Type GetType(void);
-
+	
+	unsigned long GetID(void);
 
 protected:
-	unsigned int ID;
+	unsigned long ID;
 	Type type;
 private:
+
+	World* pWorld;
 	string name;
 
 };

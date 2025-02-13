@@ -40,6 +40,9 @@ public:
 	CameraComponent* GetMainCamera(void);
 
 	EditerCamera* GetEditerCamera(void);
+
+	void TestPlay(void);
+
 private:
 	
 	GameEngine* pGameEngine;

@@ -6,19 +6,20 @@
 #include "EditerCamera.h"
 #include "Camera.h"
 #include "CameraComponent.h"
+#include "SaveSystem.h"
+#include "AssetsManager.h"
+#include "SceneAssetsData.h"
+
 SceneManager::SceneManager(World* world)
 {
 	this->pWorld = world;
 	this->pGameEngine = world->GetGameEngine();
-
+	this->pSaveSystem = pGameEngine->GetSaveSystem();
+	this->pAssetsManager = pGameEngine->GetAssetsManager();
 }
 
 SceneManager::~SceneManager()
 {
-	for (Scene* scene :sceneArray)
-	{
-		delete scene;
-	}
 }
 
 void SceneManager::Update(void)
@@ -38,19 +39,22 @@ void SceneManager::Update(void)
 	loadSceneArray.clear();
 }
 
-Scene* SceneManager::CreateScene(void)
+Scene* SceneManager::CreateNewScene(void)
 {
 
-	return CreateScene("noname");
+	return CreateNewScene("noname");
 }
 
-Scene* SceneManager::CreateScene(string name)
+Scene* SceneManager::CreateNewScene(string name)
 {
 	Scene* scene = new Scene(pWorld);
+	scene->Awake();
+
+	scene->SetSceneAssetsData(pGameEngine->GetAssetsManager()->CreateNewSceneAssets(name));
+
 	scene->SetName(name);
-	sceneArray.push_back(scene);
 	UnloadScene();
-	LoadScene(name);
+	loadSceneArray.push_back(scene);
 
 	scene->CreateDefaultObject();
 
@@ -60,26 +64,92 @@ Scene* SceneManager::CreateScene(string name)
 
 }
 
-
-
-void SceneManager::LoadScene(string name)
+Scene* SceneManager::LoadScene(SceneAssetsData* data)
 {
-	for (Scene* scene:sceneArray)
-	{
-		if (scene->GetName() == name)
-		{
-			loadSceneArray.push_back(scene);
-			return;
-		}
-		
-	}
+	Scene* scene = pSaveSystem->LoadScene(data);
+
+
+	loadSceneArray.push_back(scene);
+
+
+
+
+	return scene;
 }
+
+Scene* SceneManager::LoadScene(string name)
+{
+
+	for (SceneAssetsData* data : pAssetsManager->GetSceneAssetsDataList())
+	{
+		if (data->GetName() == name)
+		{
+			Scene* scene = pSaveSystem->LoadScene(data);
+			loadSceneArray.push_back(scene);
+			return scene;
+
+		}
+	}
+
+
+	return nullptr;
+
+}
+
+
+Scene* SceneManager::OpenScene(string name)
+{
+	for (SceneAssetsData* data : pAssetsManager->GetSceneAssetsDataList())
+	{
+		if (data->GetName() == name)
+		{
+			Scene* scene = pSaveSystem->LoadScene(data);
+			UnloadScene();
+			loadSceneArray.push_back(scene);
+			return scene;
+
+		}
+	}
+
+
+	return nullptr;
+}
+Scene* SceneManager::OpenScene(SceneAssetsData* data)
+{
+	Scene* scene = pSaveSystem->LoadScene(data);
+
+	UnloadScene();
+
+	loadSceneArray.push_back(scene);
+
+
+
+
+	return scene;
+}
+
+
+
 
 void SceneManager::UnloadScene(string name)
 {
 	for (Scene* scene : pWorld->GetActiveSceneList())
 	{
 		if (scene->GetName() == name)
+		{
+			unloadSceneArray.push_back(scene);
+			return;
+		}
+
+	}
+
+}
+
+void SceneManager::UnloadScene(Scene* scene)
+{
+	for (Scene* ascene : pWorld->GetActiveSceneList())
+	{
+		if (ascene == scene)
 		{
 			unloadSceneArray.push_back(scene);
 			return;
@@ -97,11 +167,6 @@ void SceneManager::UnloadScene(void)
 
 	}
 
-}
-
-vector<Scene*>& SceneManager::GetSceneArray(void)
-{
-	return this->sceneArray;
 }
 
 

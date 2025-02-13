@@ -173,8 +173,8 @@ XMVECTOR MeshData::GetBoxMax(void)
 void MeshData::LoadFbxFile(string fileName, AssetsManager* p)
 {
 	this->pAssetsManager = p;
-	this->fileName = fileName;
-	this->name = fileName;
+	this->SetName(fileName);
+	this->SetPath(fileName);
 	FbxManager* manager;
 	FbxIOSettings* ioSettings;
 	manager = FbxManager::Create();
@@ -193,7 +193,7 @@ void MeshData::LoadFbxFile(string fileName, AssetsManager* p)
 
 	FbxNode* root = scene->GetRootNode();
 	this->isRoot = TRUE;
-	this->index = pAssetsManager->AddMesh(this);
+	pAssetsManager->AddMesh(this);
 
 	for (int i = 0; i < root->GetChildCount(); i++)
 	{
@@ -227,12 +227,12 @@ void MeshData::LoadFbxMesh(FbxMesh* mesh,AssetsManager* ap,MeshData* parent)
 	using namespace fbxsdk;
 	this->pAssetsManager = ap;
 	FbxNode* node = mesh->GetNode();
-	name = mesh->GetNode()->GetName();
+	SetName(mesh->GetNode()->GetName());
 
 	this->parent = parent;
-	this->index = pAssetsManager->AddMesh(this);
+	pAssetsManager->AddMesh(this);
 	this->isRoot = FALSE;
-	this->fileName = parent->GetFileName();
+	this->path = parent->GetPath();
 
 	int PolygonNum = mesh->GetPolygonCount();               //‘ƒ|ƒŠƒSƒ“”
 	if (PolygonNum==0)
@@ -537,7 +537,7 @@ void MeshData::LoadFbxMesh(FbxMesh* mesh,AssetsManager* ap,MeshData* parent)
 
 				lambart->LoadFbxMaterial(fbxmaterial);
 
-				lambart->SetName(this->fileName + fbxmaterial->GetName());
+				lambart->SetName(this->GetName() + fbxmaterial->GetName());
 
 				this->material = pAssetsManager->LoadMaterial(lambart);
 
@@ -551,7 +551,7 @@ void MeshData::LoadFbxMesh(FbxMesh* mesh,AssetsManager* ap,MeshData* parent)
 
 				phong->LoadFbxMaterial(fbxmaterial);
 
-				phong->SetName(this->fileName + fbxmaterial->GetName());
+				phong->SetName(this->GetName() + fbxmaterial->GetName());
 
 
 				this->material = pAssetsManager->LoadMaterial(phong);
@@ -599,15 +599,6 @@ void MeshData::LoadFbxMesh(FbxMesh* mesh,AssetsManager* ap,MeshData* parent)
 
 }
 
-string MeshData::GetName(void)
-{
-	return this->name;
-}
-
-string MeshData::GetFileName(void)
-{
-	return this->fileName;
-}
 
 void MeshData::SetBoxMinMax(vector<XMFLOAT3> vertices)
 {

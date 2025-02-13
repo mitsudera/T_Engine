@@ -3,7 +3,6 @@
 #include "Scene.h"
 #include "GameEngine.h"
 #include "renderer.h"
-#include "CameraControllerComponent.h"
 
 DebugCamera::DebugCamera(Scene* scene)
 {
@@ -33,7 +32,6 @@ void DebugCamera::Awake(void)
 	cameraComponent->SetRenderTarget(pGameEngine->GetRenderer()->GetBackBuffer());
 	cameraComponent->SetDepthStencilView(pGameEngine->GetRenderer()->GetBackBufferDSV());
 
-	this->AddComponent<CameraControllerComponent>(); 
 
 }
 

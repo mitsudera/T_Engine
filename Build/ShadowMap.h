@@ -8,6 +8,8 @@ class Renderer;
 class CBufferManager;
 class GausianBlurShader;
 class World;
+class RenderTexture;
+
 struct ShadowCbuffer
 {
 	XMMATRIX wvpn;
@@ -51,10 +53,10 @@ private:
 	AssetsManager* pAssetsManager;
 	Renderer* pRenderer;
 	CBufferManager* pCBufferManager;
-	int shadowNearTextureIndex;
-	int shadowNearResultTextureIndex;
-	int shadowFarTextureIndex;
-	int shadowFarResultTextureIndex;
+	RenderTexture* shadowNearTexture;
+	RenderTexture* shadowNearResultTexture;
+	RenderTexture* shadowFarTexture;
+	RenderTexture* shadowFarResultTexture;
 	ShadowQuality quality;
 	ID3D11Buffer* shadowBuffer;
 	ShadowCbuffer shadowBufferStruct;

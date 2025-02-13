@@ -6,7 +6,9 @@
 class GameEngine;
 class World;
 class Scene;
-
+class SaveSystem;
+class SceneAssetsData;
+class AssetsManager;
 
 class SceneManager
 {
@@ -20,24 +22,32 @@ public:
 
 	void Update(void);
 
-	Scene* CreateScene(void);
-	Scene* CreateScene(string name);
+	Scene* CreateNewScene(void);
+	Scene* CreateNewScene(string name);
+	Scene* LoadScene(SceneAssetsData* data);
 
-	void LoadScene(string name);
+	Scene* LoadScene(string name);
+
+	Scene* OpenScene(string name);
+
+	Scene* OpenScene(SceneAssetsData* data);
+
 	void UnloadScene(string name);
+
+	void UnloadScene(Scene* scene);
 	void UnloadScene(void);
 
-	vector<Scene*>& GetSceneArray(void);
 
 
 private:
 	
 	GameEngine* pGameEngine;
 	World* pWorld;
-	vector<Scene*> sceneArray;
+	SaveSystem* pSaveSystem;
+	AssetsManager* pAssetsManager;
+
 	vector<Scene*> loadSceneArray;
 	vector<Scene*> unloadSceneArray;
-
 
 
 

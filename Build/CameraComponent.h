@@ -152,7 +152,6 @@ private:
 	int postEffectIndex;
 	BOOL postEffectEnable;
 	RenderTexture* renderTexture;
-	int renderTextureIndex;
 
 	void SetFrustumPlanes(void);
 	void SetFrustumCorners(void);

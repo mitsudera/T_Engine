@@ -78,9 +78,9 @@ void ShadowMap::CreateShadowMap(ShadowQuality quality)
 
 	}
 
-	this->shadowNearTextureIndex = pAssetsManager->CreateRenderTexture(w, h, "ShadowMapNear");
-	this->shadowNearResultTextureIndex = pAssetsManager->CreateRenderTexture(w, h, "ShadowMapNearResult");
-	this->shadowFarTextureIndex = pAssetsManager->CreateRenderTexture(w, h, "ShadowMapFar");
+	this->shadowNearTexture = pAssetsManager->CreateRenderTexture(w, h, "ShadowMapNear");
+	this->shadowNearResultTexture = pAssetsManager->CreateRenderTexture(w, h, "ShadowMapNearResult");
+	this->shadowFarTexture = pAssetsManager->CreateRenderTexture(w, h, "ShadowMapFar");
 
 	// ビューポートの設定
 	ViewPortShadowMap.TopLeftX = 0.0f;		// ビューポート領域の左上X座標。
@@ -162,15 +162,15 @@ void ShadowMap::ShadowMapping(void)
 
 	proj = XMMatrixOrthographicLH(vhwn, vhwn, vNear, vFar);
 	//proj = XMMatrixPerspectiveFovLH(90.0f, 1.0f, vNear, vFar);
-	pAssetsManager->GetRenderTexture(this->shadowNearTextureIndex)->ClearRTV(XMFLOAT4(1.0f, 1.0f, 1.0f,1.0f));
-	pAssetsManager->GetRenderTexture(this->shadowNearTextureIndex)->ClearDSV(1.0f);
+	this->shadowNearTexture->ClearRTV(XMFLOAT4(1.0f, 1.0f, 1.0f,1.0f));
+	this->shadowNearTexture->ClearDSV(1.0f);
 
 
 	ID3D11ShaderResourceView* nullSRV[1] = { nullptr };
 	pRenderer->GetDeviceContext()->PSSetShaderResources(3, 1, nullSRV);
 	pRenderer->GetDeviceContext()->PSSetShaderResources(4, 1, nullSRV);
 
-	pAssetsManager->GetRenderTexture(this->shadowNearTextureIndex)->SetRTV(RenderTexture::BindMode::BOTH, 0);
+	this->shadowNearTexture->SetRTV(RenderTexture::BindMode::BOTH, 0);
 
 
 	pRenderer->GetDeviceContext()->RSSetViewports(1,&ViewPortShadowMap);
@@ -238,27 +238,18 @@ void ShadowMap::ShadowMapping(void)
 		//分散シャドウマップならブラーをかける
 
 
-		blurShader->PostEffectDraw(pAssetsManager->GetRenderTexture(this->shadowNearTextureIndex)->GetSRV(), pAssetsManager->GetRenderTexture(this->shadowNearResultTextureIndex)->GetRenderTargetView());
-		pAssetsManager->GetRenderTexture(this->shadowNearResultTextureIndex)->SetPSSRV(RenderTexture::BindMode::Texture, 3);
+		blurShader->PostEffectDraw(this->shadowNearTexture->GetSRV(), this->shadowNearResultTexture->GetRenderTargetView());
+		this->shadowNearResultTexture->SetPSSRV(RenderTexture::BindMode::Texture, 3);
 
 	}
 	else
 	{
-		pAssetsManager->GetRenderTexture(this->shadowNearTextureIndex)->SetPSSRV(RenderTexture::BindMode::DepthTexture, 3);
+		this->shadowNearTexture->SetPSSRV(RenderTexture::BindMode::DepthTexture, 3);
 
 	}
 
 }
 
-int ShadowMap::GetNearShadowTexIndex(void)
-{
-	return this->shadowNearTextureIndex;
-}
-
-int ShadowMap::GetFarShadowTexIndex(void)
-{
-	return this->shadowFarTextureIndex;
-}
 
 void ShadowMap::SetFar(float vFar)
 {

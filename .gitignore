@@ -400,3 +400,4 @@ FodyWeavers.xsd
 # Custom
 !/data/MODEL/*.obj
 imgui.ini
+Build/Data/TEXTURE/aerial_rocks_nor.png

@@ -9,7 +9,7 @@ Material::Material()
 	assetsType = Assets::AssetsType::Material;
 	this->noDiffuseTex = 1;
 	this->noNormalTex = 1;
-	this->noArmTex = 1;
+	this->noSpecularTex = 1;
 	this->ambient = { 1.0f,1.0f,1.0f,1.0f };
 	this->diffuse= { 1.0f,1.0f,1.0f,1.0f };
 	this->specular= { 0.0f,0.0f,0.0f,0.0f };
@@ -57,7 +57,7 @@ void Material::LoadSpeculerTex(string fName)
 {
 	textureSpeculer = pAssetsManager->LoadTexture(fName);
 	this->spePath = textureSpeculer->GetPath();
-	this->noArmTex = 0;
+	this->noSpecularTex = 0;
 
 }
 

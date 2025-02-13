@@ -25,7 +25,7 @@ TerrainMaterial::TerrainMaterial(TerrainMaterial* terrain)
 	this->shininess = terrain->shininess;
 	this->noDiffuseTex = terrain->noDiffuseTex;
 	this->noNormalTex = terrain->noNormalTex;
-	this->noArmTex = terrain->noArmTex;
+	this->noSpecularTex = terrain->noSpecularTex;
 	this->textureDiffuse = terrain->textureDiffuse;
 	this->textureNormal = terrain->textureNormal;
 	this->textureSpeculer = terrain->textureSpeculer;
@@ -46,12 +46,12 @@ void TerrainMaterial::SetBufferMaterial(void)
 	mCBuffer.specular = this->specular;
 	mCBuffer.noDiffuseTex = this->noDiffuseTex;
 	mCBuffer.noNormalTex = this->noNormalTex;
-	mCBuffer.noArmTex = this->noArmTex;
+	mCBuffer.noArmTex = this->noSpecularTex;
 	this->pTerrainShader->SetMaterialCbuffer(mCBuffer);
 
 	if (!noDiffuseTex) textureDiffuse->SetShaderResourcePS(0);
 	if (!noNormalTex)textureNormal->SetShaderResourcePS(1);
-	if (!noArmTex) textureSpeculer->SetShaderResourcePS(2);
+	if (!noSpecularTex) textureSpeculer->SetShaderResourcePS(2);
 
 	TessCBuffer data;
 	data.cbEdgeFactor = tessEdgeFacter;

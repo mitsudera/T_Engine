@@ -3,6 +3,7 @@
 class GameEngine;
 class GameObject;
 class Scene;
+class Component;
 class ProjectSetting
 {
 public:
@@ -15,6 +16,9 @@ public:
 	GameObject* CreateGameObjectByTypeName(string typeName, Scene* scene);
 
 	GameObject* DynamicCreateGameObjectByTypeName(string typeName, Scene* scene);
+
+	Component* AddComponentByTypeName(string typeName, GameObject* gameObject);
+	Component* DynamicAddComponentByTypeName(string typeName, GameObject* gameObject);
 
 	template<class T>
 	T* CreateGameObject(Scene* scene);

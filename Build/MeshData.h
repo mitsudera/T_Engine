@@ -7,7 +7,7 @@
 #pragma once
 #include "CoreMinimal.h"
 #include "Renderer.h"
-
+#include "Assets.h"
 //*********************************************************
 //ƒNƒ‰ƒX’è‹`
 //*********************************************************
@@ -22,7 +22,7 @@ class Material;
 
 
 
- class MeshData
+ class MeshData:public Assets
  {
  public:
 	 MeshData();
@@ -50,8 +50,6 @@ class Material;
 
 	 void LoadFbxMesh(FbxMesh* mesh, AssetsManager* p,MeshData* parent);
 
-	 string GetName(void);
-	 string GetFileName(void);
 
 	 void SetBoxMinMax(vector<XMFLOAT3> vertices);
 
@@ -88,8 +86,6 @@ class Material;
 	 Material* shadowMaterial;
 	 BOOL isRoot;
 
-	 string name;
-	 string fileName;
 	 XMVECTOR boxMin;
 	 XMVECTOR boxMax;
 

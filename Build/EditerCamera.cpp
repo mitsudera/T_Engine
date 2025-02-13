@@ -37,7 +37,7 @@ EditerCamera::EditerCamera(World* world)
 	// 仮
 	this->aspect = 16.0f / 9.0f;	// アスペクト比 
 	this->angle = XMConvertToRadians(90.0f);	// 視野角
-	this->nearZ = 100.0f;
+	this->nearZ = 1.0f;
 	this->farZ = 10000.0f;
 
 	this->len = 50.0f;
@@ -110,14 +110,35 @@ void EditerCamera::Update(void)
 		y = (float)input->GetMouseY();
 
 
-		x *= 0.001f;
-		y *= 0.001f;
+		x *= dt*0.1f;
+		y *= dt*0.1f;
 
 		Rotate(x, yonevec());
 		Rotate(y, axisX);
 
 	}
+	else if (input->IsMouseCenterPressed())
+	{
+		float x, y;
 
+		x = (float)input->GetMouseX();
+		y = (float)input->GetMouseY();
+
+
+		x *= dt;
+		y *= dt;
+
+		Move(axisX, -x * 5.0f);
+		Move(axisY, y * 5.0f);
+
+	}
+
+	{
+		float wheel = (float)(input->GetMouseZ()) * 2.0f;
+		{
+			Move(axisZ, wheel * dt);
+		}
+	}
 
 	skyComArray.clear();
 	for (Scene* scene : pWorld->GetActiveSceneList())

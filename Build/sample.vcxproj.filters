@@ -243,9 +243,6 @@
     <ClInclude Include="renderer.h">
       <Filter>GameEngine\Renderer</Filter>
     </ClInclude>
-    <ClInclude Include="AssetsManager.h">
-      <Filter>GameEngine\Manager</Filter>
-    </ClInclude>
     <ClInclude Include="input.h">
       <Filter>GameEngine\Input</Filter>
     </ClInclude>
@@ -558,6 +555,15 @@
     <ClInclude Include="ImGuizmo\ImZoomSlider.h">
       <Filter>GameEngine\imgui</Filter>
     </ClInclude>
+    <ClInclude Include="SaveSystem.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="SceneAssetsData.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="AssetsManager.h">
+      <Filter>Assets</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp">
@@ -574,9 +580,6 @@
     </ClCompile>
     <ClCompile Include="renderer.cpp">
       <Filter>GameEngine\Renderer</Filter>
-    </ClCompile>
-    <ClCompile Include="AssetsManager.cpp">
-      <Filter>GameEngine\Manager</Filter>
     </ClCompile>
     <ClCompile Include="CameraComponent.cpp">
       <Filter>component\Camera</Filter>
@@ -877,6 +880,15 @@
     </ClCompile>
     <ClCompile Include="ImGuizmo\ImSequencer.cpp">
       <Filter>GameEngine\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="SaveSystem.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="SceneAssetsData.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="AssetsManager.cpp">
+      <Filter>Assets</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

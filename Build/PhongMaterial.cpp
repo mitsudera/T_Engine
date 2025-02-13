@@ -25,7 +25,7 @@ PhongMaterial::PhongMaterial(PhongMaterial* phong)
 	this->shininess = phong->shininess;
 	this->noDiffuseTex = phong->noDiffuseTex;
 	this->noNormalTex = phong->noNormalTex;
-	this->noArmTex = phong->noArmTex;
+	this->noSpecularTex = phong->noSpecularTex;
 	this->textureDiffuse = phong->textureDiffuse;
 	this->textureNormal = phong->textureNormal;
 	this->textureSpeculer = phong->textureSpeculer;
@@ -46,12 +46,12 @@ void PhongMaterial::SetBufferMaterial(void)
 	mCBuffer.specular = this->specular;
 	mCBuffer.noDiffuseTex = this->noDiffuseTex;
 	mCBuffer.noNormalTex = this->noNormalTex;
-	mCBuffer.noArmTex = this->noArmTex;
+	mCBuffer.noArmTex = this->noSpecularTex;
 	this->pPhongShader->SetMaterialCbuffer(mCBuffer);
 
 	if (!noDiffuseTex) textureDiffuse->SetShaderResourcePS(0);
 	if (!noNormalTex)textureNormal->SetShaderResourcePS(1);
-	if (!noArmTex) textureSpeculer->SetShaderResourcePS(2);
+	if (!noSpecularTex) textureSpeculer->SetShaderResourcePS(2);
 
 
 }
@@ -100,7 +100,7 @@ void PhongMaterial::LoadFbxMaterial(FbxSurfaceMaterial* fbxmaterial)
 
 	this->noDiffuseTex = true;
 	this->noNormalTex = true;
-	this->noArmTex = true;
+	this->noSpecularTex = true;
 
 
 	// プロパティ取得。

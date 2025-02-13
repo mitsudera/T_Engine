@@ -3,7 +3,6 @@
 #include "Scene.h"
 #include "GameEngine.h"
 #include "renderer.h"
-#include"CameraControllerComponent.h"
 
 Camera::Camera(Scene* scene)
 {

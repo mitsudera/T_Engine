@@ -3,6 +3,7 @@
 #include "ShaderSet.h"
 
 class Assets;
+class SceneAssetsData;
 
 class MeshData;
 
@@ -39,7 +40,12 @@ class NotEffectShader;
 class ComputeShader;
 class SkinMeshComputeShader;
 
+
+
+
 //debug
+
+
 
 class AssetsManager
 {
@@ -56,8 +62,7 @@ public:
 	list<Assets*>& GetAssetsList(void);
 
 	MeshData* LoadMeshFileFbx(string fileName);
-	int AddMesh(MeshData* data);
-	MeshData* GetMeshData(int n);
+	void AddMesh(MeshData* data);
 
 	SkinMeshTreeData* LoadSkinMeshFileFbx(string fileName);
 
@@ -107,38 +112,42 @@ public:
 	void SetShadowShader(ShaderSet::ShadowShaderIndex index);
 
 
-	int CreateRenderTexture(int widht, int height, string name);
-	int GetRenderTextureIndex(string name);
-	RenderTexture* GetRenderTexture(int index);
+	RenderTexture* CreateRenderTexture(int widht, int height, string name);
 
 	ShaderSet* GetShader(ShaderSet::ShaderIndex index);
 
-	void DeleteRenderTexture(int index);
+	void DeleteRenderTexture(RenderTexture* rt);
 
 	SkinMeshComputeShader* GetSkinMeshComputeShader(void);
+
+
+	list<SceneAssetsData*>& GetSceneAssetsDataList(void);
+
+	SceneAssetsData* CreateNewSceneAssets(string name);
 
 private:
 
 	GameEngine* pGameEngine;
+	list<string> sceneNameList;
 
 	list<Assets*> assetsList;
+	list<SceneAssetsData*> sceneAssetsList;
 
-	vector<MeshData*> MeshDataTree;//メッシュデータのルートの配列
-	vector<MeshData*> MeshDataArray;
-	vector<AnimationData*> AnimDataArray;
-	vector<RenderTexture*> RenderTextureArray;
-	vector<ShaderSet*> ShaderSetArray;
-	vector<PostEffectShader*> PostEffectShaderArray;
-	vector<ComputeShader*> ComputeShaderArray;
-	vector<SkinMeshTreeData*> SkinMeshTreeDataArray;
+	list<MeshData*> MeshDataTree;//メッシュデータのルートの配列
+	list<MeshData*> MeshDataList;
+	list<AnimationData*> AnimDataList;
+	list<RenderTexture*> RenderTextureList;
+	list<ShaderSet*> ShaderSetList;
+	list<PostEffectShader*> PostEffectShaderList;
+	list<ComputeShader*> ComputeShaderList;
+	list<SkinMeshTreeData*> SkinMeshTreeDataList;
 
 	//vector<KeyFrameAnimData*>  KeyFrameAnimDataArray;
 	//vector<SkinMeshDataList*> SkinMeshDataListArray;
 	//vector<SkeletonAnimData*> SkeletonAnimDataArray;
-	vector<Material*> MaterialArray;
-	vector<Material*> ShadowMaterialArray;
-
-	vector<DX11Texture*> TextureArray;
+	list<Material*> MaterialArray;
+	list<Material*> ShadowMaterialArray;
+	list<DX11Texture*> TextureList;
 
 
 	LambartShader* lambartShader;

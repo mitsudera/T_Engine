@@ -25,6 +25,7 @@
 #include "DebugLineShader.h"
 #include "StandardMaterial.h"
 #include "StandardShader.h"
+#include "SceneAssetsData.h"
 
 #define MESH_PATH "data/MODEL/mesh/"
 #define SKINMESH_PATH "data/MODEL/skinmesh/"
@@ -60,47 +61,46 @@ void AssetsManager::Awake(void)
 
 void AssetsManager::Uninit(void)
 {
-
-	for (int i = 0; i < this->MeshDataArray.size(); i++)
+	for (MeshData* data:MeshDataList)
 	{
-		if(this->MeshDataArray[i]) delete this->MeshDataArray[i];
+		delete data;
 
 	}
-	this->MeshDataArray.clear();
+	this->MeshDataList.clear();
 
-	for (int i = 0; i < this->SkinMeshTreeDataArray.size(); i++)
+	for (SkinMeshTreeData* data: SkinMeshTreeDataList)
 	{
-		if(this->SkinMeshTreeDataArray[i]) delete this->SkinMeshTreeDataArray[i];
+		delete data;
 
 	}
-	this->SkinMeshTreeDataArray.clear();
+	this->SkinMeshTreeDataList.clear();
 
 
-	for (AnimationData* data: AnimDataArray)
+	for (AnimationData* data: AnimDataList)
 	{
 		if (data) delete data;
 	}
-	AnimDataArray.clear();
+	AnimDataList.clear();
 
-	for (ShaderSet* data: ShaderSetArray)
+	for (ShaderSet* data: ShaderSetList)
 	{
 		data->Uninit();
 		if (data) delete data;
 	}
-	ShaderSetArray.clear();
+	ShaderSetList.clear();
 
-	for (PostEffectShader* data:PostEffectShaderArray)
+	for (PostEffectShader* data:PostEffectShaderList)
 	{
 		if (data) delete data;
 	}
-	PostEffectShaderArray.clear();
+	PostEffectShaderList.clear();
 
-	for (ComputeShader* data:ComputeShaderArray)
+	for (ComputeShader* data:ComputeShaderList)
 	{
 		data->Destroy();
 		if (data) delete data;
 	}
-	ComputeShaderArray.clear();
+	ComputeShaderList.clear();
 
 	for (Material* data:MaterialArray)
 	{
@@ -109,20 +109,20 @@ void AssetsManager::Uninit(void)
 	MaterialArray.clear();
 
 
-	for (RenderTexture* data : RenderTextureArray)
+	for (RenderTexture* data : RenderTextureList)
 	{
 		if (data) delete data;
 	}
-	RenderTextureArray.clear();
+	RenderTextureList.clear();
 
 
 
-
-	for (int i = 0; i < this->TextureArray.size(); i++)
+	for (DX11Texture* data : TextureList)
 	{
-		delete this->TextureArray[i];
+		delete data;
+
 	}
-	this->TextureArray.clear();
+	this->TextureList.clear();
 
 
 }
@@ -138,7 +138,7 @@ MeshData* AssetsManager::LoadMeshFileFbx(string fileName)
 	//既にロードしているデータか調べる
 	for (MeshData* mesh : MeshDataTree)
 	{
-		string filePath = mesh->GetFileName();
+		string filePath = mesh->GetPath();
 		if ((MESH_PATH + fileName) == filePath)
 		{
 			return mesh;
@@ -155,13 +155,13 @@ MeshData* AssetsManager::LoadMeshFileFbx(string fileName)
 AnimationData* AssetsManager::LoadAnimationData(string fileName)
 {
 
-	for (int i = 0; i < AnimDataArray.size(); i++)
+	for (AnimationData* data : AnimDataList)
 	{
 
-		string filePath = AnimDataArray[i]->GetFileName();
+		string filePath = data->GetFileName();
 		if ((fileName) == filePath)
 		{
-			return AnimDataArray[i];
+			return data;
 		}
 	}
 
@@ -169,21 +169,20 @@ AnimationData* AssetsManager::LoadAnimationData(string fileName)
 	AnimationData* animdata = new AnimationData;
 	string path = fileName;
 	animdata->LoadAnimation(path, this);
-	this->AnimDataArray.push_back(animdata);
+	this->AnimDataList.push_back(animdata);
 	return animdata;
 }
 
 AnimationData* AssetsManager::LoadAnimationData(string fileName1,string fileName2)
 {
 
-	for (int i = 0; i < AnimDataArray.size(); i++)
+	for (AnimationData* data : AnimDataList)
 	{
-
-		string filePath1 = AnimDataArray[i]->GetFileName();
-		string filePath2 = AnimDataArray[i]->GetFileNameSecond();
+		string filePath1 = data->GetFileName();
+		string filePath2 = data->GetFileNameSecond();
 		if (((fileName1) == filePath1)&&((fileName2) == filePath2))
 		{
-			return AnimDataArray[i];
+			return data;
 		}
 	}
 
@@ -192,26 +191,26 @@ AnimationData* AssetsManager::LoadAnimationData(string fileName1,string fileName
 	string path1 = fileName1;
 	string path2 = fileName2;
 	animdata->LoadAnimation(path1, path2, this);
-	this->AnimDataArray.push_back(animdata);
+	this->AnimDataList.push_back(animdata);
 	return animdata;
 }
 
 AnimationData* AssetsManager::LoadAnimationData(string fileName1, string fileName2, string fileName3, string fileName4)
 {
 
-	for (int i = 0; i < AnimDataArray.size(); i++)
+	for (AnimationData* data : AnimDataList)
 	{
 
-		string filePath1 = AnimDataArray[i]->GetFileName();
-		string filePath2 = AnimDataArray[i]->GetFileNameSecond();
-		string filePath3 = AnimDataArray[i]->GetFileName3();
-		string filePath4 = AnimDataArray[i]->GetFileName4();
+		string filePath1 = data->GetFileName();
+		string filePath2 = data->GetFileNameSecond();
+		string filePath3 = data->GetFileName3();
+		string filePath4 = data->GetFileName4();
 		if (((fileName1) == filePath1) 
 			&& ((fileName2) == filePath2)
 			&& ((fileName3) == filePath3)
 			&& ((fileName4) == filePath4))
 		{
-			return AnimDataArray[i];
+			return data;
 		}
 	}
 
@@ -222,28 +221,24 @@ AnimationData* AssetsManager::LoadAnimationData(string fileName1, string fileNam
 	string path3 = fileName3;
 	string path4 = fileName4;
 	animdata->LoadAnimation(path1, path2, path3, path4, this);
-	this->AnimDataArray.push_back(animdata);
+	this->AnimDataList.push_back(animdata);
 	return animdata;
 }
 
 
 
 
-int AssetsManager::AddMesh(MeshData* data)
+void AssetsManager::AddMesh(MeshData* data)
 {
-	MeshDataArray.push_back(data);
+	MeshDataList.push_back(data);
 
-	return (int)MeshDataArray.size()-1;
-}
-MeshData* AssetsManager::GetMeshData(int n)
-{
-	return this->MeshDataArray[n];
+	return ;
 }
 
 SkinMeshTreeData* AssetsManager::LoadSkinMeshFileFbx(string fileName)
 {
 	//既にロードしているデータか調べる
-	for (SkinMeshTreeData* skinMesh : SkinMeshTreeDataArray)
+	for (SkinMeshTreeData* skinMesh : SkinMeshTreeDataList)
 	{
 		string filePath = skinMesh->GetFileName();
 		if ((SKINMESH_PATH + fileName) == filePath)
@@ -255,7 +250,7 @@ SkinMeshTreeData* AssetsManager::LoadSkinMeshFileFbx(string fileName)
 	SkinMeshTreeData* skinMeshdata = new SkinMeshTreeData(this);
 	string path = SKINMESH_PATH + fileName;
 	skinMeshdata->LoadFbxFile(path);
-	this->SkinMeshTreeDataArray.push_back(skinMeshdata);
+	this->SkinMeshTreeDataList.push_back(skinMeshdata);
 	return skinMeshdata;
 }
 
@@ -269,7 +264,7 @@ GameEngine* AssetsManager::GetGameEngine(void)
 
 DX11Texture* AssetsManager::LoadTexture(string filepath)
 {
-	for (DX11Texture* tex : TextureArray)
+	for (DX11Texture* tex : TextureList)
 	{
 		if (filepath == tex->GetPath())
 		{
@@ -280,7 +275,7 @@ DX11Texture* AssetsManager::LoadTexture(string filepath)
 
 	DX11Texture* tex = new DX11Texture(this);
 	tex->CreateSRV(filepath);
-	this->TextureArray.push_back(tex);
+	this->TextureList.push_back(tex);
 	return tex;
 }
 
@@ -289,43 +284,43 @@ void AssetsManager::CreateAllShader(void)
 {
 	//
 	lambartShader = new LambartShader(this->pGameEngine->GetRenderer());
-	ShaderSetArray.push_back(lambartShader);
+	ShaderSetList.push_back(lambartShader);
 
 	phongShader = new PhongShader(this->pGameEngine->GetRenderer());
-	ShaderSetArray.push_back(phongShader);
+	ShaderSetList.push_back(phongShader);
 
 	uiShader = new UIShader(this->pGameEngine->GetRenderer());
-	ShaderSetArray.push_back(uiShader);
+	ShaderSetList.push_back(uiShader);
 
 	terrainShader = new TerrainShader(this->pGameEngine->GetRenderer());
-	ShaderSetArray.push_back(terrainShader);
+	ShaderSetList.push_back(terrainShader);
 
 	skinMeshPhongShader = new SkinMeshPhongShader(this->pGameEngine->GetRenderer());
-	ShaderSetArray.push_back(skinMeshPhongShader);
+	ShaderSetList.push_back(skinMeshPhongShader);
 	
 	standardShader = new StandardShader(this->pGameEngine->GetRenderer());
-	ShaderSetArray.push_back(standardShader);
+	ShaderSetList.push_back(standardShader);
 	
 	//shadow
 	shadowShader = new ShadowShader(this->pGameEngine->GetRenderer());
-	ShaderSetArray.push_back(shadowShader);
+	ShaderSetList.push_back(shadowShader);
 
 	skinMeshShadowShader = new SkinMeshShadowShader(this->pGameEngine->GetRenderer());
-	ShaderSetArray.push_back(skinMeshShadowShader);
+	ShaderSetList.push_back(skinMeshShadowShader);
 
 	//posteffect
 	gausianBlur = new GausianBlurShader(this->pGameEngine->GetRenderer());
-	PostEffectShaderArray.push_back(gausianBlur);
+	PostEffectShaderList.push_back(gausianBlur);
 
 	fadeShader = new FadeShader(this->pGameEngine->GetRenderer());
-	PostEffectShaderArray.push_back(fadeShader);
+	PostEffectShaderList.push_back(fadeShader);
 
 	notEffectShader = new NotEffectShader(this->pGameEngine->GetRenderer());
-	PostEffectShaderArray.push_back(notEffectShader);
+	PostEffectShaderList.push_back(notEffectShader);
 
 	//cs
 	skinMeshCompute = new SkinMeshComputeShader(this->pGameEngine->GetRenderer());
-	ComputeShaderArray.push_back(skinMeshCompute);
+	ComputeShaderList.push_back(skinMeshCompute);
 
 	
 }
@@ -449,51 +444,63 @@ void AssetsManager::SetShadowShader(ShaderSet::ShadowShaderIndex index)
 
 
 
-int AssetsManager::CreateRenderTexture(int widht, int height, string name)
+RenderTexture* AssetsManager::CreateRenderTexture(int widht, int height, string name)
 {
 	RenderTexture* rtex = new RenderTexture(this);
 	rtex->CreateRenderTexture(widht, height, name);
-	RenderTextureArray.push_back(rtex);
+	RenderTextureList.push_back(rtex);
 
 
 
-	return (int)RenderTextureArray.size() - 1;
+	return rtex;
 }
 
-int AssetsManager::GetRenderTextureIndex(string name)
-{
-
-	for (int i = 0; i < RenderTextureArray.size(); i++)
-	{
-		if (RenderTextureArray[i]->GetName() == name)
-		{
-			return i;
-		}
-	}
-
-	return -1;
-}
-
-RenderTexture* AssetsManager::GetRenderTexture(int index)
-{
-	return this->RenderTextureArray[index];
-}
 
 ShaderSet* AssetsManager::GetShader(ShaderSet::ShaderIndex index)
 {
-	return ShaderSetArray[index];
+	for (ShaderSet* shader : ShaderSetList)
+	{
+		if (shader->GetShaderIndex() == index)
+		{
+			return shader;
+		}
+	}
+
+	return nullptr;
 }
 
-void AssetsManager::DeleteRenderTexture(int index)
+void AssetsManager::DeleteRenderTexture(RenderTexture* rt)
 {
-	if(this->RenderTextureArray[index]) delete this->RenderTextureArray[index];
-	this->RenderTextureArray[index] = nullptr;
+	RenderTextureList.remove(rt);
+	delete rt;
+
 }
+
 
 SkinMeshComputeShader* AssetsManager::GetSkinMeshComputeShader(void)
 {
 	return skinMeshCompute;
 }
+
+list<SceneAssetsData*>& AssetsManager::GetSceneAssetsDataList(void)
+{
+	return sceneAssetsList;
+}
+
+SceneAssetsData* AssetsManager::CreateNewSceneAssets(string name)
+{
+	SceneAssetsData* newData = new SceneAssetsData(this);
+
+	newData->SetName(name);
+
+	this->sceneAssetsList.push_back(newData);
+	this->assetsList.push_back(newData);;
+
+
+	return newData;
+}
+
+
 
 Material* AssetsManager::LoadMaterial(Material* material)
 {

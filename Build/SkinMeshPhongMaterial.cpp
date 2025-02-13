@@ -25,7 +25,7 @@ SkinMeshPhongMaterial::SkinMeshPhongMaterial(SkinMeshPhongMaterial* phong)
 	this->shininess = phong->shininess;
 	this->noDiffuseTex = phong->noDiffuseTex;
 	this->noNormalTex = phong->noNormalTex;
-	this->noArmTex = phong->noArmTex;
+	this->noSpecularTex = phong->noSpecularTex;
 	this->textureDiffuse = phong->textureDiffuse;
 	this->textureNormal = phong->textureNormal;
 	this->textureSpeculer = phong->textureSpeculer;
@@ -46,12 +46,12 @@ void SkinMeshPhongMaterial::SetBufferMaterial(void)
 	mCBuffer.specular = this->specular;
 	mCBuffer.noDiffuseTex = this->noDiffuseTex;
 	mCBuffer.noNormalTex = this->noNormalTex;
-	mCBuffer.noArmTex = this->noArmTex;
+	mCBuffer.noArmTex = this->noSpecularTex;
 	this->pSkinMeshPhongShader->SetMaterialCbuffer(mCBuffer);
 
 	if (!noDiffuseTex) textureDiffuse->SetShaderResourcePS(0);
 	if (!noNormalTex)textureNormal->SetShaderResourcePS(1);
-	if (!noArmTex) textureSpeculer->SetShaderResourcePS(2);
+	if (!noSpecularTex) textureSpeculer->SetShaderResourcePS(2);
 
 
 }
@@ -100,7 +100,7 @@ void SkinMeshPhongMaterial::LoadFbxMaterial(FbxSurfaceMaterial* fbxmaterial)
 
 	this->noDiffuseTex = true;
 	this->noNormalTex = true;
-	this->noArmTex = true;
+	this->noSpecularTex = true;
 
 
 

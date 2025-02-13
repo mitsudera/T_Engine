@@ -18,6 +18,7 @@ class WicFactory;
 class DebugUtility;
 class World;
 class ProjectSetting;
+class SaveSystem;
 
 class GameEngine
 {
@@ -48,6 +49,8 @@ public:
 	SoundEngine* GetSoundEngine(void);
 	CBufferManager* GetCBufferManager(void);
 	ProjectSetting* GetProjectSetting(void);
+	World* GetWorld(void);
+	SaveSystem* GetSaveSystem(void);
 
 	void SetFullScreen(BOOL flag);
 
@@ -67,6 +70,11 @@ public:
 
 	BOOL GetEditerMode(void);
 
+	void SetEditerMode(BOOL b);
+
+	void TestPlay(void);
+
+	BOOL GetTestMode(void);
 private:
 
 	Main* main;
@@ -79,6 +87,7 @@ private:
 	ProjectSetting* projectSetting;
 	CBufferManager* cBufferManager;
 	World* world;
+	SaveSystem* saveSystem;
 
 	long oldMousePosX;
 	long oldMousePosY;
@@ -88,6 +97,7 @@ private:
 
 	BOOL fullscreen;
 	BOOL editerMode;
+	BOOL testMode;
 
 	Scene* nextScene;
 

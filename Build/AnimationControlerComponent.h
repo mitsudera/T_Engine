@@ -25,13 +25,14 @@ public:
 
 	float GetTimeCnt(void);
 	void SetTimeCnt(float cnt);
+	string GetName(void);
 
 protected:
 	AnimationControlerComponent* controler;
 	AssetsManager* pAssetsManager;
 	GameEngine* pGameEngine;
 	float timeCnt;
-
+	string name;
 
 };
 
@@ -41,7 +42,7 @@ public:
 	AnimationTransition(AnimationControlerComponent* controler);
 	~AnimationTransition();
 
-	void CreateTransition(AnimationNode* beforeAnimNode, AnimationNode* afterAnimNode, float transitionTime, int coditionIndex,BOOL needCondition);
+	void CreateTransition(AnimationNode* beforeAnimNode, AnimationNode* afterAnimNode, float transitionTime, string coditionName,BOOL needCondition);
 	void CreateExitTransition(AnimationNode* beforeAnimNode, AnimationNode* afterAnimNode, float transitionTime);
 
 	virtual void UpdateAnimation(GameObject* gameObject) override;
@@ -64,7 +65,7 @@ private:
 	float weight2;
 
 	BOOL needCondition;//移行条件trueになった時かfalseになった時か？
-	int needConditionIndex;//移行条件trueになった時かfalseになった時か？
+	string needConditionName;//移行条件trueになった時かfalseになった時か？
 
 
 	void UpdateMtx(MtxNode* node1, MtxNode* node2, GameObject* gameObject);
@@ -120,7 +121,6 @@ public:
 	void CreateNode(string fileName1,string fileName2,string fileName3,string fileName4, string name,BOOL loop);
 	void SetLoop(BOOL loop);
 	AnimationData* GetAnimData(void);
-	string GetName(void);
 
 
 	void AddTransition(AnimationTransition* transition);
@@ -139,7 +139,6 @@ private:
 	float exitTime;
 	BOOL animEnd;
 	BOOL loop;
-	string name;
 
 	Blend blend;
 
@@ -215,7 +214,6 @@ public:
 	void CreateCondition(string name, AnimParameter initValue);
 	void SetCondition(string name, BOOL setValue);
 	BOOL GetCondition(string name);
-	BOOL GetCondition(int index);
 
 
 	void SetActiveAnimation(Animation* animation);
@@ -238,17 +236,29 @@ public:
 	BOOL GetStop(void);
 
 	void StartForceTransition(string name,float time);
+
+	list<AnimationNode*>& GetAnimNodeList(void);
+	list<pair<AnimParameter, string>>& GetConditionList(void);
+
+	string GetLoadFileName(void);
+	void SetLoadFileName(string fName);
+
+	AnimationNode* GetDefaultNode(void);
+
 protected:
-	
+	string loadFileName;
+
 	AnimationForceTransition* fTransition;
 
 	void UpdateAnimation(MtxNode* node, GameObject* gameObject);
 
 	AssetsManager* pAssetsManager;
 
-	vector<AnimationNode*> AnimNodeArray;
+	AnimationNode* defaultNode;
 
-	vector<pair<AnimParameter,string>> conditionArray;
+	list<AnimationNode*> AnimNodeList;
+
+	list<pair<AnimParameter,string>> conditionList;
 
 	Animation* activeAnim;
 
@@ -260,7 +270,6 @@ protected:
 
 	BOOL frameBlendMode;
 
-	int defaultAnimIndex;
 
 	float blendWeight;
 

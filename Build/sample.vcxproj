@@ -94,6 +94,7 @@
       <ConformanceMode>false</ConformanceMode>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <AdditionalIncludeDirectories>$(SolutionDir)lib</AdditionalIncludeDirectories>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <AdditionalLibraryDirectories>$(SolutionDir)lib</AdditionalLibraryDirectories>
@@ -124,6 +125,7 @@
       <ConformanceMode>false</ConformanceMode>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <AdditionalIncludeDirectories>$(SolutionDir)lib</AdditionalIncludeDirectories>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
@@ -217,6 +219,8 @@
     <ClInclude Include="QuadComponent.h" />
     <ClInclude Include="RigidBodyComponent.h" />
     <ClInclude Include="RotBoxColliderComponent.h" />
+    <ClInclude Include="SaveSystem.h" />
+    <ClInclude Include="SceneAssetsData.h" />
     <ClInclude Include="SceneShareData.h" />
     <ClInclude Include="SkinMeshComponent.h" />
     <ClInclude Include="SkinMeshComputeShader.h" />
@@ -329,6 +333,8 @@
     <ClCompile Include="QuadComponent.cpp" />
     <ClCompile Include="RigidBodyComponent.cpp" />
     <ClCompile Include="RotBoxColliderComponent.cpp" />
+    <ClCompile Include="SaveSystem.cpp" />
+    <ClCompile Include="SceneAssetsData.cpp" />
     <ClCompile Include="SceneShareData.cpp" />
     <ClCompile Include="SkinMeshComponent.cpp" />
     <ClCompile Include="SkinMeshComputeShader.cpp" />

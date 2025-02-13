@@ -15,6 +15,7 @@
 #include "DebugUtility.h"
 #include "World.h"
 #include "ProjectSetting.h"
+#include "SaveSystem.h"
 
 GameEngine::GameEngine(Main* main)
 {
@@ -24,6 +25,7 @@ GameEngine::GameEngine(Main* main)
 	fixedDeltaTime = 1.0f / fixedDeltaTimeRate;
 
 	editerMode = TRUE;
+	testMode = FALSE;
 }
 
 GameEngine::~GameEngine()
@@ -35,6 +37,8 @@ void GameEngine::Awake()
 	
 	this->windowSize.x = screenWidth;
 	this->windowSize.y = screenHeight;
+
+	this->saveSystem = new SaveSystem(this);
 
 	this->projectSetting = new ProjectSetting(this);
 
@@ -191,6 +195,16 @@ ProjectSetting* GameEngine::GetProjectSetting(void)
 	return this->projectSetting;
 }
 
+World* GameEngine::GetWorld(void)
+{
+	return world;
+}
+
+SaveSystem* GameEngine::GetSaveSystem(void)
+{
+	return this->saveSystem;
+}
+
 Input* GameEngine::GetInput(void)
 {
 	return this->input;
@@ -265,6 +279,23 @@ float GameEngine::GetFixedDeltaTimeRate(void)
 BOOL GameEngine::GetEditerMode(void)
 {
 	return editerMode;
+}
+
+void GameEngine::SetEditerMode(BOOL b)
+{
+	editerMode = b;
+}
+
+void GameEngine::TestPlay(void)
+{
+	testMode = TRUE;
+	world->TestPlay();
+
+}
+
+BOOL GameEngine::GetTestMode(void)
+{
+	return testMode;
 }
 
 

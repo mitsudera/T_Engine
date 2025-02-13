@@ -19,7 +19,7 @@ World::World(GameEngine* gameEngine)
 	this->shadowMap = new ShadowMap(this);
 	this->shadowMap->CreateShadowMap(ShadowMap::ShadowQuality::High);
 	this->sceneManager = new SceneManager(this);
-	sceneManager->CreateScene("default")->Awake();
+	sceneManager->CreateNewScene("default");
 
 	if (pGameEngine->GetEditerMode())
 	{
@@ -34,6 +34,7 @@ World::~World()
 	for (Scene* scene : activeSceneList)
 	{
 		scene->Uninit();
+		delete scene;
 	}
 	delete sceneManager;
 
@@ -110,7 +111,7 @@ void World::Draw()
 	this->shadowMap->ShadowMapping();
 
 
-	if (!pGameEngine->GetEditerMode())
+	if (pGameEngine->GetEditerMode()==FALSE)
 	{
 		for (Scene* scene : activeSceneList)
 		{
@@ -118,11 +119,23 @@ void World::Draw()
 		}
 
 
+
 	}
 	else
 	{
+		if (pGameEngine->GetTestMode())
+		{
+			for (Scene* scene : activeSceneList)
+			{
+				scene->Draw();
+			}
 
-		editerCamera->Render();
+		}
+		else
+		{
+			editerCamera->Render();
+
+		}
 		gui->Draw();
 
 	}
@@ -148,7 +161,9 @@ void World::UnloadScene(Scene* scene)
 			continue;
 
 		s->Uninit();
+		delete s;
 	}
+
 }
 
 GameEngine* World::GetGameEngine(void)
@@ -195,5 +210,15 @@ CameraComponent* World::GetMainCamera(void)
 EditerCamera* World::GetEditerCamera(void)
 {
 	return this->editerCamera;
+}
+
+void World::TestPlay(void)
+{
+	for (Scene* scene : activeSceneList)
+	{
+
+		scene->Init();
+	}
+
 }
 

@@ -1,6 +1,7 @@
 #pragma once
 #include "gameobject.h"
 
+
 class SceneManager;
 class GameEngine;
 class CollisionManager;
@@ -9,6 +10,7 @@ class PrimitiveComponent;
 class RigidBodyComponent;
 class World;
 class ProjectSetting;
+class SceneAssetsData;
 
 class Scene:public Object
 {
@@ -17,7 +19,7 @@ public:
 	Scene();
 	Scene(World* world);
 	~Scene();
-
+	void LoadSave(string fileName);
 
 	virtual void Awake();
 
@@ -34,6 +36,7 @@ public:
 
 	GameObject* DynamicCreateGameObjectByTypeName(string typeName);
 	GameObject* CreateGameObjectByTypeName(string typeName);
+	GameObject* CreateGameObject(void);
 
 	void AddGameObject(GameObject* gameObject);
 	void RemoveGameObject(GameObject* gameObject);
@@ -44,6 +47,8 @@ public:
 	GameEngine* GetGameEngine(void);
 
 	list <GameObject*>& GetGameObject(void);
+	list <GameObject*>& GetAllGameObject(void);
+	void AddAllGameObject(GameObject* gameObject);
 
 	GameObject* GetGameObjectName(string name);
 
@@ -54,6 +59,8 @@ public:
 
 	template<class T>
 	T* GetGameObject(void);
+
+	GameObject* GetGameObject(unsigned long id);
 
 	GameObject* CreateDefaultGameObject(string type);
 
@@ -72,21 +79,41 @@ public:
 	void RemoveScenePrimitiveComponent(PrimitiveComponent* com);
 	void RemoveSceneRigidBodyComponent(RigidBodyComponent* com);
 
-	virtual void SetName(string name, int count) override;
 	virtual void SetName(string name) override;
+	virtual string GetName(void) override;
+
+
+
+	unsigned long GetNotUseId(void);
+	list<unsigned long>& GetNotUseIDList(void);
+
+	void SetNotUseID(unsigned long id);
+	void SetIDCnt(unsigned long idCnt);
+
+	unsigned long GetIDCnt(void);
+
+	SceneAssetsData* GetSceneAssetsData(void);
+
+	void SetSceneAssetsData(SceneAssetsData* data);
+
 
 protected:
 	GameEngine* pGameEngine;
 	World* pWorld;
 	SceneManager* pSceneManager;
 	ProjectSetting* pProjectSetting;
+	SceneAssetsData* sceneAssets;
 	list <GameObject*> gameObjectList;
 	list <CameraComponent*> cameraList;
+	list <GameObject*> allGameObjectList;
 	float sceneTime;
 	list<Component*> allComponent;
 	list<TransformComponent*> allTransformComponent;
 	list<PrimitiveComponent*> allPrimitiveComponent;
 	list<RigidBodyComponent*> allRigidBodyComponent;
+	unsigned long idCnt;
+	list<unsigned long> notUseIDList;
+
 
 };
 

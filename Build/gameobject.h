@@ -62,7 +62,9 @@ public:
 
 	void Destroy(void);
 	
-	
+	void DeleteChild(GameObject* gameObject);
+	void DeleteComponnt(Component* com);
+
 	Scene* GetScene(void);
 	World* GetWorld(void);
 	GameEngine* GetGameEngine(void);
@@ -82,10 +84,10 @@ public:
 
 	GameObject* GetChild(int index);
 	GameObject* GetChild(string name);
-	vector<GameObject*>& GetChild();
+	list<GameObject*>& GetChild();
 	GameObject* SerchAllChild(string name);
 
-	vector<Component*>& GetComponentList(void);
+	list<Component*>& GetComponentList(void);
 
 	//指定したアトリビュートを持つコンポーネントの中でn番目のコンポーネントのポインタを取得
 	Component* GetComponentAttrbute(Component::Attribute attr, int n);
@@ -96,6 +98,11 @@ public:
 	template<class T>
 	T* AddComponent(void);
 
+	template<class T>
+	T* DynamicAddComponent(void);
+
+	Component* AddComponentByTypeName(string typeName);
+	Component* DynamicAddComponentByTypeName(string typeName);
 
 
 	void SetHasShadowAll(BOOL b);
@@ -136,6 +143,8 @@ public:
 	virtual void SetName(string name, int count) override;
 	virtual void SetName(string name) override;
 
+	void SetID(void);
+	void SetID(unsigned long id);
 
 protected:
 	Scene* pScene;
@@ -144,7 +153,7 @@ protected:
 	ProjectSetting* pProjectSetting;
 	TransformComponent* transformComponent;
 
-	vector<Component*> componentList;
+	list<Component*> componentList;
 
 	ObjectTag tag;
 	Layer layer;
@@ -154,7 +163,7 @@ protected:
 	BOOL isActive;
 
 	GameObject* parent;
-	vector <GameObject*> childList;
+	list <GameObject*> childList;
 
 };
 
@@ -181,5 +190,18 @@ T* GameObject::AddComponent(void)
 
 	Component* c = dynamic_cast<Component*>(com);
 	c->Awake();
+	return com;
+}
+
+template<class T>
+T* GameObject::DynamicAddComponent(void)
+{
+	T* com = new T(this);
+
+	this->componentList.push_back(com);
+
+	Component* c = dynamic_cast<Component*>(com);
+	c->Awake();
+	c->Init();
 	return com;
 }

@@ -14,7 +14,7 @@ LambartMaterial::LambartMaterial(AssetsManager* assetsManager)
 	this->diffuse = { 1.0f,1.0f,1.0f,1.0f };
 	this->noDiffuseTex = 1;
 	this->noNormalTex = 1;
-	this->noArmTex = 1;
+	this->noSpecularTex = 1;
 	this->textureDiffuse = 0;
 	this->textureNormal = 0;
 	this->textureSpeculer = 0;
@@ -32,7 +32,7 @@ LambartMaterial::LambartMaterial(LambartMaterial* lambart)
 	this->diffuse = lambart->diffuse;
 	this->noDiffuseTex = lambart->noDiffuseTex;
 	this->noNormalTex = lambart->noNormalTex;
-	this->noArmTex = lambart->noArmTex;
+	this->noSpecularTex = lambart->noSpecularTex;
 	this->textureDiffuse = lambart->textureDiffuse;
 	this->textureNormal = lambart->textureNormal;
 	this->textureSpeculer = lambart->textureSpeculer;
@@ -51,12 +51,12 @@ void LambartMaterial::SetBufferMaterial(void)
 	mCBuffer.diffuse = this->diffuse;
 	mCBuffer.noDiffuseTex = this->noDiffuseTex;
 	mCBuffer.noNormalTex = this->noNormalTex;
-	mCBuffer.noArmTex = this->noArmTex;
+	mCBuffer.noArmTex = this->noSpecularTex;
 	this->pLambartShader->SetMaterialCbuffer(mCBuffer);
 
 	if (!noDiffuseTex) textureDiffuse->SetShaderResourcePS(0);
 	if (!noNormalTex)textureNormal->SetShaderResourcePS(1);
-	if (!noArmTex) textureSpeculer->SetShaderResourcePS(2);
+	if (!noSpecularTex) textureSpeculer->SetShaderResourcePS(2);
 
 
 }
@@ -91,7 +91,7 @@ void LambartMaterial::LoadFbxMaterial(FbxSurfaceMaterial* fbxmaterial)
 
 	this->noDiffuseTex = true;
 	this->noNormalTex = true;
-	this->noArmTex = true;
+	this->noSpecularTex = true;
 
 
 	// プロパティ取得。

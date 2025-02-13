@@ -114,8 +114,7 @@ void CameraComponent::Awake(void)
 	SetViewPort(VIEWPORT_TYPE::TYPE_FULL_SCREEN);
 	this->mtxProj = XMMatrixPerspectiveFovLH(this->angle, this->aspect, this->nearZ, this->farZ);
 
-	renderTextureIndex= pGameEngine->GetAssetsManager()->CreateRenderTexture((int)1920.0f, (int)1080.0f, "cameraRT");
-	renderTexture = pGameEngine->GetAssetsManager()->GetRenderTexture(renderTextureIndex);
+	renderTexture = pGameEngine->GetAssetsManager()->CreateRenderTexture((int)1920.0f, (int)1080.0f, "cameraRT");
 	postEffectIndex = 0;
 
 }
@@ -137,7 +136,7 @@ void CameraComponent::Uninit(void)
 {
 	Component::Uninit();
 
-	pGameEngine->GetAssetsManager()->DeleteRenderTexture(renderTextureIndex);
+	pGameEngine->GetAssetsManager()->DeleteRenderTexture(renderTexture);
 	this->cameraBuffer->Release();
 }
 

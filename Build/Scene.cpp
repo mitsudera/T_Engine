@@ -11,6 +11,8 @@
 #include "SkySphere.h"
 #include "SceneManager.h"
 #include "ProjectSetting.h"
+#include "SaveSystem.h"
+#include "SceneAssetsData.h"
 
 Scene::Scene()
 {
@@ -29,10 +31,15 @@ Scene::~Scene()
 
 }
 
+void Scene::LoadSave(string fileName)
+{
+}
+
 void Scene::Awake()
 {
 	sceneTime = 0.0f;
 	type = Type::Scene;
+	idCnt = 0;
 }
 
 void Scene::Init(void)
@@ -201,6 +208,13 @@ GameObject* Scene::CreateGameObjectByTypeName(string typeName)
 	return newObj;
 }
 
+GameObject* Scene::CreateGameObject(void)
+{
+	GameObject* newObj = pProjectSetting->CreateGameObject<GameObject>(this);
+	AddGameObject(newObj);
+	return newObj;
+}
+
 void Scene::AddGameObject(GameObject* gameObject)
 {
 	for (GameObject* obj : gameObjectList)
@@ -247,6 +261,16 @@ list<GameObject*>& Scene::GetGameObject(void)
 	return this->gameObjectList;
 }
 
+list<GameObject*>& Scene::GetAllGameObject(void)
+{
+	return allGameObjectList;
+}
+
+void Scene::AddAllGameObject(GameObject* gameObject)
+{
+	allGameObjectList.push_back(gameObject);
+}
+
 GameObject* Scene::GetGameObjectName(string name)
 {
 	for (GameObject* object:gameObjectList)
@@ -273,6 +297,21 @@ float Scene::GetSceneTime(void)
 }
 
 
+
+GameObject* Scene::GetGameObject(unsigned long id)
+{
+	for (GameObject* gameObject : allGameObjectList)
+	{
+		if (gameObject->GetID() == id)
+		{
+			return gameObject;
+
+		}
+
+	}
+
+	return nullptr;
+}
 
 GameObject* Scene::CreateDefaultGameObject(string type)
 {
@@ -339,47 +378,62 @@ void Scene::RemoveSceneRigidBodyComponent(RigidBodyComponent* com)
 	allRigidBodyComponent.remove(com);
 }
 
-void Scene::SetName(string name, int count)
-{
-	if (name.empty())
-	{
-		name = "Scene";
-	}
-
-	if (pSceneManager->GetSceneArray().empty())
-	{
-		Object::SetName(name,0);
-		return;
-	}
-	// 名前が重複しないことを確認
-	for (Scene* scene : pSceneManager->GetSceneArray())
-	{
-		if (count == 0)
-		{
-			if (scene->GetName() == name)
-			{
-				SetName(name, count + 1);
-				return;
-			}
-
-		}
-		else
-		{
-			if (scene->GetName() == name + "(" + to_string(count) + ")")
-			{
-				SetName(name, count + 1);
-				return;
-			}
-
-		}
-
-	}
-
-	Object::SetName(name, count);
-	return;
-}
 
 void Scene::SetName(string name)
 {
-	SetName(name, 0);
+	sceneAssets->SetName(name);
+	Object::SetName(sceneAssets->GetName());
 }
+
+string Scene::GetName(void)
+{
+	return sceneAssets->GetName();
+}
+
+unsigned long Scene::GetNotUseId(void)
+{
+	if (notUseIDList.empty())
+	{
+		idCnt++;
+
+		return idCnt;
+	}
+	else
+	{
+		unsigned long id = notUseIDList.front();
+		notUseIDList.pop_front();
+		return id;
+	}
+}
+
+list<unsigned long>& Scene::GetNotUseIDList(void)
+{
+	return notUseIDList;
+}
+
+void Scene::SetNotUseID(unsigned long id)
+{
+	notUseIDList.push_back(id);
+}
+
+void Scene::SetIDCnt(unsigned long idCnt)
+{
+	this->idCnt = idCnt;
+}
+
+unsigned long Scene::GetIDCnt(void)
+{
+	return idCnt;
+}
+
+SceneAssetsData* Scene::GetSceneAssetsData(void)
+{
+	return this->sceneAssets;
+}
+
+void Scene::SetSceneAssetsData(SceneAssetsData* data)
+{
+	this->sceneAssets = data;
+}
+
+

@@ -23,6 +23,8 @@ void Assets::SetName(string name, int count)
 	// 名前が重複しないことを確認
 	for (Assets* assets : pAssetsManager->GetAssetsList())
 	{
+		if (assets->GetAssetsType() != assetsType)
+			continue;
 
 		if (count == 0)
 		{
@@ -69,6 +71,11 @@ void Assets::SetName(string name, int count)
 void Assets::SetName(string name)
 {
 	Object::SetName(name);
+}
+
+void Assets::SetPath(string path)
+{
+	this->path = path;
 }
 
 string Assets::GetPath(void)

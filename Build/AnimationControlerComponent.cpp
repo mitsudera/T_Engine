@@ -24,8 +24,8 @@ AnimationControlerComponent::~AnimationControlerComponent()
 void AnimationControlerComponent::Awake(void)
 {
 	Component::Awake();
-	defaultAnimIndex = 0;
 	fTransition = new AnimationForceTransition(this);
+	loadFileName = "";
 }
 
 void AnimationControlerComponent::Init(void)
@@ -33,15 +33,18 @@ void AnimationControlerComponent::Init(void)
 	Component::Init();
 	angle = 0.0f;
 	timeCnt = 0.0f;
+	activeAnim = defaultNode;
 }
 
 void AnimationControlerComponent::Update(void)
 {
 	Component::Update();
+	if (!activeAnim)
+		return;
 
 	this->activeAnim->UpdateAnimation(pGameObject);
 
-	for (pair<AnimParameter, string>& condition : conditionArray)
+	for (pair<AnimParameter, string>& condition : conditionList)
 	{
 		if (condition.first.isTrigger)
 		{
@@ -54,7 +57,7 @@ void AnimationControlerComponent::Uninit(void)
 {
 	Component::Uninit();
 	delete fTransition;
-	for (AnimationNode* node : AnimNodeArray)
+	for (AnimationNode* node : AnimNodeList)
 	{
 		delete node;
 	}
@@ -64,15 +67,16 @@ void AnimationControlerComponent::LoadDefaulAnimation(string fileName, string na
 {
 	AnimationNode* node = new AnimationNode(this);
 	node->CreateNode(fileName, name, TRUE);
+	defaultNode = node;
 	activeAnim = node;
-	AnimNodeArray.push_back(node);
+	AnimNodeList.push_back(node);
 }
 
 void AnimationControlerComponent::LoadAnimation(string fileName, string name, BOOL loop)
 {
 	AnimationNode* node = new AnimationNode(this);
 	node->CreateNode(fileName, name, loop);
-	AnimNodeArray.push_back(node);
+	AnimNodeList.push_back(node);
 	
 }
 
@@ -80,7 +84,7 @@ void AnimationControlerComponent::LoadAnimation(string fileName1, string fileNam
 {
 	AnimationNode* node = new AnimationNode(this);
 	node->CreateNode(fileName1, fileName2, name, loop);
-	AnimNodeArray.push_back(node);
+	AnimNodeList.push_back(node);
 
 }
 
@@ -88,7 +92,7 @@ void AnimationControlerComponent::LoadAnimation(string fileNameFront, string fil
 {
 	AnimationNode* node = new AnimationNode(this);
 	node->CreateNode(fileNameFront, fileNameRight, fileNameBack, fileNameLeft, name, loop);
-	AnimNodeArray.push_back(node);
+	AnimNodeList.push_back(node);
 
 }
 
@@ -103,7 +107,7 @@ void AnimationControlerComponent::CreateTransition(
 	AnimationNode* beforeNode = nullptr;
 	AnimationNode* afterNode = nullptr;
 
-	for (AnimationNode* node:AnimNodeArray)
+	for (AnimationNode* node:AnimNodeList)
 	{
 		if (node->GetName()==beforeAnimName)
 		{
@@ -115,7 +119,7 @@ void AnimationControlerComponent::CreateTransition(
 	if (beforeNode == nullptr)
 		return;
 
-	for (AnimationNode* node:AnimNodeArray)
+	for (AnimationNode* node:AnimNodeList)
 	{
 		if (node->GetName()==afterAnimName)
 		{
@@ -126,20 +130,9 @@ void AnimationControlerComponent::CreateTransition(
 	if (afterNode == nullptr)
 		return;
 
-	int conditionIndex = -1;
-	for (int i = 0; i < conditionArray.size(); i++)
-	{
-		if (conditionArray[i].second==conditionName)
-		{
-			conditionIndex = i;
-
-		}
-	}
-	if (conditionIndex == -1)
-		return;
 
 	AnimationTransition* transition = new AnimationTransition(this);
-	transition->CreateTransition(beforeNode, afterNode, transitionTime, conditionIndex, needCondition);
+	transition->CreateTransition(beforeNode, afterNode, transitionTime, conditionName, needCondition);
 	beforeNode->AddTransition(transition);
 }
 
@@ -148,7 +141,7 @@ void AnimationControlerComponent::CreateTransition(string beforeAnimName, string
 	AnimationNode* beforeNode = nullptr;
 	AnimationNode* afterNode = nullptr;
 
-	for (AnimationNode* node : AnimNodeArray)
+	for (AnimationNode* node : AnimNodeList)
 	{
 		if (node->GetName() == beforeAnimName)
 		{
@@ -160,7 +153,7 @@ void AnimationControlerComponent::CreateTransition(string beforeAnimName, string
 	if (beforeNode == nullptr)
 		return;
 
-	for (AnimationNode* node : AnimNodeArray)
+	for (AnimationNode* node : AnimNodeList)
 	{
 		if (node->GetName() == afterAnimName)
 		{
@@ -171,22 +164,11 @@ void AnimationControlerComponent::CreateTransition(string beforeAnimName, string
 	if (afterNode == nullptr)
 		return;
 
-	int conditionIndex = -1;
-	for (int i = 0; i < conditionArray.size(); i++)
-	{
-		if (conditionArray[i].second == conditionName)
-		{
-			conditionIndex = i;
-
-		}
-	}
-	if (conditionIndex == -1)
-		return;
 
 	float transitionTime = ((float)transitionFrame) / 60.0f;
 
 	AnimationTransition* transition = new AnimationTransition(this);
-	transition->CreateTransition(beforeNode, afterNode, transitionTime, conditionIndex, needCondition);
+	transition->CreateTransition(beforeNode, afterNode, transitionTime, conditionName, needCondition);
 	beforeNode->AddTransition(transition);
 
 }
@@ -196,7 +178,7 @@ void AnimationControlerComponent::CreateTransition(string beforeAnimName, string
 	AnimationNode* beforeNode = nullptr;
 	AnimationNode* afterNode = nullptr;
 
-	for (AnimationNode* node : AnimNodeArray)
+	for (AnimationNode* node : AnimNodeList)
 	{
 		if (node->GetName() == beforeAnimName)
 		{
@@ -208,7 +190,7 @@ void AnimationControlerComponent::CreateTransition(string beforeAnimName, string
 	if (beforeNode == nullptr)
 		return;
 
-	for (AnimationNode* node : AnimNodeArray)
+	for (AnimationNode* node : AnimNodeList)
 	{
 		if (node->GetName() == afterAnimName)
 		{
@@ -219,20 +201,10 @@ void AnimationControlerComponent::CreateTransition(string beforeAnimName, string
 	if (afterNode == nullptr)
 		return;
 
-	int conditionIndex = -1;
-	for (int i = 0; i < conditionArray.size(); i++)
-	{
-		if (conditionArray[i].second == conditionName)
-		{
-			conditionIndex = i;
-		}
-	}
-	if (conditionIndex == -1)
-		return;
 
 
 	AnimationTransition* transition = new AnimationTransition(this);
-	transition->CreateTransition(beforeNode, afterNode, 0.25f, conditionIndex, needCondition);
+	transition->CreateTransition(beforeNode, afterNode, 0.25f, conditionName, needCondition);
 	beforeNode->AddTransition(transition);
 
 }
@@ -246,7 +218,7 @@ void AnimationControlerComponent::CreateNotLoopAnimExitTransition(
 	AnimationNode* beforeNode = nullptr;
 	AnimationNode* afterNode = nullptr;
 
-	for (AnimationNode* node : AnimNodeArray)
+	for (AnimationNode* node : AnimNodeList)
 	{
 		if (node->GetName() == beforeAnimName)
 		{
@@ -258,7 +230,7 @@ void AnimationControlerComponent::CreateNotLoopAnimExitTransition(
 	if (beforeNode == nullptr)
 		return;
 
-	for (AnimationNode* node : AnimNodeArray)
+	for (AnimationNode* node : AnimNodeList)
 	{
 		if (node->GetName() == afterAnimName)
 		{
@@ -281,7 +253,7 @@ void AnimationControlerComponent::CreateNotLoopAnimExitTransition(string beforeA
 	AnimationNode* beforeNode = nullptr;
 	AnimationNode* afterNode = nullptr;
 
-	for (AnimationNode* node : AnimNodeArray)
+	for (AnimationNode* node : AnimNodeList)
 	{
 		if (node->GetName() == beforeAnimName)
 		{
@@ -293,7 +265,7 @@ void AnimationControlerComponent::CreateNotLoopAnimExitTransition(string beforeA
 	if (beforeNode == nullptr)
 		return;
 
-	for (AnimationNode* node : AnimNodeArray)
+	for (AnimationNode* node : AnimNodeList)
 	{
 		if (node->GetName() == afterAnimName)
 		{
@@ -317,7 +289,7 @@ void AnimationControlerComponent::CreateNotLoopAnimExitTransition(string beforeA
 	AnimationNode* beforeNode = nullptr;
 	AnimationNode* afterNode = nullptr;
 
-	for (AnimationNode* node : AnimNodeArray)
+	for (AnimationNode* node : AnimNodeList)
 	{
 		if (node->GetName() == beforeAnimName)
 		{
@@ -329,7 +301,7 @@ void AnimationControlerComponent::CreateNotLoopAnimExitTransition(string beforeA
 	if (beforeNode == nullptr)
 		return;
 
-	for (AnimationNode* node : AnimNodeArray)
+	for (AnimationNode* node : AnimNodeList)
 	{
 		if (node->GetName() == afterAnimName)
 		{
@@ -412,7 +384,7 @@ BOOL AnimationControlerComponent::GetStop(void)
 void AnimationControlerComponent::StartForceTransition(string name, float time)
 {
 	AnimationNode* anode = nullptr;
-	for (AnimationNode* node : AnimNodeArray)
+	for (AnimationNode* node : AnimNodeList)
 	{
 		if (node->GetName() == name)
 		{
@@ -426,6 +398,33 @@ void AnimationControlerComponent::StartForceTransition(string name, float time)
 	
 	fTransition->StartTransition(anode, 0.0f, time);
 }
+
+list<AnimationNode*>& AnimationControlerComponent::GetAnimNodeList(void)
+{
+	return AnimNodeList;
+}
+
+list<pair<AnimParameter, string>>& AnimationControlerComponent::GetConditionList(void)
+{
+	return conditionList;
+}
+
+string AnimationControlerComponent::GetLoadFileName(void)
+{
+	return loadFileName;
+}
+
+void AnimationControlerComponent::SetLoadFileName(string fName)
+{
+	loadFileName = fName;
+}
+
+AnimationNode* AnimationControlerComponent::GetDefaultNode(void)
+{
+	return defaultNode;
+}
+
+
 
 
 void AnimationControlerComponent::UpdateAnimation(MtxNode* node, GameObject* gameObject)
@@ -456,12 +455,12 @@ void AnimationControlerComponent::CreateCondition(string name, AnimParameter ini
 {
 
 
-	conditionArray.push_back(make_pair(initValue, name));
+	conditionList.push_back(make_pair(initValue, name));
 
 }
 void AnimationControlerComponent::SetCondition(string name, BOOL setValue)
 {
-	for (pair<AnimParameter,string>& condition:conditionArray)
+	for (pair<AnimParameter,string>& condition:conditionList)
 	{
 		if (condition.second == name)
 		{
@@ -472,7 +471,7 @@ void AnimationControlerComponent::SetCondition(string name, BOOL setValue)
 
 BOOL AnimationControlerComponent::GetCondition(string name)
 {
-	for (pair<AnimParameter, string> condition : conditionArray)
+	for (pair<AnimParameter, string> condition : conditionList)
 	{
 		if (condition.second == name)
 		{
@@ -482,10 +481,6 @@ BOOL AnimationControlerComponent::GetCondition(string name)
 	return 0;
 }
 
-BOOL AnimationControlerComponent::GetCondition(int index)
-{
-	return this->conditionArray[index].first.value;
-}
 
 void AnimationControlerComponent::SetActiveAnimation(Animation* animation)
 {
@@ -503,15 +498,16 @@ AnimationTransition::~AnimationTransition()
 {
 }
 
-void AnimationTransition::CreateTransition(AnimationNode* beforeAnimNode, AnimationNode* afterAnimNode, float transitionTime, int coditionIndex,BOOL needCondition)
+void AnimationTransition::CreateTransition(AnimationNode* beforeAnimNode, AnimationNode* afterAnimNode, float transitionTime, string coditionName,BOOL needCondition)
 {
 	this->beforeAnimNode = beforeAnimNode;
 	this->beforeAnimData = beforeAnimNode->GetAnimData();
 	this->afterAnimNode = afterAnimNode;
 	this->afterAnimData = afterAnimNode->GetAnimData();
 	this->transitionTime = transitionTime;
-	this->needConditionIndex = coditionIndex;
+	this->needConditionName = coditionName;
 	this->needCondition = needCondition;
+	this->name = beforeAnimNode->GetName() + "To" + afterAnimNode->GetName();
 }
 
 void AnimationTransition::CreateExitTransition(AnimationNode* beforeAnimNode, AnimationNode* afterAnimNode, float transitionTime)
@@ -521,6 +517,7 @@ void AnimationTransition::CreateExitTransition(AnimationNode* beforeAnimNode, An
 	this->afterAnimNode = afterAnimNode;
 	this->afterAnimData = afterAnimNode->GetAnimData();
 	this->transitionTime = transitionTime;
+	this->name = beforeAnimNode->GetName() + "Exit" + afterAnimNode->GetName();
 
 }
 
@@ -574,7 +571,7 @@ float AnimationTransition::GetTransitionTime(void)
 
 BOOL AnimationTransition::CheckCondition(void)
 {
-	if (controler->GetCondition(this->needConditionIndex) == needCondition)
+	if (controler->GetCondition(this->needConditionName) == needCondition)
 	{
 		return TRUE;
 
@@ -804,11 +801,6 @@ AnimationData* AnimationNode::GetAnimData(void)
 	return this->animData;
 }
 
-string AnimationNode::GetName(void)
-{
-	return this->name;
-}
-
 void AnimationNode::AddTransition(AnimationTransition* transition)
 {
 	this->transitionArray.push_back(transition);
@@ -903,6 +895,11 @@ float Animation::GetTimeCnt(void)
 void Animation::SetTimeCnt(float cnt)
 {
 	this->timeCnt = cnt;
+}
+
+string Animation::GetName(void)
+{
+	return this->name;
 }
 
 AnimationForceTransition::AnimationForceTransition(AnimationControlerComponent* controler)
