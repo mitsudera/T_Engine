@@ -1,0 +1,38 @@
+{
+    "ID": 0,
+    "ambient": [
+        0.5882353186607361,
+        0.5882353186607361,
+        0.5882353186607361,
+        1.0
+    ],
+    "difPath": "data/TEXTURE/t_rock_01_d.png",
+    "diffuse": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+    ],
+    "emission": [
+        0.0,
+        0.0,
+        0.0,
+        0.0
+    ],
+    "matType": "class PhongMaterial",
+    "name": "Rock_01_LOD0M_Rock_01",
+    "nodiftex": 0,
+    "nonortex": 0,
+    "norPath": "data/TEXTURE/t_rock_01_n.png",
+    "nospetex": 1,
+    "path": "",
+    "shininess": 2.0,
+    "spePath": "",
+    "specular": [
+        0.0,
+        0.0,
+        0.0,
+        0.0
+    ],
+    "type": 0
+}

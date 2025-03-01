@@ -1,0 +1,252 @@
+{
+    "Name": "default",
+    "goData": [
+        {
+            "Components": [
+                {
+                    "lMtx_11": 0.7071066498756409,
+                    "lMtx_12": -1.7881390590446244e-07,
+                    "lMtx_13": -0.7071067690849304,
+                    "lMtx_14": 0.0,
+                    "lMtx_21": 0.7071065902709961,
+                    "lMtx_22": 0.0,
+                    "lMtx_23": 0.7071064114570618,
+                    "lMtx_24": 0.0,
+                    "lMtx_31": -1.7881392011531716e-07,
+                    "lMtx_32": -0.9999998807907104,
+                    "lMtx_33": 1.1920928244535389e-07,
+                    "lMtx_34": 0.0,
+                    "lMtx_41": 0.0,
+                    "lMtx_42": 0.0,
+                    "lMtx_43": 0.0,
+                    "lMtx_44": 1.0,
+                    "typeName": "class TransformComponent"
+                },
+                {
+                    "enable": 1,
+                    "lightAmb": [
+                        0.20000000298023224,
+                        0.20000000298023224,
+                        0.20000000298023224,
+                        1.0
+                    ],
+                    "lightDif": [
+                        1.0,
+                        1.0,
+                        1.0,
+                        1.0
+                    ],
+                    "typeName": "class DirectionalLightComponent"
+                }
+            ],
+            "ID": 1,
+            "Layer": "Default",
+            "Name": "DirectionalLight",
+            "PID": 0,
+            "Tag": "Default"
+        },
+        {
+            "Components": [
+                {
+                    "lMtx_11": 1000.0,
+                    "lMtx_12": 0.0,
+                    "lMtx_13": 0.0,
+                    "lMtx_14": 0.0,
+                    "lMtx_21": 0.0,
+                    "lMtx_22": 1000.0,
+                    "lMtx_23": 0.0,
+                    "lMtx_24": 0.0,
+                    "lMtx_31": 0.0,
+                    "lMtx_32": 0.0,
+                    "lMtx_33": 1000.0,
+                    "lMtx_34": 0.0,
+                    "lMtx_41": 0.0,
+                    "lMtx_42": 0.0,
+                    "lMtx_43": 0.0,
+                    "lMtx_44": 1.0,
+                    "typeName": "class TransformComponent"
+                }
+            ],
+            "ID": 2,
+            "Layer": "Sky",
+            "Name": "SkySphere",
+            "PID": 0,
+            "Tag": "Default"
+        },
+        {
+            "Components": [
+                {
+                    "lMtx_11": 1.0,
+                    "lMtx_12": 0.0,
+                    "lMtx_13": 0.0,
+                    "lMtx_14": 0.0,
+                    "lMtx_21": 0.0,
+                    "lMtx_22": 1.0,
+                    "lMtx_23": 0.0,
+                    "lMtx_24": 0.0,
+                    "lMtx_31": 0.0,
+                    "lMtx_32": 0.0,
+                    "lMtx_33": 1.0,
+                    "lMtx_34": 0.0,
+                    "lMtx_41": 0.0,
+                    "lMtx_42": 0.0,
+                    "lMtx_43": 0.0,
+                    "lMtx_44": 1.0,
+                    "typeName": "class TransformComponent"
+                },
+                {
+                    "alphaTest": 0,
+                    "cullMode": 2,
+                    "drawShadow": 0,
+                    "hasMaterial": true,
+                    "hasShadow": 0,
+                    "hasShadowMaterial": false,
+                    "isFrustumCulling": 1,
+                    "matName": "pSphere1lambert3",
+                    "meshFileName": "data/MODEL/mesh/SkySphere.fbx",
+                    "meshIndex": 1,
+                    "typeName": "class MeshComponent"
+                }
+            ],
+            "ID": 3,
+            "Layer": "Sky",
+            "Name": "pSphere1",
+            "PID": 2,
+            "Tag": "Default"
+        },
+        {
+            "Components": [
+                {
+                    "lMtx_11": 1.0,
+                    "lMtx_12": 0.0,
+                    "lMtx_13": 0.0,
+                    "lMtx_14": 0.0,
+                    "lMtx_21": 0.0,
+                    "lMtx_22": 1.0,
+                    "lMtx_23": 0.0,
+                    "lMtx_24": 0.0,
+                    "lMtx_31": 0.0,
+                    "lMtx_32": 0.0,
+                    "lMtx_33": 1.0,
+                    "lMtx_34": 0.0,
+                    "lMtx_41": 0.0,
+                    "lMtx_42": 0.0,
+                    "lMtx_43": 0.0,
+                    "lMtx_44": 1.0,
+                    "typeName": "class TransformComponent"
+                },
+                {
+                    "layerCull": [
+                        "Sky",
+                        "Text"
+                    ],
+                    "typeName": "class CameraComponent"
+                }
+            ],
+            "ID": 4,
+            "Layer": "Default",
+            "Name": "Camera",
+            "PID": 0,
+            "Tag": "Default"
+        },
+        {
+            "Components": [
+                {
+                    "lMtx_11": 1.0,
+                    "lMtx_12": 0.0,
+                    "lMtx_13": 0.0,
+                    "lMtx_14": 0.0,
+                    "lMtx_21": 0.0,
+                    "lMtx_22": 1.0,
+                    "lMtx_23": 0.0,
+                    "lMtx_24": 0.0,
+                    "lMtx_31": 0.0,
+                    "lMtx_32": 0.0,
+                    "lMtx_33": 1.0,
+                    "lMtx_34": 0.0,
+                    "lMtx_41": 0.0,
+                    "lMtx_42": 0.0,
+                    "lMtx_43": 0.0,
+                    "lMtx_44": 1.0,
+                    "typeName": "class TransformComponent"
+                }
+            ],
+            "ID": 278,
+            "Layer": "Default",
+            "Name": "Rock",
+            "PID": 0,
+            "Tag": "Default"
+        },
+        {
+            "Components": [
+                {
+                    "lMtx_11": 1.0,
+                    "lMtx_12": 0.0,
+                    "lMtx_13": 0.0,
+                    "lMtx_14": 0.0,
+                    "lMtx_21": 0.0,
+                    "lMtx_22": 1.0,
+                    "lMtx_23": 0.0,
+                    "lMtx_24": 0.0,
+                    "lMtx_31": 0.0,
+                    "lMtx_32": 0.0,
+                    "lMtx_33": 1.0,
+                    "lMtx_34": 0.0,
+                    "lMtx_41": 0.0,
+                    "lMtx_42": 0.0,
+                    "lMtx_43": 0.0,
+                    "lMtx_44": 1.0,
+                    "typeName": "class TransformComponent"
+                },
+                {
+                    "alphaTest": 0,
+                    "cullMode": 2,
+                    "drawShadow": 1,
+                    "hasMaterial": true,
+                    "hasShadow": 1,
+                    "hasShadowMaterial": true,
+                    "isFrustumCulling": 1,
+                    "matName": "Rock_01_LOD0M_Rock_01",
+                    "meshFileName": "data/MODEL/mesh/Rock_1.fbx",
+                    "meshIndex": 1,
+                    "shadowMatName": "Material",
+                    "typeName": "class MeshComponent"
+                }
+            ],
+            "ID": 279,
+            "Layer": "Default",
+            "Name": "Rock_01_LOD0",
+            "PID": 278,
+            "Tag": "Default"
+        },
+        {
+            "Components": [
+                {
+                    "lMtx_11": 1.0,
+                    "lMtx_12": 0.0,
+                    "lMtx_13": 0.0,
+                    "lMtx_14": 0.0,
+                    "lMtx_21": 0.0,
+                    "lMtx_22": 1.0,
+                    "lMtx_23": 0.0,
+                    "lMtx_24": 0.0,
+                    "lMtx_31": 0.0,
+                    "lMtx_32": 0.0,
+                    "lMtx_33": 1.0,
+                    "lMtx_34": 0.0,
+                    "lMtx_41": 0.0,
+                    "lMtx_42": 0.0,
+                    "lMtx_43": 0.0,
+                    "lMtx_44": 1.0,
+                    "typeName": "class TransformComponent"
+                }
+            ],
+            "ID": 784,
+            "Layer": "Default",
+            "Name": "GameObject",
+            "PID": 0,
+            "Tag": "Default"
+        }
+    ],
+    "idCnt": 784
+}

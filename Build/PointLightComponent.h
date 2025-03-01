@@ -14,7 +14,7 @@ public:
 	virtual void Update(void) override;
 
 	POINT_LIGHT_PARAM& GetLightParam(void);
-
+	void SetLightParam(POINT_LIGHT_PARAM param);
 private:
 	POINT_LIGHT_PARAM param;
 	int index;

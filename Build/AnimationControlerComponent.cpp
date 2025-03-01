@@ -26,6 +26,8 @@ void AnimationControlerComponent::Awake(void)
 	Component::Awake();
 	fTransition = new AnimationForceTransition(this);
 	loadFileName = "";
+	TypeName = typeid(AnimationControlerComponent).name();;
+
 }
 
 void AnimationControlerComponent::Init(void)
@@ -437,7 +439,7 @@ void AnimationControlerComponent::UpdateAnimation(MtxNode* node, GameObject* gam
 	else
 	{
 		XMMATRIX frameMtx = node->GetFrameMtx(timeCnt);
-		gameObject->GetTransFormComponent()->SetLocalMtx(frameMtx);
+		gameObject->GetTransFormComponent()->SetLocalMtxNotScaling(frameMtx);
 
 	}
 
@@ -839,7 +841,7 @@ void AnimationNode::UpdateMtx(MtxNode* node, GameObject* gameObject)
 			case AnimationNode::Blend::None:
 			{
 				XMMATRIX frameMtx = node->GetFrameMtx(timeCnt);
-				gameObject->GetTransFormComponent()->SetLocalMtx(frameMtx);
+				gameObject->GetTransFormComponent()->SetLocalMtxNotScaling(frameMtx);
 
 			}
 
@@ -847,7 +849,7 @@ void AnimationNode::UpdateMtx(MtxNode* node, GameObject* gameObject)
 			case AnimationNode::Blend::Double:
 			{
 				XMMATRIX frameMtx = node->GetFrameMtx(timeCnt, controler->GetBlendWeight());
-				gameObject->GetTransFormComponent()->SetLocalMtx(frameMtx);
+				gameObject->GetTransFormComponent()->SetLocalMtxNotScaling(frameMtx);
 
 			}
 
@@ -855,7 +857,7 @@ void AnimationNode::UpdateMtx(MtxNode* node, GameObject* gameObject)
 			case AnimationNode::Blend::Angle:
 			{
 				XMMATRIX frameMtx = node->GetFrameMtx(timeCnt, controler->GetAngle());
-				gameObject->GetTransFormComponent()->SetLocalMtx(frameMtx);
+				gameObject->GetTransFormComponent()->SetLocalMtxNotScaling(frameMtx);
 
 			}
 

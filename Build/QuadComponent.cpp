@@ -17,6 +17,7 @@ QuadComponent::QuadComponent(GameObject* gameObject)
 void QuadComponent::Awake(void)
 {
 	PrimitiveComponent::Awake();
+	TypeName = typeid(QuadComponent).name();;
 
 }
 

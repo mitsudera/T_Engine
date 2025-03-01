@@ -7,6 +7,7 @@ class Renderer;
 class GameEngine;
 class Input;
 class PrimitiveComponent;
+class ProjectSetting;
 
 class EditerCamera
 {
@@ -14,6 +15,7 @@ public:
 	EditerCamera(World* world);
 	~EditerCamera();
 
+	void Init(void);
 	void Update(void);
 	void Render(void);
 
@@ -26,6 +28,7 @@ private:
 	World* pWorld;
 	Renderer* pRenderer;
 	GameEngine* pGameEngine;
+	ProjectSetting* pProjectSetting;
 	Input* input;
 
 	XMVECTOR		pos;
@@ -46,7 +49,7 @@ private:
 	XMMATRIX viewProj;
 	XMFLOAT4 clearColor;
 
-	BOOL layerCulling[(int)GameObject::Layer::LayerMax];
+	list<string*>layerCulling;
 
 
 	float				angle;			// Ž‹–ìŠp
@@ -66,7 +69,6 @@ private:
 	void RotAxis(XMVECTOR qton);
 
 	void SetSkyCom(GameObject* sky);
-
 
 };
 

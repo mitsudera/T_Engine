@@ -31,7 +31,7 @@ void Component::Awake(void)
 	this->pWorld = pGameObject->GetWorld();
 	this->attribute = Attribute::Component;
 	this->input = pGameEngine->GetInput();
-	TypeName = "Component";
+	TypeName = typeid(Component).name();;
 }
 
 void Component::Init(void)

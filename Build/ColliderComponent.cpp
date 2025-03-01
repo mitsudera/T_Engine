@@ -31,11 +31,7 @@ void ColliderComponent::Awake(void)
 	enable = FALSE;
 	this->checkRadius = 1.0f;
 	isRigid = FALSE;
-	for (int i = 0; i < (int)GameObject::ObjectTag::ObjectTagMax; i++)
-	{
-		result.isHit[i] = FALSE;
-
-	}
+	TypeName = typeid(ColliderComponent).name();;
 
 }
 
@@ -75,15 +71,33 @@ void ColliderComponent::OnDisable(void)
 	OffCollider();
 }
 
-BOOL ColliderComponent::GetHitTag(GameObject::ObjectTag tag)
+BOOL ColliderComponent::GetHitTag(string* tag)
 {
-	return result.isHit[(int)tag];
+	for (GameObject* gameObject : result.hitObject)
+	{
+		if (gameObject->GetTag() == tag)
+		{
+			return TRUE;
+		}
+	}
+
+	return FALSE;
 }
 
-void ColliderComponent::SetHitTag(GameObject::ObjectTag tag, BOOL isHit)
+GameObject* ColliderComponent::GetHitTagObject(string* tag)
 {
-	this->result.isHit[(int)tag] = isHit;
+	for (GameObject* gameObject : result.hitObject)
+	{
+		if (gameObject->GetTag() == tag)
+		{
+			return gameObject;
+		}
+	}
+
+
+	return nullptr;
 }
+
 
 ColliderComponent::Shape ColliderComponent::GetShape(void)
 {
@@ -96,10 +110,6 @@ void ColliderComponent::SetShape(Shape shape)
 	this->shape = shape;
 }
 
-GameObject::ObjectTag ColliderComponent::GetTag(void)
-{
-	return pGameObject->GetTag();
-}
 
 
 void ColliderComponent::SetHitObject(GameObject* gameObject)
@@ -129,34 +139,6 @@ BOOL ColliderComponent::GetHitObject(GameObject* gameObject)
 	return ans;
 }
 
-GameObject* ColliderComponent::GetHitTagObject(GameObject::ObjectTag tag)
-{
-
-	for (GameObject* obj: result.hitObject)
-	{
-		if (obj->GetTag() == tag)
-		{
-			return obj;
-		}
-	}
-
-	return nullptr;
-}
-
-vector<GameObject*> ColliderComponent::GetHitTagObjectAll(GameObject::ObjectTag tag)
-{
-	vector<GameObject*> hitArray;
-
-	for (GameObject* obj: result.hitObject)
-	{
-		if (obj->GetTag() == tag)
-		{
-			hitArray.push_back(obj);
-		}
-	}
-
-	return hitArray;
-}
 
 vector<pair<GameObject*, XMFLOAT4>>& ColliderComponent::GetHitRigidObject(void)
 {
@@ -167,10 +149,6 @@ void ColliderComponent::Clear(void)
 {
 	this->result.hitObject.clear();
 	this->result.hitRigidObject.clear();
-	for (int i = 0; i < (int)GameObject::ObjectTag::ObjectTagMax; i++)
-	{
-		this->result.isHit[i] = FALSE;
-	}
 
 
 }
@@ -183,6 +161,11 @@ void ColliderComponent::SetPivot(XMFLOAT3 pivot)
 void ColliderComponent::SetPivot(XMVECTOR pivot)
 {
 	this->pivot = pivot;
+}
+
+XMVECTOR ColliderComponent::GetPivot(void)
+{
+	return pivot;
 }
 
 XMFLOAT3 ColliderComponent::GetCenter(void)
@@ -220,6 +203,13 @@ void ColliderComponent::SetRigidObject(GameObject* obj, XMFLOAT4 depth)
 {
 	result.hitRigidObject.push_back(make_pair(obj, depth));
 }
+
+BOOL ColliderComponent::GetEnable(void)
+{
+	return enable;
+}
+
+
 
 
 

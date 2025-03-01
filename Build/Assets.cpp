@@ -70,9 +70,30 @@ void Assets::SetName(string name, int count)
 
 void Assets::SetName(string name)
 {
+	// 最後の '/' の位置を見つける
+	size_t pos = name.rfind('/');
+
+	// 最後の '/' が見つかった場合
+	if (pos != string::npos) {
+		// '/' より後の部分を切り出す
+		name = name.substr(pos + 1);
+	}
+	// SetName(name) を呼び出す
+	SetName(name, 0);
+}
+void Assets::SetConstName(string name)
+{
+	// 最後の '/' の位置を見つける
+	size_t pos = name.rfind('/');
+
+	// 最後の '/' が見つかった場合
+	if (pos != string::npos) {
+		// '/' より後の部分を切り出す
+		name = name.substr(pos + 1);
+	}
+	// SetName(name) を呼び出す
 	Object::SetName(name);
 }
-
 void Assets::SetPath(string path)
 {
 	this->path = path;
@@ -82,3 +103,4 @@ string Assets::GetPath(void)
 {
 	return path;
 }
+

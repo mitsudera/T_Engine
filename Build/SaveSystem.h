@@ -10,6 +10,10 @@ class Scene;
 class TransformComponent;
 class SceneAssetsData;
 class AssetsManager;
+class Assets;
+class ProjectSetting;
+class World;
+class SceneManager;
 
 struct ComponentLoadData
 {
@@ -57,15 +61,22 @@ public:
 	~SaveSystem();
 
 	void SaveProject(void);
+	bool LoadProject(void);
+
 
 	void SaveScene(Scene* scene);
 	Scene* LoadScene(SceneAssetsData* aData);
 
+	void SaveAssets(Assets* assets);
+
+	void LoadAssets(string fileName);
+	
+
+	void LoadAllAssets(void);
 
 private:
 	GameEngine* pGameEngine;
 	AssetsManager* pAssetsManager;
-
-
+	ProjectSetting* pProjectSetting;
 };
 

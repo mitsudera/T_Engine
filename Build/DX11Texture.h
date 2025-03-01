@@ -7,7 +7,6 @@ class AssetsManager;
 
 class DX11Texture :public Assets
 {
-	AssetsManager* pManager;
 	ID3D11ShaderResourceView* SRV;
 
 public:

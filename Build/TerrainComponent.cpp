@@ -21,7 +21,8 @@ void TerrainComponent::Awake(void)
 {
 	PrimitiveComponent::Awake();
 
-	
+	TypeName = typeid(TerrainComponent).name();;
+
 	
 
 }
@@ -256,6 +257,11 @@ float TerrainComponent::GetHeight(XMFLOAT3 pos)
 	float height = heightMap->sampling(sampleUV).x * heighFacter;
 
 	return GetTransFormComponent()->GetWorldPos().y + height;
+}
+
+XMINT2 TerrainComponent::GetResolution(void)
+{
+	return terrainResolution;
 }
 
 XMFLOAT2 TerrainComponent::GetHW(void)

@@ -38,6 +38,7 @@
 #include <future>
 //#include <minmax.h>
 #include <functional>
+#include <filesystem>
 
 //FBXSDKƒ‰ƒCƒuƒ‰ƒŠ
 #include <fbxsdk.h>

@@ -10,6 +10,8 @@ public:
 	ProjectSetting(GameEngine* gameEngine);
 	~ProjectSetting();
 
+	void LoadDefaultSeting(void);
+
 	vector<string>& GetDefaultGameObjectTypeNameArray(void);
 	vector<string>& GetComponentNameArray(void);
 
@@ -27,18 +29,38 @@ public:
 	T* DynamicCreateGameObject(Scene* scene);
 
 	template<class T>
+	T* LoadGameObject(Scene* scene);
+
+	template<class T>
+	T* DynamicLoadGameObject(Scene* scene);
+
+	template<class T>
 	T* CreateGameObject(string name, Scene* scene);
 
 	template<class T>
 	T* DynamicCreateGameObject(string name, Scene* scene);
 
+	void SetProjectName(string name);
+	string GetProjectName(void);
 
+	void SetDefaultScene(string name);
+	string GetDefaultScene(void);
 
+	string* AddNewTag(string tag);
+	string* AddNewLayer(string layer);
+
+	string* GetTag(string tag);
+	string* GetLayer(string layer);
+
+	list<string*>& GetTagList(void);
+	list<string*>& GetLayerList(void);
 
 private:
 	GameEngine* pGameEngine;
-	vector<string> objectTagArray;
-	vector<string> layerArray;
+	string projectName = "project";
+	string defaultScene="";
+	list<string*> objectTagList;
+	list<string*> layerList;
 	vector<string> defaultGameObjectTypeNameArray;
 	vector<string> componentTypeNameArray;
 };
@@ -67,6 +89,33 @@ T* ProjectSetting::DynamicCreateGameObject(Scene* scene)
 	o->InitAllComponent();
 	return obj;
 }
+
+template<class T>
+T* ProjectSetting::LoadGameObject(Scene* scene)
+{
+	T* obj = new T(scene);
+
+
+	GameObject* o = dynamic_cast<GameObject*>(obj);
+	o->Load();
+
+	return obj;
+}
+
+template<class T>
+T* ProjectSetting::DynamicLoadGameObject(Scene* scene)
+{
+	T* obj = new T(scene);
+
+
+	GameObject* o = dynamic_cast<GameObject*>(obj);
+	o->Load();
+
+	o->InitAllComponent();
+	return obj;
+}
+
+
 template<class T>
 T* ProjectSetting::CreateGameObject(string name, Scene* scene)
 {

@@ -13,6 +13,7 @@
 SkinMeshData::SkinMeshData(AssetsManager* p)
 {
 	pAssetsManager = p;
+	
 }
 
 SkinMeshData::~SkinMeshData()
@@ -32,6 +33,8 @@ void SkinMeshData::LoadNode(FbxNode* node, SkinMeshTreeNode* parent, SkinMeshTre
 	this->pAssetsManager = skinMeshTree->GetAssetsMnager();
 	this->pRenderer = pAssetsManager->GetGameEngine()->GetRenderer();
 	this->skinMeshTree = skinMeshTree;
+	skinMeshTree->AddNode(this);
+
 	FbxMesh* mesh = node->GetMesh();
 	name = mesh->GetNode()->GetName();
 	fileName = skinMeshTree->GetFileName();
@@ -424,11 +427,6 @@ int* SkinMeshData::GetCPIndexArray(void)
 	return cpIndexArray;
 }
 
-SkinMeshTreeData* SkinMeshData::GetSkinMeshTree(void)
-{
-	return this->skinMeshTree;
-}
-
 void SkinMeshData::CreateVertexArray(int n)
 {
 	this->vertNum = n;
@@ -504,6 +502,7 @@ XMFLOAT3 SkinMeshData::GetRotOffset(void)
 SkinMeshTreeData::SkinMeshTreeData(AssetsManager* p)
 {
 	pAssetsManager = p;
+	assetsType = AssetsType::SkinMeshData;
 }
 
 SkinMeshTreeData::~SkinMeshTreeData()
@@ -677,6 +676,18 @@ int SkinMeshTreeData::GetBoneNumber(string name)
 	return -1;
 }
 
+void SkinMeshTreeData::AddNode(SkinMeshTreeNode* node)
+{
+	allNodeArray.push_back(node);
+	node->SetIndex(allNodeArray.size());
+
+}
+
+SkinMeshTreeNode* SkinMeshTreeData::GetNode(unsigned int index)
+{
+	return allNodeArray[index];
+}
+
 BoneData::BoneData(AssetsManager* p)
 { 
 	this->pAssetsManager = p;
@@ -695,6 +706,7 @@ void BoneData::LoadNode(FbxNode* node, SkinMeshTreeNode* parent, SkinMeshTreeDat
 	this->parent = parent;
 	this->nodeAttribute = Attribute::Bone;
 	this->skinMeshTree = skinMeshTree;
+	skinMeshTree->AddNode(this);
 	FbxSkeleton* bone = node->GetSkeleton();
 
 	this->name = node->GetName();
@@ -771,7 +783,7 @@ SkinMeshTreeNode::~SkinMeshTreeNode()
 void SkinMeshTreeNode::LoadNode(FbxNode* node, SkinMeshTreeNode* parent, SkinMeshTreeData* skinMeshTree)
 {
 	this->skinMeshTree = skinMeshTree;
-
+	skinMeshTree->AddNode(this);
 	this->parent = parent;
 	this->nodeAttribute = Attribute::Null;
 	this->name = node->GetName();
@@ -785,11 +797,13 @@ void SkinMeshTreeNode::LoadChild(FbxNode* node)
 	{
 		FbxNode* child = node->GetChild(i);
 
+		SkinMeshTreeNode* newNode = nullptr;
 		if (child->GetNodeAttribute()->GetAttributeType() == FbxNodeAttribute::eMesh)
 		{
 			SkinMeshData* childData = new SkinMeshData(pAssetsManager);
 			childData->LoadNode(child, this, skinMeshTree);
 			childArray.push_back(childData);
+
 
 		}
 		else if (child->GetNodeAttribute()->GetAttributeType() == FbxNodeAttribute::eSkeleton)
@@ -843,6 +857,21 @@ SkinMeshTreeNode* SkinMeshTreeNode::GetParent(void)
 	return parent;
 }
 
+unsigned int SkinMeshTreeNode::GetIndex(void)
+{
+	return index;
+}
+
+void SkinMeshTreeNode::SetIndex(unsigned int index)
+{
+	this->index = index;
+}
+
+SkinMeshTreeData* SkinMeshTreeNode::GetSkinMeshTree(void)
+{
+	return skinMeshTree;
+}
+
 NullData::NullData(AssetsManager* p)
 {
 	pAssetsManager = p;
@@ -859,7 +888,7 @@ void NullData::LoadNode(FbxNode* node, SkinMeshTreeNode* parent, SkinMeshTreeDat
 	using namespace fbxsdk;
 
 	this->skinMeshTree = skinMeshTree;
-
+	skinMeshTree->AddNode(this);
 	this->name = node->GetName();
 
 	this->LoadChild(node);

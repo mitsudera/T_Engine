@@ -7,7 +7,6 @@
 
 struct HitResult
 {
-	BOOL isHit[(int)GameObject::ObjectTag::ObjectTagMax];
 	vector<GameObject*> hitObject;
 	vector<pair<GameObject*,XMFLOAT4>> hitRigidObject;
 };
@@ -50,22 +49,17 @@ public:
 	virtual void OnEnable(void)override;
 	virtual void OnDisable(void)override;
 
-	BOOL GetHitTag(GameObject::ObjectTag tag);
+	BOOL GetHitTag(string* tag);
+	GameObject* GetHitTagObject(string* tag);
 
-	void SetHitTag(GameObject::ObjectTag tag, BOOL isHit);
 
 	Shape GetShape(void);
 	void SetShape(Shape shape);
 
-	GameObject::ObjectTag GetTag(void);
 
 
 	void SetHitObject(GameObject* gameObject);
 	BOOL GetHitObject(GameObject* gameObject);
-
-	GameObject* GetHitTagObject(GameObject::ObjectTag tag);
-
-	vector<GameObject*> GetHitTagObjectAll(GameObject::ObjectTag tag);
 
 	vector<pair<GameObject*, XMFLOAT4>>& GetHitRigidObject(void);
 
@@ -75,6 +69,7 @@ public:
 
 	void SetPivot(XMFLOAT3 pivot);
 	void SetPivot(XMVECTOR pivot);
+	XMVECTOR GetPivot(void);
 
 	XMFLOAT3 GetCenter(void);
 	float GetCheckRadius(void);
@@ -86,6 +81,8 @@ public:
 	BOOL GetIsRigid(void);
 
 	void SetRigidObject(GameObject* obj, XMFLOAT4 depth);
+
+	BOOL GetEnable(void);
 
 protected:
 	HitResult result;

@@ -1,0 +1,38 @@
+{
+    "ID": 0,
+    "ambient": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+    ],
+    "difPath": "data/TEXTURE/Sky_07.png",
+    "diffuse": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+    ],
+    "emission": [
+        0.0,
+        0.0,
+        0.0,
+        0.0
+    ],
+    "matType": "class LambartMaterial",
+    "name": "pSphere1lambert3",
+    "nodiftex": 0,
+    "nonortex": 1,
+    "norPath": "",
+    "nospetex": 1,
+    "path": "",
+    "shininess": 10.0,
+    "spePath": "",
+    "specular": [
+        0.0,
+        0.0,
+        0.0,
+        0.0
+    ],
+    "type": 0
+}

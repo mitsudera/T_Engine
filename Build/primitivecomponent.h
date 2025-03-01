@@ -35,6 +35,8 @@ public:
 	Material* LoadMaterial(Material* material);
 
 	Material* GetShadowMaterial(void);
+	void SetShadowMaterial(Material* material);
+	Material* LoadShadowMaterial(Material* material);
 
 	void SetCullingMode(int cullMode);
 	int GetCullingMode(void);
@@ -52,15 +54,19 @@ public:
 	 
 protected:
 	Renderer* pRenderer;
-	BOOL hasShadow;
-	BOOL drawShadow;
-	Material* material;
-	Material* shadowMaterial;
-	BOOL alphaTest;
 	CBufferManager* pCBufferManager;
 	AssetsManager* pAssetsManager;
+
+	BOOL hasShadow;
+	BOOL drawShadow;
+	BOOL alphaTest;
 	int cullMode;
 	BOOL isFrustumCulling;
+
+	Material* material;
+	Material* shadowMaterial;
+
+
 	XMVECTOR boxMin;
 	XMVECTOR boxMax;
 

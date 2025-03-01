@@ -12,6 +12,7 @@
 #include "AssetsManager.h"
 #include "ShaderSet.h"
 #include "DebugUtility.h"
+#include "ProjectSetting.h"
 
 EditerCamera::EditerCamera(World* world)
 {
@@ -19,14 +20,13 @@ EditerCamera::EditerCamera(World* world)
 	pGameEngine = world->GetGameEngine();
 	pRenderer = pGameEngine->GetRenderer();
 	input = pGameEngine->GetInput();
-
+	pProjectSetting = pGameEngine->GetProjectSetting();
 	pos = XMVectorZero();
 	axisX = xonevec();
 	axisY = yonevec();
 	axisZ = zonevec();
 	mtxpos = XMMatrixIdentity();
 	quaternion = XMQuaternionIdentity();
-
 
 
 	//camerasetting
@@ -42,10 +42,6 @@ EditerCamera::EditerCamera(World* world)
 
 	this->len = 50.0f;
 
-	for (int i = 0; i < (int)GameObject::Layer::LayerMax; i++)
-	{
-		layerCulling[i] = FALSE;
-	}
 
 	this->clearColor = XMFLOAT4(0.5f, 0.5f, 0.5f, 1.0f);
 
@@ -67,6 +63,13 @@ EditerCamera::EditerCamera(World* world)
 
 EditerCamera::~EditerCamera()
 {
+}
+
+void EditerCamera::Init(void)
+{
+	layerCulling.push_back(pProjectSetting->GetLayer("Sky"));
+	layerCulling.push_back(pProjectSetting->GetLayer("Text"));
+
 }
 
 void EditerCamera::Update(void)
@@ -140,11 +143,20 @@ void EditerCamera::Update(void)
 		}
 	}
 
-	skyComArray.clear();
-	for (Scene* scene : pWorld->GetActiveSceneList())
-	{
-		SetSkyCom(scene->GetGameObject<SkySphere>());
-	}
+	//skyComArray.clear();
+	//for (Scene* scene : pWorld->GetActiveSceneList())
+	//{
+
+	//	for (PrimitiveComponent* com : scene->GetAllPrimitiveComponent())
+	//	{
+	//		if (com->GetGameObject()->GetLayer() == GameObject::Layer::Sky)
+	//		{
+	//			SetSkyCom(scene->GetGameObject<SkySphere>());
+
+	//		}
+	//	}
+
+	//}
 
 
 }
@@ -178,7 +190,6 @@ void EditerCamera::Render(void)
 
 	//スカイスフィアで背景クリアをする場合
 
-	layerCulling[(int)GameObject::Layer::Sky] = TRUE;
 	pRenderer->SetDepthEnable(FALSE);
 
 
@@ -186,14 +197,18 @@ void EditerCamera::Render(void)
 	cMtx.r[3] = XMVectorSet(0.0f, 0.0f, 0.0f, 1.0f);
 
 	pGameEngine->GetCBufferManager()->SetViewMtx(&cMtx);
-
-
-	for (PrimitiveComponent* com : skyComArray)
+	for (Scene* scene : pWorld->GetActiveSceneList())
 	{
-		com->GetMaterial()->GetShaderSet()->SetShaderRenderer();
-		com->Draw();
-	}
+		for (PrimitiveComponent* com : scene->GetAllPrimitiveComponent())
+		{
+			if (com->GetGameObject()->GetLayer() == pProjectSetting->GetLayer("Sky"))
+			{
+				com->GetMaterial()->GetShaderSet()->SetShaderRenderer();
+				com->Draw();
 
+			}
+		}
+	}
 
 
 
@@ -216,6 +231,9 @@ void EditerCamera::Render(void)
 		{
 			for (PrimitiveComponent* com : scene->GetAllPrimitiveComponent())
 			{
+
+
+
 				if (!com->GetActive())
 					continue;
 
@@ -223,7 +241,8 @@ void EditerCamera::Render(void)
 					continue;
 
 				//レイヤーのカリングチェック
-				if (layerCulling[(int)com->GetGameObject()->GetLayer()] || com->GetGameObject()->GetLayer() == GameObject::Layer::Text)
+				auto it = find(layerCulling.begin(), layerCulling.end(), com->GetGameObject()->GetLayer());
+				if (it!=layerCulling.end())
 					continue;
 
 				if (com->GetMaterial() == nullptr)
@@ -290,7 +309,8 @@ void EditerCamera::Render(void)
 
 
 				//レイヤーのカリングチェック
-				if (layerCulling[(int)com->GetGameObject()->GetLayer()] || com->GetGameObject()->GetLayer() == GameObject::Layer::Text)
+				auto it = find(layerCulling.begin(), layerCulling.end(), com->GetGameObject()->GetLayer());
+				if (it != layerCulling.end())
 					continue;
 
 				if (com->GetMaterial() == nullptr)
@@ -342,7 +362,7 @@ void EditerCamera::Render(void)
 				continue;
 
 			//レイヤーのカリングチェック
-			if (com->GetGameObject()->GetLayer() != GameObject::Layer::Text)
+			if (com->GetGameObject()->GetLayer() != pProjectSetting->GetLayer("Text"))
 				continue;
 
 
@@ -410,3 +430,4 @@ void EditerCamera::SetSkyCom(GameObject* sky)
 		SetSkyCom(obj);
 	}
 }
+

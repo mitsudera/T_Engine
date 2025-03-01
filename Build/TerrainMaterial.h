@@ -23,10 +23,17 @@ public:
 	void SetHeghtMapUVScale(XMFLOAT2 scale);
 	float GetHeightFacter(void);
 
+	float GetEdgeFacter(void);
+
+	float GetInsideFacter(void);
+
+	XMFLOAT2 GetUVscale(void);
+
+	XMFLOAT2 GetMapUVscale(void);
+
 
 private:
 	TerrainShader* pTerrainShader;
-	int heightMapTexIndex;
 
 	float tessEdgeFacter;
 	float tessInsideFacter;

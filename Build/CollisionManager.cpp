@@ -45,8 +45,6 @@ void CollisionManager::Update(void)
 			pairList[i].collider1->SetHitObject(pairList[i].collider2->GetGameObject());
 			pairList[i].collider2->SetHitObject(pairList[i].collider1->GetGameObject());
 
-			pairList[i].collider1->SetHitTag(pairList[i].collider2->GetTag(), ans);
-			pairList[i].collider2->SetHitTag(pairList[i].collider1->GetTag(), ans);
 
 
 			if (pairList[i].collider1->GetIsRigid() && pairList[i].collider2->GetIsRigid())

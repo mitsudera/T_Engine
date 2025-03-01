@@ -8,6 +8,7 @@
 #include "Scene.h"
 #include "TerrainColliderComponent.h"
 #include "TerrainMaterial.h"
+#include "ProjectSetting.h"
 MeshField::MeshField(Scene* scene)
 {
 	pScene = scene;
@@ -21,8 +22,8 @@ void MeshField::Awake(void)
 {
 	GameObject::Awake();
 	SetName("Field");
-	this->tag = GameObject::ObjectTag::Field;
-	this->layer = Layer::Field;
+	this->tag = pGameEngine->GetProjectSetting()->GetTag("Field");
+	this->layer = pGameEngine->GetProjectSetting()->GetLayer("Field");
 	TerrainComponent* meshField = AddComponent<TerrainComponent>();
 	meshField->LoadHeightMap("data/texture/HeightMap/heightMap.png");
 
@@ -47,6 +48,5 @@ void MeshField::Awake(void)
 	meshField->SetHasShadow(FALSE);
 
 	TerrainColliderComponent* collider = AddComponent<TerrainColliderComponent>();
-	collider->SetTerrainComponent(meshField);
 
 }

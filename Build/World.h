@@ -11,6 +11,7 @@ class CollisionManager;
 class ShadowMap;
 class GUI;
 class EditerCamera;
+class GameObject;
 
 class World
 {
@@ -55,7 +56,6 @@ private:
 	ShadowMap* shadowMap;
 	GUI* gui;
 	EditerCamera* editerCamera;
-
 
 
 	BOOL notDtime;

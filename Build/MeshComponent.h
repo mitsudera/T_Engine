@@ -28,8 +28,9 @@ public:
 
 
 	void SetMeshData(MeshData* data);
+	void SetMeshData(string path,unsigned int index);
 
-
+	MeshData* GetMeshData(void);
 
 protected:
 
@@ -38,7 +39,6 @@ protected:
 	MeshData* meshData;
 	
 
-	BOOL isRoot;
 
 };
 

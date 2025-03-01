@@ -15,6 +15,8 @@ void RotBoxColliderComponent::Awake(void)
 {
 	ColliderComponent::Awake();
 	this->shape = Shape::RotBox;
+	TypeName = typeid(RotBoxColliderComponent).name();;
+
 }
 
 void RotBoxColliderComponent::Uninit(void)

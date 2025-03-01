@@ -1,5 +1,6 @@
 #pragma once
 #include "Coreminimal.h"
+#include "Assets.h"
 
 class AssetsManager;
 class AnimationData;
@@ -90,7 +91,7 @@ private:
 
 };
 
-class AnimationData
+class AnimationData:public Assets
 {
 public:
 
@@ -119,10 +120,12 @@ public:
 	void LoadAnimation(string fileName1, string fileName2, AssetsManager* assetsManager);
 	void LoadAnimation(string fileName1, string fileName2,string fileName3, string fileName4, AssetsManager* assetsManager);
 
+	int GetFileNum(void);
 
 private:
 	int frameNum;
 	int frameRate;
+	int fileNum;
 	LONGLONG startTime;
 	LONGLONG oneFrameValue;
 

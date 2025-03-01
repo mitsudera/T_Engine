@@ -15,7 +15,8 @@ void SphereColliderComponent::Awake(void)
 {
 	ColliderComponent::Awake();
 	this->shape = Shape::Sphere;
-	
+	TypeName = typeid(SphereColliderComponent).name();;
+
 }
 
 void SphereColliderComponent::Uninit(void)

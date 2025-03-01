@@ -20,6 +20,8 @@ void SoundSpeakerComponent::Awake(void)
 {
 	Component::Awake();
 	pSoundEngine = pGameEngine->GetSoundEngine();
+	TypeName = typeid(SoundSpeakerComponent).name();;
+
 }
 
 void SoundSpeakerComponent::Uninit(void)

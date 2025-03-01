@@ -149,6 +149,7 @@ MeshData* AssetsManager::LoadMeshFileFbx(string fileName)
 	string path = MESH_PATH + fileName;
 	meshdata->LoadFbxFile(path, this);
 	this->MeshDataTree.push_back(meshdata);
+	this->assetsList.push_back(meshdata);
 	return meshdata;
 }
 
@@ -235,6 +236,11 @@ void AssetsManager::AddMesh(MeshData* data)
 	return ;
 }
 
+MeshData* AssetsManager::GetMesh(string fileName, int index)
+{
+	return LoadMeshFileFbx(fileName)->GetMeshData(index);
+}
+
 SkinMeshTreeData* AssetsManager::LoadSkinMeshFileFbx(string fileName)
 {
 	//既にロードしているデータか調べる
@@ -251,7 +257,13 @@ SkinMeshTreeData* AssetsManager::LoadSkinMeshFileFbx(string fileName)
 	string path = SKINMESH_PATH + fileName;
 	skinMeshdata->LoadFbxFile(path);
 	this->SkinMeshTreeDataList.push_back(skinMeshdata);
+	this->assetsList.push_back(skinMeshdata);
 	return skinMeshdata;
+}
+
+SkinMeshTreeNode* AssetsManager::GetSkinMeshTreeNode(string fileName, int index)
+{
+	return LoadSkinMeshFileFbx(fileName)->GetNode(index);
 }
 
 
@@ -276,6 +288,7 @@ DX11Texture* AssetsManager::LoadTexture(string filepath)
 	DX11Texture* tex = new DX11Texture(this);
 	tex->CreateSRV(filepath);
 	this->TextureList.push_back(tex);
+	this->assetsList.push_back(tex);
 	return tex;
 }
 
@@ -494,10 +507,32 @@ SceneAssetsData* AssetsManager::CreateNewSceneAssets(string name)
 	newData->SetName(name);
 
 	this->sceneAssetsList.push_back(newData);
-	this->assetsList.push_back(newData);;
+	AddAssets(newData);;
 
 
 	return newData;
+}
+
+SceneAssetsData* AssetsManager::LoadSceneAssets(SceneAssetsData* loadData)
+{
+
+
+	this->sceneAssetsList.push_back(loadData);
+	this->AddLoadAssets(loadData);
+
+	return loadData;
+}
+
+void AssetsManager::AddAssets(Assets* assets)
+{
+	assets->SetID(++idCnt);
+	assetsList.push_back(assets);
+}
+
+void AssetsManager::AddLoadAssets(Assets* assets)
+{
+	assetsList.push_back(assets);
+
 }
 
 

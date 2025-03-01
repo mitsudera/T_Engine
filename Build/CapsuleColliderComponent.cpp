@@ -14,6 +14,8 @@ void CapsuleColliderComponent::Awake(void)
 {
 	ColliderComponent::Awake();
 	this->shape = Shape::Capsule;
+	TypeName = typeid(CapsuleColliderComponent).name();;
+
 }
 
 void CapsuleColliderComponent::Uninit(void)

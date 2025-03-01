@@ -16,7 +16,7 @@
 #include "World.h"
 #include "ProjectSetting.h"
 #include "SaveSystem.h"
-
+#include "EditerCamera.h"
 GameEngine::GameEngine(Main* main)
 {
 	this->main = main;
@@ -38,7 +38,6 @@ void GameEngine::Awake()
 	this->windowSize.x = screenWidth;
 	this->windowSize.y = screenHeight;
 
-	this->saveSystem = new SaveSystem(this);
 
 	this->projectSetting = new ProjectSetting(this);
 
@@ -65,12 +64,23 @@ void GameEngine::Awake()
 
 	this->debugUtility = new DebugUtility(this);
 	
+
+
+
+	this->saveSystem = new SaveSystem(this);
+
 	this->world = new World(this);
 
 
 	SetFullScreen(TRUE);
 
 
+	if (!saveSystem->LoadProject())
+	{
+		this->projectSetting->LoadDefaultSeting();
+		this->world->GetSceneManager()->CreateNewScene("default");
+	}
+	this->world->GetEditerCamera()->Init();
 }
 
 void GameEngine::Update()

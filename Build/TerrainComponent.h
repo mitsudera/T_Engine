@@ -21,7 +21,7 @@ public:
 
 
 	float GetHeight(XMFLOAT3 pos);
-
+	XMINT2 GetResolution(void);
 	XMFLOAT2 GetHW(void);
 	void SetHeightMapPath(string path);
 	string GetHeightMapPath(void);

@@ -102,7 +102,6 @@ void Scene::FixedLateUpdate()
 void Scene::Update()
 {
 
-
 	for (Component* com :allComponent)
 	{
 		if (!com->GetActive())
@@ -187,7 +186,6 @@ void Scene::CreateDefaultObject(void)
 
 
 	GameObject* camera = pProjectSetting->CreateGameObject<Camera>(this);
-	camera->GetComponent<CameraComponent>()->SetSky(GetGameObject<SkySphere>());
 	AddGameObject(camera);
 
 	pWorld->SetMainCamera(camera->GetComponent<CameraComponent>());
@@ -209,6 +207,13 @@ GameObject* Scene::CreateGameObjectByTypeName(string typeName)
 }
 
 GameObject* Scene::CreateGameObject(void)
+{
+	GameObject* newObj = pProjectSetting->CreateGameObject<GameObject>(this);
+	AddGameObject(newObj);
+	return newObj;
+}
+
+GameObject* Scene::LoadGameObject(void)
 {
 	GameObject* newObj = pProjectSetting->CreateGameObject<GameObject>(this);
 	AddGameObject(newObj);
@@ -238,9 +243,18 @@ void Scene::RemoveGameObject(GameObject* gameObject)
 
 void Scene::DeleteGameObject(GameObject* gameObject)
 {
+	gameObject->Unparent();
 	gameObjectList.remove(gameObject);
-
+	allGameObjectList.remove(gameObject);
 	gameObject->Destroy();
+	delete gameObject;
+
+}
+
+void Scene::DynamicDeleteGameObject(GameObject* gameObject)
+{
+	gameObject->Unparent();
+	gameObject->DynamicDestroy();
 	delete gameObject;
 
 }
@@ -434,6 +448,11 @@ SceneAssetsData* Scene::GetSceneAssetsData(void)
 void Scene::SetSceneAssetsData(SceneAssetsData* data)
 {
 	this->sceneAssets = data;
+}
+
+void Scene::RemoveAllGameObjectList(GameObject* gameObject)
+{
+	allGameObjectList.remove(gameObject);
 }
 
 

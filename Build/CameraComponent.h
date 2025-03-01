@@ -1,9 +1,3 @@
-//=============================================================================
-//
-// カメラ処理 [camera.h]
-// Author : 
-//
-//=============================================================================
 #pragma once
 #include "Component.h"
 #include "gameobject.h"
@@ -17,10 +11,8 @@ class PostEffectShader;
 class RenderTexture;
 
 class PrimitiveComponent;
-//*****************************************************************************
-// マクロ定義
-//*****************************************************************************
 
+class ProjectSetting;
 
 enum VIEWPORT_TYPE
 {
@@ -91,9 +83,6 @@ public:
 	void SetClearMode(ClearMode mode);
 	void SetClearColor(XMFLOAT4 color);
 
-	void SetSkyCom(GameObject* sky);
-
-	void SetSky(GameObject* sky);
 
 	void SetMainCamera(void);
 
@@ -112,8 +101,14 @@ public:
 	BOOL FrustumCulling(XMVECTOR min, XMVECTOR max);
 
 
+	list<string*>& GetLayerCulling(void);
+	bool GetLayerCulling(string* layer);
+	void SetLayerCulling(string* layer, bool b);
+	void SetLayerCulling(string layer, bool b);
 
 private:
+
+	ProjectSetting* pProjectSetting;
 
 	D3D11_VIEWPORT vp;
 
@@ -131,7 +126,7 @@ private:
 	float				farZ;			// カメラのクリッピング最大値Z
 
 
-	BOOL layerCulling[(int)GameObject::Layer::LayerMax];
+	list<string*> layerCulling;
 
 	GameObject*			lookObject;
 	Renderer* pRenderer;
@@ -145,8 +140,6 @@ private:
 
 	ClearMode clearMode;
 
-	GameObject* sky;
-	vector<PrimitiveComponent*> skyComArray;
 
 	vector<PostEffectShader*> shaderArray;
 	int postEffectIndex;

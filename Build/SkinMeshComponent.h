@@ -46,11 +46,15 @@ public:
 
 
 	void SetSkinMeshData(SkinMeshData* data,SkinMeshLinkerComponent* linker);
+	void SetSkinMeshData(string fileName, unsigned int index);
 
 	void CreateVertexArray(int n, SkinMeshVertex* vertexArray);
 
+	SkinMeshData* GetSkinMeshData(void);
+	SkinMeshLinkerComponent* GetLinker(void);
 
-	
+	void SetLinker(SkinMeshLinkerComponent* linker);
+	void SetLinker(unsigned long id);
 
 private:
 

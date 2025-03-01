@@ -1,6 +1,8 @@
 #pragma once
 #include "Coreminimal.h"
 #include "SkinMeshPhongShader.h"
+#include "Assets.h"
+
 class AssetsManager;
 class SkinMeshTreeData;
 class BoneData;
@@ -40,7 +42,13 @@ public:
 
 	SkinMeshTreeNode* GetParent(void);
 
+	unsigned int GetIndex(void);
+	void SetIndex(unsigned int index);
+	SkinMeshTreeData* GetSkinMeshTree(void);
+
+
 protected:
+	unsigned int index;
 	AssetsManager* pAssetsManager;
 	Renderer* pRenderer;
 
@@ -79,7 +87,6 @@ public:
 	SkinMeshVertex* GetVertexArray(void);
 	int* GetCPIndexArray(void);
 
-	SkinMeshTreeData* GetSkinMeshTree(void);
 	void BufferSetIndex(void);
 
 	int GetIndexNum(void);
@@ -90,7 +97,6 @@ public:
 	XMFLOAT3 GetPosOffset(void);
 	XMFLOAT3 GetSclOffset(void);
 	XMFLOAT3 GetRotOffset(void);
-
 
 private:
 
@@ -154,7 +160,7 @@ private:
 
 };
 
-class SkinMeshTreeData
+class SkinMeshTreeData:public Assets
 {
 public:
 	SkinMeshTreeData(AssetsManager* p);
@@ -167,14 +173,20 @@ public:
 	int GetBoneCnt(void);
 	vector<SkinMeshTreeNode*>& GetNodeArray(void);
 
+
 	XMMATRIX GetInitMtx(string name);
 	void SetLinkMtx(pair<XMMATRIX, string> link);
 
 	int GetBoneNumber(string name);
 
+	void AddNode(SkinMeshTreeNode* node);
+
+	SkinMeshTreeNode* GetNode(unsigned int index);
+
 private:
 	AssetsManager* pAssetsManager;
 	vector<SkinMeshTreeNode*> nodeArray;
+	vector<SkinMeshTreeNode*> allNodeArray;
 	string fileName;
 	string name;
 	int skinCnt;

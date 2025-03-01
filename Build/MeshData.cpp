@@ -29,6 +29,8 @@ MeshData::MeshData()
 	this->worldOffset = XMMatrixIdentity();
 	this->childcnt = 0;
 	this->pAssetsManager = nullptr;
+	this->assetsType = AssetsType::MeshData;
+
 }
 
 MeshData::~MeshData()
@@ -163,6 +165,33 @@ XMVECTOR MeshData::GetBoxMax(void)
 	return boxMax;
 }
 
+unsigned int MeshData::AddMeshData(MeshData* child)
+{
+	allChildMeshData.push_back(child);
+	child->SetIndex(allChildMeshData.size() - 1);
+	return allChildMeshData.size() - 1;
+}
+
+MeshData* MeshData::GetMeshData(int n)
+{
+	return allChildMeshData[n];
+}
+
+unsigned int MeshData::GetIndex(void)
+{
+	return number;
+}
+
+void MeshData::SetIndex(unsigned int index)
+{
+	number = index;
+}
+
+MeshData* MeshData::GetRoot(void)
+{
+	return root;
+}
+
 
 
 
@@ -193,6 +222,9 @@ void MeshData::LoadFbxFile(string fileName, AssetsManager* p)
 
 	FbxNode* root = scene->GetRootNode();
 	this->isRoot = TRUE;
+	this->root = this;
+	this->AddMeshData(this);
+
 	pAssetsManager->AddMesh(this);
 
 	for (int i = 0; i < root->GetChildCount(); i++)
@@ -227,12 +259,14 @@ void MeshData::LoadFbxMesh(FbxMesh* mesh,AssetsManager* ap,MeshData* parent)
 	using namespace fbxsdk;
 	this->pAssetsManager = ap;
 	FbxNode* node = mesh->GetNode();
-	SetName(mesh->GetNode()->GetName());
+	Object::SetName(mesh->GetNode()->GetName());
 
 	this->parent = parent;
 	pAssetsManager->AddMesh(this);
 	this->isRoot = FALSE;
+	this->root = parent->GetRoot();
 	this->path = parent->GetPath();
+	root->AddMeshData(this);
 
 	int PolygonNum = mesh->GetPolygonCount();               //‘ƒ|ƒŠƒSƒ“”
 	if (PolygonNum==0)

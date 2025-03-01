@@ -26,30 +26,6 @@ public:
 	static const string TypeName;
 
 
-	enum class ObjectTag:int
-	{
-		Default,
-		Player,
-		Enemy,
-		PlayerAttack,
-		EnemyAttack,
-		Field,
-
-		ObjectTagMax,
-	};
-
-
-	enum class Layer:int
-	{
-		Default,
-		Sky,
-		Field,
-		Water,
-		UI,
-		Text,
-
-		LayerMax,
-	};
 
 	GameObject();
 	GameObject(Scene* scene);
@@ -58,9 +34,12 @@ public:
 
 	virtual void Awake(void);
 
+	void Load(void);
+
 	void InitAllComponent(void);
 
 	void Destroy(void);
+	void DynamicDestroy(void);
 	
 	void DeleteChild(GameObject* gameObject);
 	void DeleteComponnt(Component* com);
@@ -71,10 +50,10 @@ public:
 
 	TransformComponent* GetTransFormComponent(void);
 
-	void SetTag(ObjectTag tag);
-	ObjectTag GetTag(void);
-	void SetLayer(Layer layer);
-	Layer GetLayer(void);
+	void SetTag(string* tag);
+	string* GetTag(void);
+	void SetLayer(string* layer);
+	string* GetLayer(void);
 
 	BOOL GetActive(void);
 	void SetActive(BOOL isActive);
@@ -108,7 +87,13 @@ public:
 	void SetHasShadowAll(BOOL b);
 
 	GameObject* CreateChild(string name);
+	GameObject* LoadChild(string name);
 	GameObject* CreateChild(void);
+	GameObject* LoadChild(void);
+
+	void RemoveChild(GameObject* child);
+
+	void Unparent(void);
 
 	GameObject* CreateChildByTypeName(string typeName);
 	GameObject* DynamicCreateChildByTypeName(string typeName);
@@ -155,8 +140,8 @@ protected:
 
 	list<Component*> componentList;
 
-	ObjectTag tag;
-	Layer layer;
+	string* tag;
+	string* layer;
 
 	BOOL notAnim;
 
@@ -164,6 +149,7 @@ protected:
 
 	GameObject* parent;
 	list <GameObject*> childList;
+
 
 };
 

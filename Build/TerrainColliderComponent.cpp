@@ -13,7 +13,15 @@ void TerrainColliderComponent::Awake(void)
 {
 	ColliderComponent::Awake();
 	this->shape = Shape::Terrain;
+	TypeName = typeid(TerrainColliderComponent).name();;
 
+}
+
+void TerrainColliderComponent::Init(void)
+{
+	ColliderComponent::Init();
+
+	SetTerrainComponent(GetComponent<TerrainComponent>());
 }
 
 void TerrainColliderComponent::Uninit(void)

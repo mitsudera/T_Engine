@@ -96,6 +96,26 @@ float TerrainMaterial::GetHeightFacter(void)
 	return this->heightFacter;
 }
 
+float TerrainMaterial::GetEdgeFacter(void)
+{
+	return this->tessEdgeFacter;
+}
+
+float TerrainMaterial::GetInsideFacter(void)
+{
+	return this->tessInsideFacter;
+}
+
+XMFLOAT2 TerrainMaterial::GetUVscale(void)
+{
+	return this->uvScale;
+}
+
+XMFLOAT2 TerrainMaterial::GetMapUVscale(void)
+{
+	return this->heightMapUvScale;
+}
+
 
 
 

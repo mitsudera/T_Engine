@@ -15,14 +15,15 @@ public:
 		SkinMeshData,
 		AnimationData,
 		Scene,
+		Prefab,
 	};
 
 	AssetsType GetAssetsType(void);
 	virtual void SetName(string name, int count) override;
 	virtual void SetName(string name) override;
+	void SetConstName(string name);
 	void SetPath(string path);
 	string GetPath(void);
-
 
 protected:
 

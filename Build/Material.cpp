@@ -21,6 +21,11 @@ Material::~Material()
 {
 }
 
+void Material::SetName(string name)
+{
+	Object::SetName(name);
+}
+
 
 void Material::SetShaderRenderer(void)
 {

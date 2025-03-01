@@ -16,6 +16,8 @@ public:
 	Material();
 	~Material();
 
+	virtual void SetName(string name);
+
 	void SetShaderRenderer(void);
 
 	virtual void SetBufferMaterial(void) = 0;

@@ -140,6 +140,11 @@ void GUI::UpdateToolWindow(void)
 
             pGameEngine->TestPlay();
         }
+        if (ImGui::MenuItem("SaveProject"))
+        {
+
+            pSaveSystem->SaveProject();
+        }
         ImGui::EndMenuBar();
     }
     ImGui::End();
@@ -266,16 +271,30 @@ void GUI::UpdateHierarchyWindow(void)
 
     for (Scene* scene : pWorld->GetActiveSceneList())
     {
-        ImGui::SetNextItemOpen(true, ImGuiCond_Once);//初期状態を開いた状態にする
+        ImGui::SetNextItemOpen(true, ImGuiCond_Once); // 初期状態を開いた状態にする
         ImGuiTreeNodeFlags nodeFlags = (selectedObject == scene) ? ImGuiTreeNodeFlags_Selected : 0;
+        nodeFlags |= ImGuiTreeNodeFlags_OpenOnArrow; // ここでフラグを追加する
 
-        if (ImGui::TreeNodeEx(scene->GetName().c_str(),nodeFlags))
+
+        bool open = ImGui::TreeNodeEx(scene->GetName().c_str(), nodeFlags);
+
+        if (ImGui::IsItemClicked())
         {
+            selectedObject = scene;  // 選択されたオブジェクトを記憶
+
+
+        }
+
+        if (open)
+        {
+
             ShowObject(scene);
 
             ShowAllGameObject(scene);
             ImGui::TreePop();
         }
+
+
     }
 
     ImGui::End();
@@ -422,7 +441,7 @@ void GUI::UpdateInspectorWindow(void)
 
             if (ImGui::MenuItem("Remove"))
             {
-                gameObject->GetScene()->DeleteGameObject(gameObject);
+                gameObject->GetScene()->DynamicDeleteGameObject(gameObject);
                 selectedObject = nullptr;
 
 
@@ -471,19 +490,113 @@ void GUI::UpdateAssetsWindow(void)
     ImGui::SetNextWindowSize(ImVec2(sizeX, sizeY), ImGuiCond_Once);
     ImGui::Begin("Assets", NULL, ImGuiWindowFlags_MenuBar);
 
-    for (Assets* assets : pAssetsManager->GetAssetsList())
-    {
-        if (ImGui::Button(assets->GetName().c_str()))
+
+    ImGui::BeginTabBar("AssetsBar");
+
+    if (ImGui::BeginTabItem("Scene")) {
+
+        for (Assets* assets : pAssetsManager->GetAssetsList())
         {
-            selectedObject = assets;
+            if (assets->GetAssetsType() == Assets::AssetsType::Scene)
+            {
+                if (ImGui::Button(assets->GetName().c_str()))
+                {
+                    selectedObject = assets;
+                }
+
+            }
         }
 
+        ImGui::EndTabItem();
+    }
+
+    if (ImGui::BeginTabItem("Texture")) {
+
+        for (Assets* assets : pAssetsManager->GetAssetsList())
+        {
+            if (assets->GetAssetsType() == Assets::AssetsType::Texture)
+            {
+                if (ImGui::Button(assets->GetName().c_str()))
+                {
+                    selectedObject = assets;
+                }
+
+            }
+        }
+
+        ImGui::EndTabItem();
+    }
+
+    if (ImGui::BeginTabItem("Material")) {
+
+        for (Assets* assets : pAssetsManager->GetAssetsList())
+        {
+            if (assets->GetAssetsType() == Assets::AssetsType::Material)
+            {
+                if (ImGui::Button(assets->GetName().c_str()))
+                {
+                    selectedObject = assets;
+                }
+
+            }
+        }
+
+        ImGui::EndTabItem();
+    }
+
+    if (ImGui::BeginTabItem("MeshData")) {
+
+        for (Assets* assets : pAssetsManager->GetAssetsList())
+        {
+            if (assets->GetAssetsType() == Assets::AssetsType::MeshData)
+            {
+                if (ImGui::Button(assets->GetName().c_str()))
+                {
+                    selectedObject = assets;
+                }
+
+            }
+        }
+
+        ImGui::EndTabItem();
+    }
+
+    if (ImGui::BeginTabItem("SkinMeshData")) {
+
+        for (Assets* assets : pAssetsManager->GetAssetsList())
+        {
+            if (assets->GetAssetsType() == Assets::AssetsType::SkinMeshData)
+            {
+                if (ImGui::Button(assets->GetName().c_str()))
+                {
+                    selectedObject = assets;
+                }
+
+            }
+        }
+
+        ImGui::EndTabItem();
+    }
+
+    if (ImGui::BeginTabItem("AnimationData")) {
+
+        for (Assets* assets : pAssetsManager->GetAssetsList())
+        {
+            if (assets->GetAssetsType() == Assets::AssetsType::AnimationData)
+            {
+                if (ImGui::Button(assets->GetName().c_str()))
+                {
+                    selectedObject = assets;
+                }
+
+            }
+        }
+
+        ImGui::EndTabItem();
     }
 
 
-
-
-
+    ImGui::EndTabBar();
     ImGui::End();
 
 }
@@ -525,14 +638,24 @@ void GUI::ShowAllGameObject(Scene* scene)
     for (GameObject* gameObject : scene->GetGameObject())
     {
         ImGuiTreeNodeFlags nodeFlags = (selectedObject == gameObject) ? ImGuiTreeNodeFlags_Selected : 0;
+        nodeFlags |= ImGuiTreeNodeFlags_OpenOnArrow; // ここでフラグを追加する
 
-        if (ImGui::TreeNodeEx(gameObject->GetName().c_str(), nodeFlags))
+        bool open = ImGui::TreeNodeEx(gameObject->GetName().c_str(), nodeFlags);
         {
+            if (ImGui::IsItemClicked())
+            {
+                selectedObject = gameObject;  // 選択されたオブジェクトを記憶
 
-            ShowObject(gameObject);
 
-            ShowAllGameObject(gameObject);
-            ImGui::TreePop();
+            }
+            if (open)
+            {
+                ShowObject(gameObject);
+
+                ShowAllGameObject(gameObject);
+                ImGui::TreePop();
+
+            }
         }
     }
 }
@@ -541,10 +664,21 @@ void GUI::ShowAllGameObject(GameObject* gameObject)
 {
     for (GameObject* child : gameObject->GetChild())
     {
-        ImGuiTreeNodeFlags nodeFlags = (selectedObject == gameObject) ? ImGuiTreeNodeFlags_Selected : 0;
+        ImGuiTreeNodeFlags nodeFlags = (selectedObject == child) ? ImGuiTreeNodeFlags_Selected : 0;
 
-        if (ImGui::TreeNodeEx(child->GetName().c_str(), nodeFlags))
+        bool open = ImGui::TreeNodeEx(child->GetName().c_str(), nodeFlags);
+
+        if (ImGui::IsItemClicked())
         {
+            selectedObject = child;  // 選択されたオブジェクトを記憶
+
+
+        }
+
+
+        if (open)
+        {
+
             ShowObject(child);
             ShowAllGameObject(child);
             ImGui::TreePop();
@@ -555,12 +689,6 @@ void GUI::ShowAllGameObject(GameObject* gameObject)
 void GUI::ShowObject(Object* object)
 {
 
-    if (ImGui::IsItemClicked())
-    {
-        selectedObject = object;  // 選択されたオブジェクトを記憶
-
-
-    }
 
 
     if (GameObject* gameObject = dynamic_cast<GameObject*>(object))
@@ -568,9 +696,9 @@ void GUI::ShowObject(Object* object)
 
 
 
-        if (ImGui::IsItemClicked())
+        if (ImGui::IsItemHovered()&&ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left))
         {
-
+            
 
             pEditerCamera->FocusObject(gameObject);
         }
@@ -955,6 +1083,29 @@ void GUI::ShowTerrainComponent(TerrainComponent* com)
 }
 void GUI::ShowCamCom(CameraComponent* com)
 {
+    if (ImGui::TreeNode("LayerCulling"))
+    {
+
+        for (string* layer: pProjectSetting->GetLayerList())
+        {
+            bool cull = com->GetLayerCulling(layer);
+            
+            ImGui::Text(layer->data());
+            ImGui::SameLine();
+
+            string label = "##" + *layer;
+
+            if (ImGui::Checkbox(label.c_str(), &cull))
+            {
+                com->SetLayerCulling(layer, cull);
+
+            }
+
+        }
+
+        ImGui::TreePop();
+
+    }
 
 }
 

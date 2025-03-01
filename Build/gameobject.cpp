@@ -23,7 +23,6 @@ GameObject::GameObject()
 	this->transformComponent = new TransformComponent(this);
 	this->componentList.push_back(transformComponent);
 
-	tag = ObjectTag::Default;
 
 }
 
@@ -32,9 +31,9 @@ GameObject::GameObject(Scene* scene)
 {
 	this->parent = nullptr;
 	this->pScene = scene;
-	tag = ObjectTag::Default;
+	tag = nullptr;
 
-	this->layer = Layer::Default;
+	this->layer = nullptr;
 
 
 	this->transformComponent = new TransformComponent(this);
@@ -69,12 +68,13 @@ void GameObject::Awake(void)
 	this->pProjectSetting = pGameEngine->GetProjectSetting();
 	this->isActive = TRUE;
 	this->transformComponent->Awake();
-	tag = ObjectTag::Default;
 	notAnim = FALSE;
 	type = Type::GameObject;
 	
+	this->tag = pProjectSetting->GetTag("Default");
+	this->layer = pProjectSetting->GetLayer("Default");
 
-	this->layer = Layer::Default;
+	
 	if (parent)
 	{
 		this->isActive = parent->GetActive();
@@ -84,6 +84,22 @@ void GameObject::Awake(void)
 
 	}
 	SetID();
+	pScene->AddAllGameObject(this);
+}
+
+void GameObject::Load(void)
+{
+	this->pWorld = pScene->GetWorld();
+
+	this->pGameEngine = pScene->GetGameEngine();
+	this->pProjectSetting = pGameEngine->GetProjectSetting();
+	this->isActive = TRUE;
+	this->transformComponent->Awake();
+	notAnim = FALSE;
+	type = Type::GameObject;
+	
+
+	
 	pScene->AddAllGameObject(this);
 }
 
@@ -98,7 +114,6 @@ void GameObject::InitAllComponent(void)
 
 void GameObject::Destroy(void)
 {
-	
 
 	for (Component* com: this->componentList)
 	{
@@ -107,13 +122,39 @@ void GameObject::Destroy(void)
 	}
 	this->componentList.clear();
 
+
 	for (GameObject* child: childList)
 	{
 		child->Destroy();
 		delete child;
-
 	}
+
+
 	this->childList.clear();
+
+	
+}
+
+void GameObject::DynamicDestroy(void)
+{
+	for (Component* com : this->componentList)
+	{
+		com->Uninit();
+		delete com;
+	}
+	this->componentList.clear();
+
+
+	for (GameObject* child : childList)
+	{
+		child->DynamicDestroy();
+		delete child;
+	}
+
+
+	this->childList.clear();
+	pScene->RemoveAllGameObjectList(this);
+	pScene->RemoveGameObject(this);
 }
 
 void GameObject::DeleteChild(GameObject* gameObject)
@@ -154,31 +195,35 @@ TransformComponent* GameObject::GetTransFormComponent(void)
 	return this->transformComponent;
 }
 
-
-void GameObject::SetTag(ObjectTag tag)
+void GameObject::SetTag(string* tag)
 {
 	this->tag = tag;
+	for (GameObject* child : childList)
+	{
+		child->SetTag(tag);
+	}
+
 }
 
-GameObject::ObjectTag GameObject::GetTag(void)
+string* GameObject::GetTag(void)
 {
-	return tag;
+	return this->tag;
 }
 
-void GameObject::SetLayer(Layer layer)
+void GameObject::SetLayer(string* layer)
 {
 	this->layer = layer;
-
-	for (GameObject* go : childList)
+	for (GameObject* child : childList)
 	{
-		go->SetLayer(layer);
+		child->SetLayer(layer);
 	}
 }
 
-GameObject::Layer GameObject::GetLayer(void)
+string* GameObject::GetLayer(void)
 {
 	return this->layer;
 }
+
 
 BOOL GameObject::GetActive(void)
 {
@@ -331,15 +376,45 @@ void GameObject::SetHasShadowAll(BOOL b)
 GameObject* GameObject::CreateChild(string name)
 {
 	GameObject* newObj = new GameObject(pScene);
-	newObj->SetName(name);
 	newObj->Awake();
 	this->AddChild(newObj);
+	newObj->SetName(name);
+
+	return newObj;
+}
+GameObject* GameObject::LoadChild(string name)
+{
+	GameObject* newObj = new GameObject(pScene);
+	newObj->Load();
+	this->AddChild(newObj);
+	newObj->SetName(name);
+
 	return newObj;
 }
 
 GameObject* GameObject::CreateChild(void)
 {
 	return CreateChild("GameObject");
+}
+
+GameObject* GameObject::LoadChild(void)
+{
+	return LoadChild("GameObject");
+}
+
+void GameObject::RemoveChild(GameObject* child)
+{
+	childList.remove(child);
+}
+
+void GameObject::Unparent(void)
+{
+	if (!parent)
+		return;
+
+	this->parent->RemoveChild(this);
+
+	this->parent = nullptr;
 }
 
 GameObject* GameObject::CreateChildByTypeName(string typeName)

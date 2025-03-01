@@ -8,6 +8,7 @@ class SceneAssetsData;
 class MeshData;
 
 class SkinMeshTreeData;
+class SkinMeshTreeNode;
 
 class DX11Texture;
 
@@ -64,8 +65,11 @@ public:
 	MeshData* LoadMeshFileFbx(string fileName);
 	void AddMesh(MeshData* data);
 
+	MeshData* GetMesh(string fileName, int index);
+
 	SkinMeshTreeData* LoadSkinMeshFileFbx(string fileName);
 
+	SkinMeshTreeNode* GetSkinMeshTreeNode(string fileName, int index);
 
 	AnimationData* LoadAnimationData(string fileName);
 
@@ -125,6 +129,11 @@ public:
 
 	SceneAssetsData* CreateNewSceneAssets(string name);
 
+	SceneAssetsData* LoadSceneAssets(SceneAssetsData* loadData);
+
+	void AddAssets(Assets* assets);
+	void AddLoadAssets(Assets* assets);
+
 private:
 
 	GameEngine* pGameEngine;
@@ -141,10 +150,6 @@ private:
 	list<PostEffectShader*> PostEffectShaderList;
 	list<ComputeShader*> ComputeShaderList;
 	list<SkinMeshTreeData*> SkinMeshTreeDataList;
-
-	//vector<KeyFrameAnimData*>  KeyFrameAnimDataArray;
-	//vector<SkinMeshDataList*> SkinMeshDataListArray;
-	//vector<SkeletonAnimData*> SkeletonAnimDataArray;
 	list<Material*> MaterialArray;
 	list<Material*> ShadowMaterialArray;
 	list<DX11Texture*> TextureList;
@@ -167,6 +172,8 @@ private:
 	//cs
 	SkinMeshComputeShader* skinMeshCompute;
 
+	unsigned long idCnt;
+	list<unsigned long> notUseIDList;
 
 };
 

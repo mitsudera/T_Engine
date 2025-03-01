@@ -15,6 +15,8 @@ void BoxColliderComponent::Awake(void)
 {
 	ColliderComponent::Awake();
 	this->shape = Shape::Box;
+	TypeName = typeid(BoxColliderComponent).name();;
+
 }
 
 void BoxColliderComponent::Uninit(void)

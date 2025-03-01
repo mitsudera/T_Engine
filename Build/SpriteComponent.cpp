@@ -29,6 +29,8 @@ void SpriteComponent::Awake(void)
 	texSlice.x = 1;
 	texSlice.y = 1;
 	texLRrev = FALSE;
+	TypeName = typeid(SpriteComponent).name();;
+
 }
 
 void SpriteComponent::Update(void)

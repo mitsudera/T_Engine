@@ -1,0 +1,25 @@
+{
+    "DefaulScene": "",
+    "ProjectName": "project",
+    "layer": [
+        "Default",
+        "Sky",
+        "Field",
+        "Water",
+        "UI",
+        "Text"
+    ],
+    "openScene": [
+        {
+            "name": "default"
+        }
+    ],
+    "tag": [
+        "Default",
+        "Player",
+        "Enemy",
+        "PlayerAttack",
+        "EnemyAttack",
+        "Field"
+    ]
+}

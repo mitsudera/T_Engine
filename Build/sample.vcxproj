@@ -163,7 +163,6 @@
     <ClInclude Include="BoxColliderComponent.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="CameraComponent.h" />
-    <ClInclude Include="CameraControllerComponent.h" />
     <ClInclude Include="CapsuleColliderComponent.h" />
     <ClInclude Include="CBufferManager.h" />
     <ClInclude Include="ColliderComponent.h" />
@@ -215,6 +214,7 @@
     <ClInclude Include="MeshComponent.h" />
     <ClInclude Include="NotEffectShader.h" />
     <ClInclude Include="Object.h" />
+    <ClInclude Include="Prefab.h" />
     <ClInclude Include="ProjectSetting.h" />
     <ClInclude Include="QuadComponent.h" />
     <ClInclude Include="RigidBodyComponent.h" />
@@ -280,7 +280,6 @@
     <ClCompile Include="BoxColliderComponent.cpp" />
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="CameraComponent.cpp" />
-    <ClCompile Include="CameraControllerComponent.cpp" />
     <ClCompile Include="CapsuleColliderComponent.cpp" />
     <ClCompile Include="CBufferManager.cpp" />
     <ClCompile Include="ColliderComponent.cpp" />
@@ -329,6 +328,7 @@
     <ClCompile Include="MeshComponent.cpp" />
     <ClCompile Include="NotEffectShader.cpp" />
     <ClCompile Include="Object.cpp" />
+    <ClCompile Include="Prefab.cpp" />
     <ClCompile Include="ProjectSetting.cpp" />
     <ClCompile Include="QuadComponent.cpp" />
     <ClCompile Include="RigidBodyComponent.cpp" />

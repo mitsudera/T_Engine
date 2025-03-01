@@ -13,6 +13,8 @@ void LineColliderComponent::Awake(void)
 {
 	ColliderComponent::Awake();
 	this->shape = Shape::Line;
+	TypeName = typeid(LineColliderComponent).name();;
+
 }
 
 void LineColliderComponent::Uninit(void)

@@ -30,6 +30,8 @@ void TextMeshComponent::Awake(void)
 	CreateVertexBuffer();
 	this->material = pGameObject->GetScene()->GetGameEngine()->GetAssetsManager()->GetMaterial("UIMaterial");
 	SetAlphaTest(TRUE);
+    TypeName = typeid(TextMeshComponent).name();;
+
 }
 
 void TextMeshComponent::Update(void)

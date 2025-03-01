@@ -297,9 +297,6 @@
     <ClInclude Include="UIShader.h">
       <Filter>Shader\UIShader</Filter>
     </ClInclude>
-    <ClInclude Include="CameraControllerComponent.h">
-      <Filter>component\Camera</Filter>
-    </ClInclude>
     <ClInclude Include="DebugCamera.h">
       <Filter>gameobject\Camera</Filter>
     </ClInclude>
@@ -534,9 +531,6 @@
     <ClInclude Include="ProjectSetting.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="Assets.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
     <ClInclude Include="ImGuizmo\GraphEditor.h">
       <Filter>GameEngine\imgui</Filter>
     </ClInclude>
@@ -563,6 +557,12 @@
     </ClInclude>
     <ClInclude Include="AssetsManager.h">
       <Filter>Assets</Filter>
+    </ClInclude>
+    <ClInclude Include="Assets.h">
+      <Filter>Assets</Filter>
+    </ClInclude>
+    <ClInclude Include="Prefab.h">
+      <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -631,9 +631,6 @@
     </ClCompile>
     <ClCompile Include="UIMaterial.cpp">
       <Filter>Shader\UIShader</Filter>
-    </ClCompile>
-    <ClCompile Include="CameraControllerComponent.cpp">
-      <Filter>component\Camera</Filter>
     </ClCompile>
     <ClCompile Include="DebugCamera.cpp">
       <Filter>gameobject\Camera</Filter>
@@ -863,9 +860,6 @@
     <ClCompile Include="ProjectSetting.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="Assets.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
     <ClCompile Include="ImGuizmo\GraphEditor.cpp">
       <Filter>GameEngine\imgui</Filter>
     </ClCompile>
@@ -889,6 +883,12 @@
     </ClCompile>
     <ClCompile Include="AssetsManager.cpp">
       <Filter>Assets</Filter>
+    </ClCompile>
+    <ClCompile Include="Assets.cpp">
+      <Filter>Assets</Filter>
+    </ClCompile>
+    <ClCompile Include="Prefab.cpp">
+      <Filter>ソース ファイル</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

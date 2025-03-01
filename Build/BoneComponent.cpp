@@ -21,6 +21,8 @@ void BoneComponent::Awake(void)
 	Component::Awake();
 	isPhysics = FALSE;
 	joint = Joint::Standard;
+	TypeName = typeid(BoneComponent).name();;
+
 
 }
 void BoneComponent::Init(void)

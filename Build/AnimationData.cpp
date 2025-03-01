@@ -255,9 +255,11 @@ MtxNode* AnimationData::GetMtxTreeRoot(void)
 
 void AnimationData::LoadAnimation(string fileName, AssetsManager* assetsManager)
 {
-
+	fileNum = 1;
 	this->fileName = fileName;
 	
+	SetName(fileName);
+
 	string path = ANIMATION_PATH + fileName;
 
 	FbxManager* manager;
@@ -338,7 +340,8 @@ void AnimationData::LoadAnimation(string fileName1, string fileName2, AssetsMana
 	this->fileName = fileName1;
 	this->fileNameSecond = fileName2;
 
-
+	fileNum = 2;
+	SetName("blend" + fileName1 + "&" + fileName2);
 	pAssetsManager = assetsManager;
 
 	AnimationData* animData1 = pAssetsManager->LoadAnimationData(fileName1);
@@ -363,6 +366,9 @@ void AnimationData::LoadAnimation(string fileName1, string fileName2, string fil
 	this->fileName3 = fileName3;
 	this->fileName4 = fileName4;
 
+	fileNum = 4;
+	SetName("blend" + fileName1 + "&" + fileName2 + "&" + fileName3 + "&" + fileName4);
+
 
 	pAssetsManager = assetsManager;
 
@@ -381,6 +387,11 @@ void AnimationData::LoadAnimation(string fileName1, string fileName2, string fil
 
 	mtxTreeRoot = bmtxTreeRoot;
 
+}
+
+int AnimationData::GetFileNum(void)
+{
+	return fileNum;
 }
 
 BlendMtxNode::BlendMtxNode()

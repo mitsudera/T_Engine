@@ -7,6 +7,8 @@
 #include "Material.h"
 #include "SkinMeshLinkerComponent.h"
 #include "BoneComponent.h"
+#include "AssetsManager.h"
+#include "Scene.h"
 
 #define TEXTURE_PATH	"data/TEXTURE/"
 
@@ -30,6 +32,8 @@ void SkinMeshComponent::Awake(void)
 	this->isFrustumCulling = TRUE;
 
 	hasShadow = TRUE;
+
+	TypeName = typeid(SkinMeshComponent).name();
 
 }
 
@@ -157,6 +161,11 @@ void SkinMeshComponent::SetSkinMeshData(SkinMeshData* data, SkinMeshLinkerCompon
 
 }
 
+void SkinMeshComponent::SetSkinMeshData(string fileName, unsigned int index)
+{
+	skinMeshData = dynamic_cast<SkinMeshData*>(pAssetsManager->GetSkinMeshTreeNode(fileName, index));
+}
+
 void SkinMeshComponent::CreateVertexArray(int n, SkinMeshVertex* vertexArray)
 {
 	this->vertexArray = new SkinMeshVertex[n];
@@ -186,4 +195,24 @@ void SkinMeshComponent::CreateVertexArray(int n, SkinMeshVertex* vertexArray)
 
 
 
+}
+
+SkinMeshData* SkinMeshComponent::GetSkinMeshData(void)
+{
+	return this->skinMeshData;
+}
+
+SkinMeshLinkerComponent* SkinMeshComponent::GetLinker(void)
+{
+	return linker;
+}
+
+void SkinMeshComponent::SetLinker(SkinMeshLinkerComponent* linker)
+{
+	this->linker = linker;
+}
+
+void SkinMeshComponent::SetLinker(unsigned long id)
+{
+	this->linker = pScene->GetGameObject(id)->GetComponent<SkinMeshLinkerComponent>();
 }

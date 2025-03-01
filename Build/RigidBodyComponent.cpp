@@ -5,6 +5,8 @@
 #include "TerrainComponent.h"
 #include "ColliderComponent.h"
 #include "Scene.h"
+#include "GameEngine.h"
+#include "ProjectSetting.h"
 
 constexpr XMFLOAT3 gravity = XMFLOAT3(0.0f, -981.f, 0.0f); // 標準重力
 constexpr float onGroundFacter = 5.0f;
@@ -32,6 +34,8 @@ void RigidBodyComponent::Awake(void)
 	onGround = TRUE;
 	isStatic = FALSE;
 	isFixTerrain = TRUE;
+	TypeName = typeid(RigidBodyComponent).name();;
+
 }
 
 void RigidBodyComponent::Init(void)
@@ -104,11 +108,11 @@ void RigidBodyComponent::FixedLateUpdate(void)
 		if (isFixTerrain)
 		{
 			//地面との当たり判定を取得し座標修正
-			if (collider->GetHitTag(GameObject::ObjectTag::Field))
+			if (collider->GetHitTag(pGameEngine->GetProjectSetting()->GetTag("Field")))
 			{
 
 
-				float h = collider->GetHitTagObject(GameObject::ObjectTag::Field)->GetComponent<TerrainComponent>()->GetHeight(GetWorldPos());
+				float h = collider->GetHitTagObject(pGameEngine->GetProjectSetting()->GetTag("Field"))->GetComponent<TerrainComponent>()->GetHeight(GetWorldPos());
 
 				worldPos.m128_f32[1] = h;
 				onGround = TRUE;
@@ -196,11 +200,11 @@ void RigidBodyComponent::FixedLateUpdate(void)
 	if (!fixY)
 	{
 		//地面との当たり判定を取得し座標修正
-		if (collider->GetHitTag(GameObject::ObjectTag::Field))
+		if (collider->GetHitTag(pGameEngine->GetProjectSetting()->GetTag("Field")))
 		{
 
 
-			float h = collider->GetHitTagObject(GameObject::ObjectTag::Field)->GetComponent<TerrainComponent>()->GetHeight(GetWorldPos());
+			float h = collider->GetHitTagObject(pGameEngine->GetProjectSetting()->GetTag("Field"))->GetComponent<TerrainComponent>()->GetHeight(GetWorldPos());
 			if (worldPos.m128_f32[1] > h)
 			{
 				onGround = FALSE;

@@ -21,6 +21,8 @@
 #include "PostEffectShader.h"
 #include "DebugUtility.h"
 #include "World.h"
+#include "ProjectSetting.h"
+
 //*****************************************************************************
 // マクロ定義
 //*****************************************************************************
@@ -40,10 +42,6 @@ static int				ViewPortType = TYPE_FULL_SCREEN;
 
 CameraComponent::CameraComponent()
 {
-	for (int i = 0; i < (int)GameObject::Layer::LayerMax; i++)
-	{
-		layerCulling[i] = FALSE;
-	}
 
 }
 
@@ -53,10 +51,6 @@ CameraComponent::CameraComponent(GameObject* gameObject)
 	pRenderer = gameObject->GetScene()->GetGameEngine()->GetRenderer();
 
 	gameObject->GetScene()->AddCamera(this);
-	for (int i = 0; i < (int)GameObject::Layer::LayerMax; i++)
-	{
-		layerCulling[i] = FALSE;
-	}
 
 	// カメラバッファ生成
 	D3D11_BUFFER_DESC hBufferDesc;
@@ -81,8 +75,8 @@ CameraComponent::~CameraComponent()
 void CameraComponent::Awake(void)
 {
 	Component::Awake();
-	TypeName = "Camera";
-
+	TypeName = typeid(CameraComponent).name();;
+	pProjectSetting = pGameEngine->GetProjectSetting();
 	this->attribute = Attribute::Camera;
 
 	this->mode = TrackingMode::NONE;
@@ -103,10 +97,6 @@ void CameraComponent::Awake(void)
 	this->len = 50.0f;
 
 	this->mode = TrackingMode::NONE;
-	for (int i = 0; i < (int)GameObject::Layer::LayerMax; i++)
-	{
-		layerCulling[i] = FALSE;
-	}
 
 	this->clearColor = XMFLOAT4(0.5f, 0.5f, 0.5f, 1.0f);
 
@@ -116,6 +106,8 @@ void CameraComponent::Awake(void)
 
 	renderTexture = pGameEngine->GetAssetsManager()->CreateRenderTexture((int)1920.0f, (int)1080.0f, "cameraRT");
 	postEffectIndex = 0;
+	layerCulling.push_back(pProjectSetting->GetLayer("Sky"));
+	layerCulling.push_back(pProjectSetting->GetLayer("Text"));
 
 }
 
@@ -210,7 +202,6 @@ void CameraComponent::Render(void)
 
 			//スカイスフィアで背景クリアをする場合
 
-			layerCulling[(int)GameObject::Layer::Sky] = TRUE;
 			pRenderer->SetDepthEnable(FALSE);
 
 
@@ -220,10 +211,17 @@ void CameraComponent::Render(void)
 			pGameEngine->GetCBufferManager()->SetViewMtx(&cMtx);
 
 
-			for (PrimitiveComponent* com : skyComArray)
+			for (Scene* scene : pWorld->GetActiveSceneList())
 			{
-				com->GetMaterial()->GetShaderSet()->SetShaderRenderer();
-				com->Draw();
+				for (PrimitiveComponent* com : scene->GetAllPrimitiveComponent())
+				{
+					if (com->GetGameObject()->GetLayer() == pProjectSetting->GetLayer("Sky"))
+					{
+						com->GetMaterial()->GetShaderSet()->SetShaderRenderer();
+						com->Draw();
+
+					}
+				}
 			}
 
 
@@ -262,7 +260,6 @@ void CameraComponent::Render(void)
 
 			//スカイスフィアで背景クリアをする場合
 
-			layerCulling[(int)GameObject::Layer::Sky] = TRUE;
 			pRenderer->SetDepthEnable(FALSE);
 			XMMATRIX cMtx = this->mtxView;
 			cMtx.r[3] = XMVectorSet(0.0f, 0.0f, 0.0f, 1.0f);
@@ -270,12 +267,18 @@ void CameraComponent::Render(void)
 			pGameEngine->GetCBufferManager()->SetViewMtx(&cMtx);
 
 
-			for (PrimitiveComponent* com:skyComArray)
+			for (Scene* scene : pWorld->GetActiveSceneList())
 			{
-				com->GetMaterial()->GetShaderSet()->SetShaderRenderer();
-				com->Draw();
-			}
+				for (PrimitiveComponent* com : scene->GetAllPrimitiveComponent())
+				{
+					if (com->GetGameObject()->GetLayer() == pProjectSetting->GetLayer("Sky"))
+					{
+						com->GetMaterial()->GetShaderSet()->SetShaderRenderer();
+						com->Draw();
 
+					}
+				}
+			}
 
 			pRenderer->SetDepthEnable(TRUE);
 
@@ -304,9 +307,9 @@ void CameraComponent::Render(void)
 
 				if (com->GetAlphaTest())
 					continue;
-
 				//レイヤーのカリングチェック
-				if (layerCulling[(int)com->GetGameObject()->GetLayer()] || com->GetGameObject()->GetLayer() == GameObject::Layer::Text)
+				auto it = find(layerCulling.begin(), layerCulling.end(), com->GetGameObject()->GetLayer());
+				if (it != layerCulling.end())
 					continue;
 
 				if (com->GetMaterial() == nullptr)
@@ -372,7 +375,8 @@ void CameraComponent::Render(void)
 
 
 					//レイヤーのカリングチェック
-					if (layerCulling[(int)com->GetGameObject()->GetLayer()] || com->GetGameObject()->GetLayer() == GameObject::Layer::Text)
+					auto it = find(layerCulling.begin(), layerCulling.end(), com->GetGameObject()->GetLayer());
+					if (it != layerCulling.end())
 						continue;
 
 					if (com->GetMaterial() == nullptr)
@@ -431,9 +435,10 @@ void CameraComponent::Render(void)
 			if (!com->GetActive())
 				continue;
 
+
 			//レイヤーのカリングチェック
-			if (com->GetGameObject()->GetLayer() != GameObject::Layer::Text)
-				continue;
+			if (com->GetGameObject()->GetLayer() != pProjectSetting->GetLayer("Text"))
+			continue;
 
 
 
@@ -486,25 +491,6 @@ void CameraComponent::SetClearMode(ClearMode mode)
 void CameraComponent::SetClearColor(XMFLOAT4 color)
 {
 	this->clearColor = color;
-}
-
-void CameraComponent::SetSkyCom(GameObject* sky)
-{
-	PrimitiveComponent* com = sky->GetComponent<PrimitiveComponent>();
-	if (com != nullptr)
-		skyComArray.push_back(com);
-
-	for (GameObject* obj : sky->GetChild())
-	{
-		SetSkyCom(obj);
-	}
-	clearMode = ClearMode::SkySphere;
-}
-
-void CameraComponent::SetSky(GameObject* sky)
-{
-	this->sky = sky;
-	SetSkyCom(sky);
 }
 
 void CameraComponent::SetMainCamera(void)
@@ -598,6 +584,59 @@ BOOL CameraComponent::FrustumCulling(XMVECTOR min, XMVECTOR max)
 
 	return true;
 }
+
+list<string*>& CameraComponent::GetLayerCulling(void)
+{
+	return layerCulling;
+}
+
+bool CameraComponent::GetLayerCulling(string* layer)
+{
+	auto it = find(layerCulling.begin(), layerCulling.end(), layer);
+	if (it != layerCulling.end())
+	{
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+}
+
+void CameraComponent::SetLayerCulling(string* layer, bool b)
+{
+	if (b)
+	{
+		if (GetLayerCulling(layer))
+		{
+			return;
+		}
+		else
+		{
+			layerCulling.push_back(layer);
+		}
+
+	}
+	else
+	{
+		if (GetLayerCulling(layer))
+		{
+			layerCulling.remove(layer);
+		}
+		else
+		{
+			return;
+		}
+
+	}
+}
+
+void CameraComponent::SetLayerCulling(string layer, bool b)
+{
+	SetLayerCulling(pProjectSetting->GetLayer(layer), b);
+
+}
+
 void CameraComponent::SetFrustumPlanes(void)
 {
 	

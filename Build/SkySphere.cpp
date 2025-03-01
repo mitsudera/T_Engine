@@ -4,7 +4,7 @@
 #include "renderer.h"
 #include "Scene.h"
 #include "GameEngine.h"
-
+#include "ProjectSetting.h"
 
 SkySphere::SkySphere(Scene* scene)
 {
@@ -30,6 +30,6 @@ void SkySphere::Awake(void)
 	this->SerchAllChild("pSphere1")->GetComponent<PrimitiveComponent>()->SetDrawShadow(FALSE);
 	this->SerchAllChild("pSphere1")->GetComponent<PrimitiveComponent>()->SetHasShadow(FALSE);
 
-	SetLayer(Layer::Sky);
+	SetLayer(pProjectSetting->GetLayer("Sky"));
 
 }

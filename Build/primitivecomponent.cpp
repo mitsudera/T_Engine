@@ -42,6 +42,9 @@ void PrimitiveComponent::Awake(void)
 	drawShadow = TRUE;
 
 	isFrustumCulling = FALSE;
+
+	TypeName = typeid(PrimitiveComponent).name();;
+
 }
 
 void PrimitiveComponent::Update(void)
@@ -92,9 +95,9 @@ Material* PrimitiveComponent::GetMaterial(void)
 	return this->material;
 }
 
-void PrimitiveComponent::SetMaterial(Material* matelial)
+void PrimitiveComponent::SetMaterial(Material* material)
 {
-	this->material = matelial;
+	this->material = material;
 }
 
 Material* PrimitiveComponent::LoadMaterial(Material* material)
@@ -106,6 +109,19 @@ Material* PrimitiveComponent::LoadMaterial(Material* material)
 
 Material* PrimitiveComponent::GetShadowMaterial(void)
 {
+	return this->shadowMaterial;
+}
+
+void PrimitiveComponent::SetShadowMaterial(Material* material)
+{
+	this->shadowMaterial = material;
+
+}
+
+Material* PrimitiveComponent::LoadShadowMaterial(Material* material)
+{
+	this->shadowMaterial = pGameEngine->GetAssetsManager()->LoadMaterial(material);
+
 	return this->shadowMaterial;
 }
 

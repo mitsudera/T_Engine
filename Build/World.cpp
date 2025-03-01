@@ -19,7 +19,6 @@ World::World(GameEngine* gameEngine)
 	this->shadowMap = new ShadowMap(this);
 	this->shadowMap->CreateShadowMap(ShadowMap::ShadowQuality::High);
 	this->sceneManager = new SceneManager(this);
-	sceneManager->CreateNewScene("default");
 
 	if (pGameEngine->GetEditerMode())
 	{

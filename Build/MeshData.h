@@ -64,10 +64,16 @@ class Material;
 	 XMVECTOR GetBoxMin(void);
 	 XMVECTOR GetBoxMax(void);
 
- private:
-	 AssetsManager* pAssetsManager;
+	 unsigned int AddMeshData(MeshData* child);
+	 MeshData* GetMeshData(int n);
 
-	 int index;
+	 unsigned int GetIndex(void);
+	 void SetIndex(unsigned int index);
+
+	 MeshData* GetRoot(void);
+
+ private:
+
 
 	 ID3D11Buffer* VertexBuffer;
 	 unsigned int indexnum;
@@ -79,13 +85,14 @@ class Material;
 	 XMFLOAT3	rotOffset;
 
 	 MeshData* parent;
+	 MeshData* root;
 	 int childcnt;
 	 vector <MeshData*> childArray;
-
+	 unsigned int number;
 	 Material* material;
 	 Material* shadowMaterial;
 	 BOOL isRoot;
-
+	 vector <MeshData*> allChildMeshData;
 	 XMVECTOR boxMin;
 	 XMVECTOR boxMax;
 

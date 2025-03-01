@@ -60,6 +60,7 @@ public:
 	//void RotForward(XMFLOAT3 forward);
 	void SetWorldMtx(XMMATRIX mtx);
 	void SetLocalMtx(XMMATRIX mtx);
+	void SetLocalMtxNotScaling(XMMATRIX mtx);
 	void SetLocalMtx(XMMATRIX mtx1, float weight1, XMMATRIX mtx2, float weight2);
 	void SetLocalMtxNotScaling(XMMATRIX mtx1, float weight1, XMMATRIX mtx2, float weight2);
 	void SetTransForm(XMFLOAT3 pos, XMFLOAT3 rot, XMFLOAT3 scl);

@@ -24,6 +24,7 @@ public:
 	Type GetType(void);
 	
 	unsigned long GetID(void);
+	void SetID(unsigned long id);
 
 protected:
 	unsigned long ID;

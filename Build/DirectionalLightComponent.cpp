@@ -7,7 +7,7 @@
 DirectionalLightComponent::DirectionalLightComponent(GameObject* gameObject)
 {
 	this->pGameObject = gameObject;
-	
+
 }
 
 DirectionalLightComponent::~DirectionalLightComponent()
@@ -18,6 +18,8 @@ void DirectionalLightComponent::Awake(void)
 {
 	Component::Awake();
 	index = pWorld->GetLightmanager()->AddLight(this);
+	TypeName = typeid(DirectionalLightComponent).name();;
+
 }
 
 void DirectionalLightComponent::Uninit(void)

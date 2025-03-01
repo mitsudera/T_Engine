@@ -26,6 +26,8 @@ void SkinMeshLinkerComponent::Awake(void)
 
 	skinMeshShader = pGameEngine->GetAssetsManager()->GetSkinMeshShader();
 
+	TypeName = typeid(SkinMeshLinkerComponent).name();;
+
 }
 
 

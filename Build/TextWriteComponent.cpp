@@ -30,6 +30,9 @@ void TextWriteComponent::Awake(void)
 	this->SetAnchor(XMFLOAT2(0.5f, 0.5f));
 	this->SetPivot(XMFLOAT2(0.5f, 0.5f));
 	this->SetTextAnchor(TEXT_ANCHOR_CENTER_CENTER);
+
+	TypeName = typeid(TextWriteComponent).name();;
+
 }
 
 void TextWriteComponent::Update(void)

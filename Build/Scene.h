@@ -38,9 +38,13 @@ public:
 	GameObject* CreateGameObjectByTypeName(string typeName);
 	GameObject* CreateGameObject(void);
 
+	GameObject* LoadGameObject(void);
+
 	void AddGameObject(GameObject* gameObject);
 	void RemoveGameObject(GameObject* gameObject);
 	void DeleteGameObject(GameObject* gameObject);
+
+	void DynamicDeleteGameObject(GameObject* gameObject);
 
 	World* GetWorld(void);
 
@@ -96,6 +100,7 @@ public:
 
 	void SetSceneAssetsData(SceneAssetsData* data);
 
+	void RemoveAllGameObjectList(GameObject* gameObject);
 
 protected:
 	GameEngine* pGameEngine;

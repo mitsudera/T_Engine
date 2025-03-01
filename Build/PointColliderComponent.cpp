@@ -13,6 +13,8 @@ void PointColliderComponent::Awake(void)
 {
 	ColliderComponent::Awake();
 	this->shape = Shape::Point;
+	TypeName = typeid(PointColliderComponent).name();;
+
 }
 
 void PointColliderComponent::Uninit(void)

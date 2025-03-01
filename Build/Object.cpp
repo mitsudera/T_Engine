@@ -44,3 +44,8 @@ unsigned long Object::GetID(void)
 	return ID;
 }
 
+void Object::SetID(unsigned long id)
+{
+	ID = id;
+}
+

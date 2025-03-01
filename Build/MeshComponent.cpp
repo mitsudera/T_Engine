@@ -38,6 +38,7 @@ void MeshComponent::Awake(void)
 
 	cullMode = CULL_MODE::CULL_MODE_BACK;
 	this->alphaTest = FALSE;
+	TypeName = typeid(MeshComponent).name();;
 
 
 	hasShadow = TRUE;
@@ -144,4 +145,24 @@ void MeshComponent::SetMeshData(MeshData* data)
 	this->GetTransFormComponent()->UpdateMatrix();
 
 	SetBoxMinMax(data->GetBoxMin(), data->GetBoxMax());
+}
+
+void MeshComponent::SetMeshData(string path, unsigned int index)
+{
+	string fileName = path;
+	// 最後の '/' の位置を見つける
+	size_t pos = fileName.rfind('/');
+
+	// 最後の '/' が見つかった場合
+	if (pos != string::npos) {
+		// '/' より後の部分を切り出す
+		fileName = fileName.substr(pos + 1);
+	}
+
+	this->meshData = pAssetsManager->LoadMeshFileFbx(fileName)->GetMeshData(index);
+}
+
+MeshData* MeshComponent::GetMeshData(void)
+{
+	return meshData;
 }
