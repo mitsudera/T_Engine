@@ -168,7 +168,6 @@ public:
 	void LoadFbxFile(string fileName);
 
 	AssetsManager* GetAssetsMnager(void);
-	string GetFileName(void);
 
 	int GetBoneCnt(void);
 	vector<SkinMeshTreeNode*>& GetNodeArray(void);
@@ -184,11 +183,8 @@ public:
 	SkinMeshTreeNode* GetNode(unsigned int index);
 
 private:
-	AssetsManager* pAssetsManager;
 	vector<SkinMeshTreeNode*> nodeArray;
 	vector<SkinMeshTreeNode*> allNodeArray;
-	string fileName;
-	string name;
 	int skinCnt;
 	int* clusterCnt;
 	int boneCnt;

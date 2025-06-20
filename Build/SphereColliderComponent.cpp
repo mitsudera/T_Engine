@@ -15,7 +15,7 @@ void SphereColliderComponent::Awake(void)
 {
 	ColliderComponent::Awake();
 	this->shape = Shape::Sphere;
-	TypeName = typeid(SphereColliderComponent).name();;
+	TypeName = typeid(SphereColliderComponent).name();
 
 }
 
@@ -27,13 +27,16 @@ void SphereColliderComponent::Uninit(void)
 void SphereColliderComponent::Update(void)
 {
 	ColliderComponent::Update();
+
 }
 
 void SphereColliderComponent::DebugDraw(void)
 {
 	ColliderComponent::DebugDraw();
-	XMMATRIX world = XMMatrixScaling(checkRadius, checkRadius, checkRadius) * XMMatrixTranslationFromVector(XMLoadFloat3(&GetWorldPos()));
-	
+
+	XMVECTOR pos = XMVector3Transform(pivot, GetWorldMtx());
+
+	XMMATRIX world = XMMatrixScaling(checkRadius, checkRadius, checkRadius) * XMMatrixTranslationFromVector(pos);
 
 	this->pGameEngine->GetCBufferManager()->SetWorldMtx(&world);
 

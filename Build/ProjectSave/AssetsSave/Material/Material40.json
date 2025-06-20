@@ -1,0 +1,38 @@
+{
+    "ID": 0,
+    "ambient": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+    ],
+    "difPath": "",
+    "diffuse": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+    ],
+    "emission": [
+        0.0,
+        0.0,
+        0.0,
+        0.0
+    ],
+    "matType": "class SkinMeshShadowMappingMaterial",
+    "name": "Material40",
+    "nodiftex": 0,
+    "nonortex": 1,
+    "norPath": "",
+    "nospetex": 1,
+    "path": "",
+    "shininess": 10.0,
+    "spePath": "",
+    "specular": [
+        0.0,
+        0.0,
+        0.0,
+        0.0
+    ],
+    "type": 0
+}

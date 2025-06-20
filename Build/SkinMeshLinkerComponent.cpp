@@ -19,7 +19,7 @@ SkinMeshLinkerComponent::~SkinMeshLinkerComponent()
 
 void SkinMeshLinkerComponent::Awake(void)
 {
-	PrimitiveComponent::Awake();
+	Component::Awake();
 	pRenderer = pGameEngine->GetRenderer();
 	pCBufferManager = pGameEngine->GetCBufferManager();
 	boneMtxArray = new XMMATRIX[BONE_MAX];
@@ -33,14 +33,14 @@ void SkinMeshLinkerComponent::Awake(void)
 
 void SkinMeshLinkerComponent::Update(void)
 {
-	PrimitiveComponent::Update();
+	Component::Update();
 
 
 }
 
 void SkinMeshLinkerComponent::LateUpdate(void)
 {
-	PrimitiveComponent::LateUpdate();
+	Component::LateUpdate();
 
 	for (int i = 0; i < boneArray.size(); i++)
 	{
@@ -50,21 +50,26 @@ void SkinMeshLinkerComponent::LateUpdate(void)
 
 }
 
-void SkinMeshLinkerComponent::Draw(void)
+//void SkinMeshLinkerComponent::Draw(void)
+//{
+//	PrimitiveComponent::Draw();
+//	skinMeshShader->SetBoneBuffer(boneMtxArray);
+//}
+//
+//void SkinMeshLinkerComponent::ShadowMapping(void)
+//{
+//	PrimitiveComponent::ShadowMapping();
+//	skinMeshShader->SetBoneBuffer(boneMtxArray);
+//}
+void SkinMeshLinkerComponent::SetBoneBuffer(void)
 {
-	PrimitiveComponent::Draw();
 	skinMeshShader->SetBoneBuffer(boneMtxArray);
 }
 
-void SkinMeshLinkerComponent::ShadowMapping(void)
-{
-	PrimitiveComponent::ShadowMapping();
-	skinMeshShader->SetBoneBuffer(boneMtxArray);
-}
 
 void SkinMeshLinkerComponent::Uninit(void)
 {
-	PrimitiveComponent::Uninit();
+	Component::Uninit();
 }
 
 void SkinMeshLinkerComponent::AddBone(BoneComponent* bone)

@@ -11,20 +11,43 @@ class Renderer;
 class Scene;
 class GameObject;
 class Object;
-class TransformComponent;
 class Component;
-class CameraComponent;
 class ProjectSetting;
 class AssetsManager;
 class TerrainMaterial;
 class Material;
 class Assets;
-class TerrainComponent;
-class AnimationControlerComponent;
 class EditerCamera;
 class SaveSystem;
 class SceneManager;
 class SceneAssetsData;
+class TransformComponent;
+class CameraComponent;
+class DirectionalLightComponent;
+class AnimationControlerComponent;
+class ColliderComponent;
+class PointLightComponent;
+class PrimitiveComponent;
+class MeshComponent;
+class QuadComponent;
+class SpriteComponent;
+class TerrainColliderComponent;
+class TerrainComponent;
+class TextMeshComponent;
+class TextWriteComponent;
+class RigidBodyComponent;
+class SkinMeshLinkerComponent;
+class SkinMeshComponent;
+class BoneComponent;
+class SoundSpeakerComponent;
+class PointColliderComponent;
+class LineColliderComponent;
+class SphereColliderComponent;
+class BoxColliderComponent;
+class CapsuleColliderComponent;
+class RotBoxColliderComponent;
+
+
 
 class GUI
 {
@@ -47,6 +70,9 @@ private:
 	void ShowAllGameObject(GameObject* gameObject);
 	void ShowObject(Object* object);
 	void ShowComponent(Component* com);
+	void ShowColliderComponent(ColliderComponent* com);
+	void ShowRigidBodyComponent(RigidBodyComponent* com);
+	void ShowBoneComponent(BoneComponent* com);
 	void ShowTransformCom(TransformComponent* com);
 	void ShowCamCom(CameraComponent* com);
 	void ShowTerrainComponent(TerrainComponent* com);
@@ -56,6 +82,7 @@ private:
 	void ShowMaterial(Material* mat);
 	void ShowSceneAssets(SceneAssetsData* sad);
 	void ShowTerrainMaterial(TerrainMaterial* mat);
+
 
 	World* pWorld;
 	GameEngine* pGameEngine;
@@ -77,7 +104,9 @@ private:
 	XMFLOAT4X4 proj;
 	XMFLOAT4X4 view;
 
-	
+	Component* remCom;
+
+	Object* lastSelectSceneOrGameObject;
 
 };
 

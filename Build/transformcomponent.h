@@ -124,6 +124,8 @@ public:
 
 	XMMATRIX GetLastLocalMtx(void);
 
+	void Reset(void);
+
 protected:
 
 	

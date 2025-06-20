@@ -80,7 +80,7 @@ void TerrainComponent::Draw(void)
 
 
 }
-void TerrainComponent::CreateVetexBuffer(XMINT2 resolution, XMFLOAT2 size)
+void TerrainComponent::CreateVertexBuffer(XMINT2 resolution, XMFLOAT2 size)
 {
 
 	terrainResolution = resolution;

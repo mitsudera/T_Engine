@@ -37,7 +37,7 @@ void SkinMeshData::LoadNode(FbxNode* node, SkinMeshTreeNode* parent, SkinMeshTre
 
 	FbxMesh* mesh = node->GetMesh();
 	name = mesh->GetNode()->GetName();
-	fileName = skinMeshTree->GetFileName();
+	fileName = skinMeshTree->GetPath();
 	this->parent = parent;
 
 	int PolygonNum = mesh->GetPolygonCount();               //総ポリゴン数
@@ -64,7 +64,6 @@ void SkinMeshData::LoadNode(FbxNode* node, SkinMeshTreeNode* parent, SkinMeshTre
 
 	bool bIsUnmapped = false;
 	this->boneNum = skinMeshTree->GetBoneCnt();
-
 
 	CreateCpArray(controlNum);
 	for (int i = 0; i < controlNum; i++)
@@ -112,8 +111,15 @@ void SkinMeshData::LoadNode(FbxNode* node, SkinMeshTreeNode* parent, SkinMeshTre
 
 
 	}
+	vector<CONTROLPOINT> caray;
+	for (int i = 0; i < controlNum; i++)
+	{
+		caray.push_back(this->cpArray[i]);
+	}
 
 
+
+	vector<SkinMeshVertex> vArray;
 
 	int vcnt = 0;
 
@@ -209,10 +215,10 @@ void SkinMeshData::LoadNode(FbxNode* node, SkinMeshTreeNode* parent, SkinMeshTre
 
 				vertexArray[vcnt].Diffuse = { 1.0f,1.0f,1.0f,1.0f };
 
+
 				vcnt++;
 
 			}
-
 
 			// タンジェントベクトルの計算
 			FbxVector4 edge1 = positions[1] - positions[0];
@@ -256,6 +262,11 @@ void SkinMeshData::LoadNode(FbxNode* node, SkinMeshTreeNode* parent, SkinMeshTre
 
 	}
 
+	for (int i = 0; i < vertNum; i++)
+	{
+		vArray.push_back(vertexArray[i]);
+
+	}
 	//インデックス配列を埋める
 	unsigned int* indexArray = nullptr;
 	indexArray = new unsigned int[indexnum];
@@ -519,8 +530,8 @@ SkinMeshTreeData::~SkinMeshTreeData()
 
 void SkinMeshTreeData::LoadFbxFile(string fileName)
 {
-	this->fileName = fileName;
-	this->name = fileName + "root";
+	this->SetName(fileName);
+	this->SetPath(fileName);
 	FbxManager* manager;
 	FbxIOSettings* ioSettings;
 	manager = FbxManager::Create();
@@ -621,10 +632,6 @@ AssetsManager* SkinMeshTreeData::GetAssetsMnager(void)
 	return this->pAssetsManager;
 }
 
-string SkinMeshTreeData::GetFileName(void)
-{
-	return fileName;
-}
 
 
 int SkinMeshTreeData::GetBoneCnt(void)
@@ -679,7 +686,7 @@ int SkinMeshTreeData::GetBoneNumber(string name)
 void SkinMeshTreeData::AddNode(SkinMeshTreeNode* node)
 {
 	allNodeArray.push_back(node);
-	node->SetIndex(allNodeArray.size());
+	node->SetIndex(allNodeArray.size()-1);
 
 }
 

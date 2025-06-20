@@ -52,6 +52,19 @@ public:
 
 	void StartTransition(float beforeAnimCnt,float afterAnimCnt);
 
+	string GetNeedConditionName(void);
+	BOOL GetNeedCondition(void);
+
+	void SetNeedConditionName(string name);
+	void SetNeedCondition(BOOL b);
+
+	AnimationNode* GetBeforeAnimNode(void);
+
+	AnimationNode* GetAfterAnimNode(void);
+
+	bool isExit;
+
+
 private:
 	AnimationNode* beforeAnimNode;
 	AnimationNode* afterAnimNode;
@@ -114,11 +127,15 @@ public:
 	AnimationNode(AnimationControlerComponent* controler);
 	~AnimationNode();
 
+
 	virtual void UpdateAnimation(GameObject* gameObject)override;
 
 	void CreateNode(string fileName, string name,BOOL loop);
 	void CreateNode(string fileName1,string fileName2, string name,BOOL loop);
 	void CreateNode(string fileName1,string fileName2,string fileName3,string fileName4, string name,BOOL loop);
+	void CreateNode(AnimationData* animData, string name, BOOL loop, Blend blend);
+	void CreateNode(AnimationNode* node);
+	void CreateNode(string animName, string name, BOOL loop, Blend blend);
 	void SetLoop(BOOL loop);
 	AnimationData* GetAnimData(void);
 
@@ -131,16 +148,24 @@ public:
 
 	Blend GetBlend(void);
 
+
+	list<AnimationTransition*>& GetTransitionList(void);
+
+	AnimationTransition* GetExitTransition(void);
+
+	BOOL GetLoop(void);
+
 private:
 	AnimationData* animData;
-	vector<AnimationTransition*> transitionArray;
-	AnimationTransition* exitTransition;
 	float endTime;
 	float exitTime;
 	BOOL animEnd;
 	BOOL loop;
 
 	Blend blend;
+
+	list<AnimationTransition*> transitionList;
+	AnimationTransition* exitTransition;
 
 	void UpdateMtx(MtxNode* node, GameObject* gameObject);
 };
@@ -167,9 +192,17 @@ public:
 	virtual void Uninit(void) override;
 
 	void LoadDefaulAnimation(string fileName, string name);
+	void LoadDefaulAnimationAssets(string assetsName, string name);
+	void LoadDefaulAnimation(AnimationNode* node);
+
 	void LoadAnimation(string fileName, string name, BOOL loop);
+	void LoadAnimation(string animName, string name, BOOL loop,AnimationNode::Blend blend);
 	void LoadAnimation(string fileName1,string fileName2, string name, BOOL loop);
 	void LoadAnimation(string fileNameFront,string fileNameRight,string fileNameBack,string fileNameLeft, string name, BOOL loop);
+	void LoadAnimation(bool loop);
+	void LoadAnimation2(bool loop);
+	void LoadAnimation4(bool loop);
+	void LoadAnimation(AnimationNode* node);
 
 	void CreateTransition(
 		string beforeAnimName,//このアニメーションから
@@ -215,6 +248,7 @@ public:
 	void SetCondition(string name, BOOL setValue);
 	BOOL GetCondition(string name);
 
+	void SetIsTrigger(string name, BOOL b);
 
 	void SetActiveAnimation(Animation* animation);
 
@@ -239,14 +273,16 @@ public:
 
 	list<AnimationNode*>& GetAnimNodeList(void);
 	list<pair<AnimParameter, string>>& GetConditionList(void);
-
-	string GetLoadFileName(void);
-	void SetLoadFileName(string fName);
+	list<AnimationTransition*>& GetTransitionList(void);
+	string GetLoadFileName(int slot);
+	void SetLoadFileName(string fName,int slot);
 
 	AnimationNode* GetDefaultNode(void);
 
+	string createConditionName;
+
 protected:
-	string loadFileName;
+	string loadFileName[4];
 
 	AnimationForceTransition* fTransition;
 
@@ -259,6 +295,9 @@ protected:
 	list<AnimationNode*> AnimNodeList;
 
 	list<pair<AnimParameter,string>> conditionList;
+
+	list<AnimationTransition*> transitionList;
+
 
 	Animation* activeAnim;
 

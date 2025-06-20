@@ -73,6 +73,7 @@ void SkinMeshPhongShader::SetMaterialCbuffer(MaterialCBuffer data)
 
 void SkinMeshPhongShader::SetBoneBuffer(XMMATRIX* bone)
 {
+    bone[4];
     pRenderer->GetDeviceContext()->UpdateSubresource(this->boneBuffer, 0, nullptr, bone, 0, 0);
 
 }

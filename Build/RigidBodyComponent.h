@@ -25,6 +25,18 @@ public:
 	void SetAngularDrag(float f);
 	void SetUseGarvity(BOOL b);
 	void SetIsKinematic(BOOL b);
+	void SetIsStatic(BOOL b);
+	void SetIsFixTerrain(BOOL b);
+
+	float GetMass(void);
+	float GetDrag(void);
+	float GetFriction(void);
+	float GetAngularDrag(void);
+	BOOL GetUseGarvity(void);
+	BOOL GetIsKinematic(void);
+	BOOL GetIsStatic(void);
+	BOOL GetIsFixTerrain(void);
+
 	void AddForce(XMVECTOR force);
 	void RotVelocityY(float f);
 	void MovePosition(XMVECTOR vec, float moveValue);
@@ -35,9 +47,8 @@ public:
 
 	BOOL GetOnGround(void);
 
-	void SetIsStatic(BOOL b);
-
-	void SetIsFixTerrain(BOOL b);
+	void SetWorldPos(XMFLOAT3 pos);
+	float offsetY;
 
 private:
 	ColliderComponent* collider;
@@ -57,5 +68,6 @@ private:
 	BOOL isStatic;
 	BOOL isFixTerrain;
 	float groundLen;
+
 };
 

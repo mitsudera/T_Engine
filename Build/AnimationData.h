@@ -135,7 +135,6 @@ private:
 	string fileName3;
 	string fileName4;
 	
-	AssetsManager* pAssetsManager;
 	MtxNode* mtxTreeRoot;
 
 };

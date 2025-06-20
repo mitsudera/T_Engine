@@ -61,7 +61,7 @@ public:
 
 
 	void SetViewPort(int m_type);
-	int GetViewPortType(void);
+	int GetViewPort(void);
 
 	virtual void Awake(void) override;
 	virtual void Init(void) override;
@@ -79,6 +79,7 @@ public:
 	void SetRenderTarget(ID3D11RenderTargetView* rtv);
 	ID3D11DepthStencilView* GetDepthStencilView(void);
 	void SetDepthStencilView(ID3D11DepthStencilView* dsv);
+	void SetRenderTargetBackBuffer(void);
 
 	void SetClearMode(ClearMode mode);
 	void SetClearColor(XMFLOAT4 color);
@@ -91,6 +92,8 @@ public:
 
 	void SetTrackingMode(TrackingMode mode);
 	TrackingMode GetTrackingMode(void);
+	ClearMode GetClearMode(void);
+
 	XMFLOAT3 GetAtPos(void);
 
 	void SetNear(float f);
@@ -106,11 +109,34 @@ public:
 	void SetLayerCulling(string* layer, bool b);
 	void SetLayerCulling(string layer, bool b);
 
+	float GetAngle(void);
+	float GetAspect(void);
+	float GetNear(void);
+	float GetFar(void);
+
+	void SetAngle(float angle);
+	void SetAspect(float aspect);
+
+	GameObject* GetLookObject(void);
+
+	int GetPostEffectIndex(void);
+	BOOL GetPostEffectEnable(void);
+
+	int GetRT(void);
+
+	XMFLOAT4 GetClearColor(void);
+
 private:
+
+	int rt;
+
+	RenderTexture* rttex;
 
 	ProjectSetting* pProjectSetting;
 
 	D3D11_VIEWPORT vp;
+
+	int viewPortType;
 
 	XMMATRIX mtxView;
 	XMMATRIX mtxProj;

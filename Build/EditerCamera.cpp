@@ -276,18 +276,25 @@ void EditerCamera::Render(void)
 
 	}
 
+
+
 #ifdef _DEBUG
-	pGameEngine->GetDebugUtility()->SetDebugLineShader();
 
-	for (Scene* scene : pWorld->GetActiveSceneList())
+	if (pWorld->GetShowGui())
 	{
+		pGameEngine->GetDebugUtility()->SetDebugLineShader();
 
-		for (Component* com : scene->GetAllComponent())
+		for (Scene* scene : pWorld->GetActiveSceneList())
 		{
-			if (!com->GetActive())
-				continue;
-			com->DebugDraw();
+
+			for (Component* com : scene->GetAllComponent())
+			{
+				if (!com->GetActive())
+					continue;
+				com->DebugDraw();
+			}
 		}
+
 	}
 #endif
 
@@ -393,6 +400,17 @@ XMMATRIX EditerCamera::GetViewMatrix(void)
 {
 	return this->mtxView;
 }
+
+XMVECTOR EditerCamera::GetAxisZ(void)
+{
+	return axisZ;
+}
+
+XMVECTOR EditerCamera::GetPosition(void)
+{
+	return pos;
+}
+
 
 void EditerCamera::Move(XMVECTOR vec, float value)
 {

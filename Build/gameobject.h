@@ -29,7 +29,8 @@ public:
 
 	GameObject();
 	GameObject(Scene* scene);
-	//GameObject(GameObject* parent);
+	GameObject(GameObject* clone);
+	GameObject(GameObject* clone, GameObject* parent);
 	~GameObject();
 
 	virtual void Awake(void);
@@ -40,6 +41,8 @@ public:
 
 	void Destroy(void);
 	void DynamicDestroy(void);
+
+	void RemoveComponent(Component* com);
 	
 	void DeleteChild(GameObject* gameObject);
 	void DeleteComponnt(Component* com);
@@ -97,6 +100,7 @@ public:
 
 	GameObject* CreateChildByTypeName(string typeName);
 	GameObject* DynamicCreateChildByTypeName(string typeName);
+	GameObject* DynamicCreateChildClone(GameObject* gameObject, GameObject* parent);
 
 	void AddChild(GameObject* child);
 

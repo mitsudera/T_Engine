@@ -44,6 +44,11 @@ public:
 
 	void TestPlay(void);
 
+	void ShowGui(void);
+	void HideGui(void);
+
+	BOOL GetShowGui(void);
+
 private:
 	
 	GameEngine* pGameEngine;
@@ -61,6 +66,7 @@ private:
 	BOOL notDtime;
 	BOOL drawSkip;
 
+	BOOL showGui;
 
 };
 

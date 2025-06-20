@@ -10,6 +10,8 @@ public:
 	{
 		Standard,
 		Spring,
+		Hair,
+
 	};
 
 	BoneComponent(GameObject* gameObject);
@@ -23,6 +25,7 @@ public:
 	XMMATRIX GetInitMtxInverse(void);
 
 	void SetBone(BoneData* data, SkinMeshLinkerComponent* linker);
+	void SetBone(string path, unsigned int index, SkinMeshLinkerComponent* linker);
 
 
 	XMMATRIX& GetBoneMtx(void);
@@ -37,7 +40,22 @@ public:
 	void SetSpringPhysics(float mass, float tension, float resistance);
 
 	string GetRigName(void);
+
+	Joint GetJoint(void);
+
+	float GetMass(void);
+	float GetTension(void);
+	float GetResistance(void);
+	void SetMass(float mass);
+	void SetTension(float tention);
+	void SetResistance(float resistance);
+
+	BoneData* GetBoneData(void);
+
+	SkinMeshLinkerComponent* GetLinker(void);
+
 private:
+	BoneData* boneData;
 	BOOL isPhysics;
 	Joint joint;
 	float mass; // Ž¿—Ê
@@ -47,7 +65,7 @@ private:
 	float resistance;
 	XMVECTOR wpv;
 	XMVECTOR defaultLength;//‚Î‚Ë‚ÌŽ©‘R’·
-
+	float fdl;
 	string rigName;
 
 	BoneComponent* parentBone;

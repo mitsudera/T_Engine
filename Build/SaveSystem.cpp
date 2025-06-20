@@ -3,7 +3,6 @@
 #include "SceneManager.h"
 #include "Scene.h"
 #include "gameobject.h"
-#include "transformcomponent.h"
 #include "SceneAssetsData.h"
 #include "AssetsManager.h"
 #include "Assets.h"
@@ -23,6 +22,9 @@
 #include "SkinMeshShadowMappingMaterial.h"
 #include "StandardMaterial.h"
 #include "UIMaterial.h"
+
+//com
+#include "transformcomponent.h"
 #include "CameraComponent.h"
 #include "AnimationControlerComponent.h"
 #include "ColliderComponent.h"
@@ -43,6 +45,13 @@
 #include "SpriteComponent.h"
 #include "SoundSpeakerComponent.h"
 #include "TerrainColliderComponent.h"
+#include "PointColliderComponent.h"
+#include "LineColliderComponent.h"
+#include "SphereColliderComponent.h"
+#include "BoxColliderComponent.h"
+#include "CapsuleColliderComponent.h"
+#include "RotBoxColliderComponent.h"
+
 
 #define ProjectSavePath "ProjectSave/ProjectSave.json"
 #define SceneSavePath "ProjectSave/SceneSave/"
@@ -218,6 +227,25 @@ void SaveSystem::SaveScene(Scene* scene)
 			if (CameraComponent* cCom = dynamic_cast<CameraComponent*>(com))
 			{
 
+				comData["vp"] = cCom->GetViewPort();
+				comData["angle"] = cCom->GetAngle();
+				comData["aspect"] = cCom->GetAspect();
+				comData["near"] = cCom->GetNear();
+				comData["far"] = cCom->GetFar();
+				comData["trackMode"] = cCom->GetTrackingMode();
+				comData["clearMode"] = cCom->GetClearMode();
+				if (GameObject* lo = cCom->GetLookObject())
+				{
+					comData["lookObjectID"] = lo->GetID();
+
+				}
+				comData["postEffectEnable"] = cCom->GetPostEffectEnable();
+				comData["postEffectIndex"] = cCom->GetPostEffectIndex();
+
+				comData["rt"] = cCom->GetRT();
+				XMFLOAT4 cc = cCom->GetClearColor();
+				comData["clearColor"] = { cc.x,cc.y,cc.z,cc.w };
+
 				for (string* layer: cCom->GetLayerCulling())
 				{
 
@@ -287,9 +315,6 @@ void SaveSystem::SaveScene(Scene* scene)
 					comData["meshIndex"] = mCom->GetMeshData()->GetIndex();
 				}
 
-				if (SkinMeshLinkerComponent* sCom = dynamic_cast<SkinMeshLinkerComponent*>(pCom))
-				{
-				}
 				if (SkinMeshComponent* sCom = dynamic_cast<SkinMeshComponent*>(pCom))
 				{
 					comData["linkerID"] = sCom->GetLinker()->GetGameObject()->GetID();
@@ -306,6 +331,11 @@ void SaveSystem::SaveScene(Scene* scene)
 
 			}
 
+			if (SkinMeshLinkerComponent* sCom = dynamic_cast<SkinMeshLinkerComponent*>(com))
+			{
+
+				comData["boneCnt"] = sCom->GetBoneCount();
+			}
 
 			if (ColliderComponent* cCom = dynamic_cast<ColliderComponent*>(com))
 			{
@@ -316,12 +346,123 @@ void SaveSystem::SaveScene(Scene* scene)
 				comData["pivot"] = { pivot.x,pivot.y,pivot.z };
 				comData["radius"] = cCom->GetCheckRadius();
 				comData["isRigid"] = cCom->GetIsRigid();
-				if (TerrainColliderComponent* tCom = dynamic_cast<TerrainColliderComponent*>(cCom))
+				if (BoxColliderComponent* bcCom = dynamic_cast<BoxColliderComponent*>(cCom))
+				{
+					XMFLOAT3 size = bcCom->GetSize();
+					comData["size"] = { size.x,size.y,size.z };
+				}
+				if (CapsuleColliderComponent* ccCom = dynamic_cast<CapsuleColliderComponent*>(cCom))
+				{
+					XMFLOAT3 startPoint = ccCom->GetLStart();
+					XMFLOAT3 endPoint = ccCom->GetLEnd();
+
+					float radius = ccCom->GetRadius();
+
+					comData["ep"] = { endPoint.x,endPoint.y,endPoint.z };
+					comData["sp"] = { startPoint.x,startPoint.y,startPoint.z };
+					comData["capRadius"] = radius;
+
+				}
+				if (LineColliderComponent* lcCom = dynamic_cast<LineColliderComponent*>(cCom))
 				{
 
 				}
+				if (PointColliderComponent* pcCom = dynamic_cast<PointColliderComponent*>(cCom))
+				{
+
+				}
+				if (RotBoxColliderComponent* rbcCom = dynamic_cast<RotBoxColliderComponent*>(cCom))
+				{
+					XMFLOAT3 size = rbcCom->GetSize();
+					comData["size"] = { size.x,size.y,size.z };
+
+				}
+				if (SphereColliderComponent* scCom = dynamic_cast<SphereColliderComponent*>(cCom))
+				{
+
+				}
+				if (TerrainColliderComponent* tcCom = dynamic_cast<TerrainColliderComponent*>(cCom))
+				{
+
+				}
+			}
+			if (BoneComponent* bCom = dynamic_cast<BoneComponent*>(com))
+			{
+				comData["skinMeshFileName"] = bCom->GetBoneData()->GetSkinMeshTree()->GetPath();
+				comData["boneMeshIndex"] = bCom->GetBoneData()->GetIndex();
+				comData["linkerID"] = bCom->GetLinker()->GetGameObject()->GetID();
+
+				comData["isPhysics"] = bCom->GetIsPhysics();
+				comData["joint"] = bCom->GetJoint();
+				comData["mass"] = bCom->GetMass();
+				comData["tension"] = bCom->GetTension();
+				comData["resistanace"] = bCom->GetResistance();
 
 			}
+			if (RigidBodyComponent* rCom = dynamic_cast<RigidBodyComponent*>(com))
+			{
+
+				comData["mass"] = rCom->GetMass();
+				comData["drag"] = rCom->GetDrag();
+				comData["friction"] = rCom->GetFriction();
+				comData["angularDrag"] = rCom->GetAngularDrag();
+				comData["useGravity"] = rCom->GetUseGarvity();
+				comData["isKinematic"] = rCom->GetIsKinematic();
+				comData["isStatic"] = rCom->GetIsStatic();
+				comData["isFixTerrain"] = rCom->GetIsFixTerrain();
+				comData["offSetY"] = rCom->offsetY;
+
+			}
+			if (AnimationControlerComponent* aCom = dynamic_cast<AnimationControlerComponent*>(com))
+			{
+
+				for (AnimationNode* node : aCom->GetAnimNodeList())
+				{
+
+					json nodeData;
+
+
+
+					nodeData["name"] = node->GetName();
+					nodeData["animDataName"] = node->GetAnimData()->GetName();
+					nodeData["animDataPath"] = node->GetAnimData()->GetPath();
+					nodeData["loop"] = node->GetLoop();
+					nodeData["blend"] = node->GetBlend();
+					comData["node"].push_back(nodeData);
+				}
+
+
+				for (pair<AnimParameter, string> condition : aCom->GetConditionList())
+				{
+
+					json conditionData;
+					conditionData["name"] = condition.second;
+
+					conditionData["value"] = condition.first.value;
+					conditionData["isTrigger"] = condition.first.isTrigger;
+
+
+					comData["condition"].push_back(conditionData);
+				}
+
+				for (AnimationTransition* transition : aCom->GetTransitionList())
+				{
+
+					json transitionData;
+
+					transitionData["needConditionName"] = transition->GetNeedConditionName();
+					transitionData["needCondition"] = transition->GetNeedCondition();
+					transitionData["transitionTime"] = transition->GetTransitionTime();
+					transitionData["beforeAnim"] = transition->GetBeforeAnimNode()->GetName();
+					transitionData["afterAnim"] = transition->GetAfterAnimNode()->GetName();
+					transitionData["isExit"] = transition->isExit;
+					comData["transition"].push_back(transitionData);
+				}
+
+
+
+			}
+
 
 			goData["Components"].push_back(comData);
 
@@ -427,6 +568,24 @@ Scene* SaveSystem::LoadScene(SceneAssetsData* aData)
 			{
 				CameraComponent* com = go->AddComponent<CameraComponent>();
 
+				com->SetViewPort(comData["vp"]);
+				com->SetAngle(comData["angle"]);
+				com->SetAspect(comData["aspect"]);
+				com->SetNear(comData["near"]);
+				com->SetFar(comData["far"]);
+				com->SetTrackingMode(comData["trackMode"]);
+				com->SetClearMode(comData["clearMode"]);
+				XMFLOAT4 cc = { comData["clearColor"][0],comData["clearColor"][1],comData["clearColor"][2],comData["clearColor"][3] };
+				com->SetClearColor(cc);
+				//comData["lookObjectID"];
+				com->SetPostEffectEnable(comData["postEffectEnable"]);
+				//comData["postEffectIndex"]; 
+				if (comData["rt"] == -1)
+				{
+					com->SetRenderTargetBackBuffer();
+				}
+
+
 				for (string layer : comData["layerCull"])
 				{
 
@@ -494,29 +653,23 @@ Scene* SaveSystem::LoadScene(SceneAssetsData* aData)
 			if (typeName == typeid(SkinMeshLinkerComponent).name())
 			{
 				SkinMeshLinkerComponent* com = go->AddComponent<SkinMeshLinkerComponent>();
-				com->SetHasShadow(comData["hasShadow"]);
-				com->SetDrawShadow(comData["drawShadow"]);
-				com->SetAlphaTest(comData["alphaTest"]);
-				com->SetIsFrustumCulling(comData["isFrustumCulling"]);
-				com->SetCullingMode(comData["cullMode"]);
 
-				if (comData["hasMaterial"])
-				{
-					Material* mat = pAssetsManager->GetMaterial(comData["matName"]);
-					com->SetMaterial(mat);
-				}
 
-				if (comData["hasShadowMaterial"])
-				{
-					Material* mat = pAssetsManager->GetMaterial(comData["shadowMatName"]);
-					com->SetShadowMaterial(mat);
-
-				}
+				com->SetBoneCount(comData["boneCnt"]);
 
 			}
 			if (typeName == typeid(BoneComponent).name())
 			{
 				BoneComponent* com = go->AddComponent<BoneComponent>();
+
+				SkinMeshLinkerComponent* linker = go->GetScene()->GetGameObject(comData["linkerID"])->GetComponent<SkinMeshLinkerComponent>();
+				com->SetBone(comData["skinMeshFileName"], comData["boneMeshIndex"], linker);
+
+				com->SetIsPhysics(comData["isPhysics"]);
+				com->SetJoint(comData["joint"]);
+				com->SetMass(comData["mass"]);
+				com->SetTension(comData["tension"]);
+				com->SetResistance(comData["resistanace"]);
 
 			}
 			if (typeName == typeid(SkinMeshComponent).name())
@@ -541,13 +694,13 @@ Scene* SaveSystem::LoadScene(SceneAssetsData* aData)
 
 				}
 
+				com->SetLinker(comData["linkerID"]);
 
 				
-				com->SetSkinMeshData(comData["skinMeshFileName"], comData["skinMeshIndex"]);
+				com->SetSkinMeshData(comData["skinMeshFileName"], comData["skinMeshIndex"], com->GetLinker());
 
 
 
-				com->SetLinker(comData["linkerID"]);
 
 			}
 			if (typeName == typeid(TerrainComponent).name())
@@ -573,10 +726,125 @@ Scene* SaveSystem::LoadScene(SceneAssetsData* aData)
 				}
 
 				com->LoadHeightMap(comData["hightMapPath"]);
-				com->CreateVetexBuffer(XMINT2(comData["resolution"][0], comData["resolution"][1]), XMFLOAT2(comData["size"][0], comData["size"][1]));
+				com->CreateVertexBuffer(XMINT2(comData["resolution"][0], comData["resolution"][1]), XMFLOAT2(comData["size"][0], comData["size"][1]));
 			}
 
 
+			if (typeName == typeid(BoxColliderComponent).name())
+			{
+				BoxColliderComponent* com = go->AddComponent<BoxColliderComponent>();
+				com->SetShape(comData["shape"]);
+				com->SetPivot(XMFLOAT3(comData["pivot"][0], comData["pivot"][1], comData["pivot"][2]));
+				com->SetCheckRadius(comData["radius"]);
+				com->SetIsRigid(comData["isRigid"]);
+				int enable = comData["enable"];
+
+				XMFLOAT3 size = { comData["size"][0],comData["size"][1],comData["size"][2] };
+
+				com->SetBox(size);
+
+				if (enable)
+				{
+					com->OnCollider();
+				}
+
+			}
+			if (typeName == typeid(CapsuleColliderComponent).name())
+			{
+				CapsuleColliderComponent* com = go->AddComponent<CapsuleColliderComponent>();
+				com->SetShape(comData["shape"]);
+				com->SetPivot(XMFLOAT3(comData["pivot"][0], comData["pivot"][1], comData["pivot"][2]));
+				com->SetCheckRadius(comData["radius"]);
+				com->SetIsRigid(comData["isRigid"]);
+				int enable = comData["enable"];
+
+				XMFLOAT3 start = { comData["sp"][0],comData["sp"][1],comData["sp"][2] };
+				XMFLOAT3 end = { comData["ep"][0],comData["ep"][1],comData["ep"][2] };
+				float rad = comData["capRadius"];
+				com->SetCapsule(start, end, rad);
+
+
+				if (enable)
+				{
+					com->OnCollider();
+				}
+
+			}
+			if (typeName == typeid(LineColliderComponent).name())
+			{
+				LineColliderComponent* com = go->AddComponent<LineColliderComponent>();
+				com->SetShape(comData["shape"]);
+				com->SetPivot(XMFLOAT3(comData["pivot"][0], comData["pivot"][1], comData["pivot"][2]));
+				com->SetCheckRadius(comData["radius"]);
+				com->SetIsRigid(comData["isRigid"]);
+				int enable = comData["enable"];
+
+				//XMFLOAT3 start = { comData["sp"][0],comData["sp"][1],comData["sp"][2] };
+				//XMFLOAT3 end = { comData["ep"][0],comData["ep"][1],comData["ep"][2] };
+				//float rad = comData["capRadius"];
+
+
+				if (enable)
+				{
+					com->OnCollider();
+				}
+
+			}
+			if (typeName == typeid(PointColliderComponent).name())
+			{
+				PointColliderComponent* com = go->AddComponent<PointColliderComponent>();
+				com->SetShape(comData["shape"]);
+				com->SetPivot(XMFLOAT3(comData["pivot"][0], comData["pivot"][1], comData["pivot"][2]));
+				com->SetCheckRadius(comData["radius"]);
+				com->SetIsRigid(comData["isRigid"]);
+				int enable = comData["enable"];
+
+				if (enable)
+				{
+					com->OnCollider();
+				}
+
+			}
+			if (typeName == typeid(RotBoxColliderComponent).name())
+			{
+				RotBoxColliderComponent* com = go->AddComponent<RotBoxColliderComponent>();
+				com->SetShape(comData["shape"]);
+				com->SetPivot(XMFLOAT3(comData["pivot"][0], comData["pivot"][1], comData["pivot"][2]));
+				com->SetCheckRadius(comData["radius"]);
+				com->SetIsRigid(comData["isRigid"]);
+				int enable = comData["enable"];
+
+				XMFLOAT3 size = { comData["size"][0],comData["size"][1],comData["size"][2] };
+
+				com->SetRotBox(size);
+
+
+				if (enable)
+				{
+					com->OnCollider();
+				}
+
+			}
+			if (typeName == typeid(SphereColliderComponent).name())
+			{
+				SphereColliderComponent* com = go->AddComponent<SphereColliderComponent>();
+				com->SetShape(comData["shape"]);
+				com->SetPivot(XMFLOAT3(comData["pivot"][0], comData["pivot"][1], comData["pivot"][2]));
+				com->SetCheckRadius(comData["radius"]);
+				com->SetIsRigid(comData["isRigid"]);
+				int enable = comData["enable"];
+
+				XMFLOAT3 size = { comData["size"][0],comData["size"][1],comData["size"][2] };
+
+				com->SetRadius(comData["radius"]);
+
+
+				if (enable)
+				{
+					com->OnCollider();
+				}
+
+			}
 			if (typeName == typeid(TerrainColliderComponent).name())
 			{
 				TerrainColliderComponent* com = go->AddComponent<TerrainColliderComponent>();
@@ -591,6 +859,77 @@ Scene* SaveSystem::LoadScene(SceneAssetsData* aData)
 				{
 					com->OnCollider();
 				}
+
+			}
+			if (typeName == typeid(AnimationControlerComponent).name())
+			{
+				AnimationControlerComponent* com = go->AddComponent<AnimationControlerComponent>();
+
+				int cnt = 0;
+
+				for (json nodeData : comData["node"])
+				{
+					string animDataName = nodeData["animDataName"];
+					string name = nodeData["name"];
+					BOOL loop = nodeData["loop"];
+					AnimationNode::Blend blend = nodeData["blend"];
+
+
+					if (cnt == 0)
+					{
+						com->LoadDefaulAnimation(animDataName, name);
+					}
+					else
+					{
+						com->LoadAnimation(animDataName, name, loop, blend);
+
+					}
+
+					cnt++;
+				}
+				for (json conditionData : comData["condition"])
+				{
+					string conditionName = conditionData["name"];
+					AnimParameter para;
+					para.isTrigger = conditionData["isTrigger"];
+					para.value = conditionData["value"];
+					com->CreateCondition(conditionName, para);
+				}
+
+				for (json transitionData : comData["transition"])
+				{
+
+
+					if (transitionData["isExit"])
+					{
+						float time = transitionData["transitionTime"];
+						com->CreateNotLoopAnimExitTransition(transitionData["beforeAnim"], transitionData["afterAnim"], time);
+					}
+					else
+					{
+						float time = transitionData["transitionTime"];
+						com->CreateTransition(transitionData["beforeAnim"], transitionData["afterAnim"], transitionData["needConditionName"], transitionData["needCondition"], time);
+
+					}
+				}
+
+
+
+			}
+			if (typeName == typeid(RigidBodyComponent).name())
+			{
+				RigidBodyComponent* com = go->AddComponent<RigidBodyComponent>();
+
+				com->SetMass(comData["mass"]);
+				com->SetDrag(comData["drag"]);
+				com->SetFriction(comData["friction"]);
+				com->SetAngularDrag(comData["angularDrag"]);
+				com->SetUseGarvity(comData["useGravity"]);
+				com->SetIsKinematic(comData["isKinematic"]);
+				com->SetIsStatic(comData["isStatic"]);
+				com->SetIsFixTerrain(comData["isFixTerrain"]);
+				com->offsetY = comData["offSetY"];
+
 
 			}
 
@@ -784,7 +1123,8 @@ void SaveSystem::LoadAssets(string fileName)
 		{
 			StandardMaterial* mat = new StandardMaterial(pAssetsManager);
 
-			mat->SetName(loadData["name"]);
+			string matName = loadData["name"];
+			mat->SetName(matName);
 
 			mat->diffuse = { loadData["diffuse"][0], loadData["diffuse"][1], loadData["diffuse"][2], loadData["diffuse"][3] };
 			mat->ambient = { loadData["ambient"][0], loadData["ambient"][1], loadData["ambient"][2], loadData["ambient"][3] };
@@ -814,7 +1154,8 @@ void SaveSystem::LoadAssets(string fileName)
 		{
 			LambartMaterial* mat = new LambartMaterial(pAssetsManager);
 
-			mat->SetName(loadData["name"]);
+			string matName = loadData["name"];
+			mat->SetName(matName);
 
 			mat->diffuse = { loadData["diffuse"][0], loadData["diffuse"][1], loadData["diffuse"][2], loadData["diffuse"][3] };
 			mat->ambient = { loadData["ambient"][0], loadData["ambient"][1], loadData["ambient"][2], loadData["ambient"][3] };
@@ -844,7 +1185,8 @@ void SaveSystem::LoadAssets(string fileName)
 		{
 			PhongMaterial* mat = new PhongMaterial(pAssetsManager);
 
-			mat->SetName(loadData["name"]);
+			string matName = loadData["name"];
+			mat->SetName(matName);
 
 			mat->diffuse = { loadData["diffuse"][0], loadData["diffuse"][1], loadData["diffuse"][2], loadData["diffuse"][3] };
 			mat->ambient = { loadData["ambient"][0], loadData["ambient"][1], loadData["ambient"][2], loadData["ambient"][3] };
@@ -874,7 +1216,8 @@ void SaveSystem::LoadAssets(string fileName)
 		{
 			UIMaterial* mat = new UIMaterial(pAssetsManager);
 
-			mat->SetName(loadData["name"]);
+			string matName = loadData["name"];
+			mat->SetName(matName);
 
 			mat->diffuse = { loadData["diffuse"][0], loadData["diffuse"][1], loadData["diffuse"][2], loadData["diffuse"][3] };
 			mat->ambient = { loadData["ambient"][0], loadData["ambient"][1], loadData["ambient"][2], loadData["ambient"][3] };
@@ -905,7 +1248,8 @@ void SaveSystem::LoadAssets(string fileName)
 		{
 			TerrainMaterial* mat = new TerrainMaterial(pAssetsManager);
 
-			mat->SetName(loadData["name"]);
+			string matName = loadData["name"];
+			mat->SetName(matName);
 
 			mat->diffuse = { loadData["diffuse"][0], loadData["diffuse"][1], loadData["diffuse"][2], loadData["diffuse"][3] };
 			mat->ambient = { loadData["ambient"][0], loadData["ambient"][1], loadData["ambient"][2], loadData["ambient"][3] };
@@ -941,7 +1285,8 @@ void SaveSystem::LoadAssets(string fileName)
 		{
 			SkinMeshPhongMaterial* mat = new SkinMeshPhongMaterial(pAssetsManager);
 
-			mat->SetName(loadData["name"]);
+			string matName = loadData["name"];
+			mat->SetName(matName);
 
 			mat->diffuse = { loadData["diffuse"][0], loadData["diffuse"][1], loadData["diffuse"][2], loadData["diffuse"][3] };
 			mat->ambient = { loadData["ambient"][0], loadData["ambient"][1], loadData["ambient"][2], loadData["ambient"][3] };
@@ -973,7 +1318,8 @@ void SaveSystem::LoadAssets(string fileName)
 		{
 			ShadowMappingMaterial* mat = new ShadowMappingMaterial(pAssetsManager);
 
-			mat->SetName(loadData["name"]);
+			string matName = loadData["name"];
+			mat->SetName(matName);
 
 			mat->diffuse = { loadData["diffuse"][0], loadData["diffuse"][1], loadData["diffuse"][2], loadData["diffuse"][3] };
 			mat->ambient = { loadData["ambient"][0], loadData["ambient"][1], loadData["ambient"][2], loadData["ambient"][3] };
@@ -1005,7 +1351,8 @@ void SaveSystem::LoadAssets(string fileName)
 		{
 			SkinMeshShadowMappingMaterial* mat = new SkinMeshShadowMappingMaterial(pAssetsManager);
 
-			mat->SetName(loadData["name"]);
+			string matName = loadData["name"];
+			mat->SetName(matName);
 
 			mat->diffuse = { loadData["diffuse"][0], loadData["diffuse"][1], loadData["diffuse"][2], loadData["diffuse"][3] };
 			mat->ambient = { loadData["ambient"][0], loadData["ambient"][1], loadData["ambient"][2], loadData["ambient"][3] };
@@ -1083,23 +1430,21 @@ void SaveSystem::LoadAssets(string fileName)
 	{
 		int fnum = loadData["fileNum"];
 
-		AnimationData* animData = new AnimationData;
 
 		if (fnum == 1)
 		{
-			animData->LoadAnimation(loadData["fileName1"], pAssetsManager);
+			pAssetsManager->LoadAnimationData(loadData["fileName1"]);
 		}
 		if (fnum == 2)
 		{
-			animData->LoadAnimation(loadData["fileName1"],loadData["fileName2"], pAssetsManager);
+			pAssetsManager->LoadAnimationData(loadData["fileName1"],loadData["fileName2"]);
 
 		}
 		if (fnum == 4)
 		{
-			animData->LoadAnimation(loadData["fileName1"],loadData["fileName2"],loadData["fileName3"],loadData["fileName4"], pAssetsManager);
+			pAssetsManager->LoadAnimationData(loadData["fileName1"], loadData["fileName2"], loadData["fileName3"], loadData["fileName4"]);
 
 		}
-
 	}
 		break;
 	case Assets::AssetsType::Scene:

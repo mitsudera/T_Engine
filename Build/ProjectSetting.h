@@ -28,6 +28,10 @@ public:
 	template<class T>
 	T* DynamicCreateGameObject(Scene* scene);
 
+	GameObject* DynamicCroneGameObject(GameObject* gameObject);
+
+	GameObject* DynamicCroneGameObject(GameObject* gameObject, GameObject* parent);
+
 	template<class T>
 	T* LoadGameObject(Scene* scene);
 

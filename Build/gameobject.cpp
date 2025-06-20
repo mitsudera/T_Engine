@@ -14,6 +14,36 @@
 #include "BoneComponent.h"
 #include "SkinMeshTreeData.h"
 #include "ProjectSetting.h"
+#include "AnimationData.h"
+
+#include "transformcomponent.h"
+#include "CameraComponent.h"
+#include "AnimationControlerComponent.h"
+#include "ColliderComponent.h"
+#include "DirectionalLightComponent.h"
+#include "PointLightComponent.h"
+#include "primitivecomponent.h"
+#include "MeshComponent.h"
+#include "QuadComponent.h"
+#include "SpriteComponent.h"
+#include "TerrainColliderComponent.h"
+#include "TerrainComponent.h"
+#include "TextMeshComponent.h"
+#include "TextWriteComponent.h"
+#include "RigidBodyComponent.h"
+#include "SkinMeshLinkerComponent.h"
+#include "SkinMeshComponent.h"
+#include "BoneComponent.h"
+#include "SpriteComponent.h"
+#include "SoundSpeakerComponent.h"
+#include "TerrainColliderComponent.h"
+#include "PointColliderComponent.h"
+#include "LineColliderComponent.h"
+#include "SphereColliderComponent.h"
+#include "BoxColliderComponent.h"
+#include "CapsuleColliderComponent.h"
+#include "RotBoxColliderComponent.h"
+
 
 const string GameObject::TypeName = "GameObject";
 
@@ -31,6 +61,10 @@ GameObject::GameObject(Scene* scene)
 {
 	this->parent = nullptr;
 	this->pScene = scene;
+	this->pWorld = pScene->GetWorld();
+	this->pGameEngine = pScene->GetGameEngine();
+	this->pProjectSetting = pGameEngine->GetProjectSetting();
+
 	tag = nullptr;
 
 	this->layer = nullptr;
@@ -40,6 +74,773 @@ GameObject::GameObject(Scene* scene)
 	this->componentList.push_back(transformComponent);
 
 }
+
+GameObject::GameObject(GameObject* original)
+{
+	this->parent = nullptr;
+	this->pScene = original->pScene;
+	this->pWorld = pScene->GetWorld();
+	this->pGameEngine = pScene->GetGameEngine();
+	this->pProjectSetting = pGameEngine->GetProjectSetting();
+
+	tag = original->tag;
+	this->SetName(original->GetName());
+	this->layer = original->layer;
+
+
+	this->transformComponent = new TransformComponent(this);
+	this->componentList.push_back(transformComponent);
+
+
+	for (Component* ocom : original->GetComponentList())
+	{
+		if (TransformComponent* tcom = dynamic_cast<TransformComponent*>(ocom))
+		{
+			this->GetTransFormComponent()->SetLocalMtx(tcom->GetLocalMtx());
+		}
+		else
+		{
+
+			string typeName = ocom->GetTypeName();
+			this->AddComponentByTypeName(typeName);
+
+
+
+
+			if (typeName == typeid(CameraComponent).name())
+			{
+				CameraComponent* com = this->AddComponent<CameraComponent>();
+				CameraComponent* occom = static_cast<CameraComponent*>(ocom);
+				com->SetViewPort(occom->GetViewPort());
+				com->SetAngle(occom->GetAngle());
+				com->SetAspect(occom->GetAspect());
+				com->SetNear(occom->GetNear());
+				com->SetFar(occom->GetFar());
+				com->SetTrackingMode(occom->GetTrackingMode());
+				com->SetClearMode(occom->GetClearMode());
+				com->SetClearColor(occom->GetClearColor());
+				com->SetPostEffectEnable(occom->GetPostEffectEnable());
+				com->SetRenderTargetBackBuffer();
+
+
+				for (string* layer : occom->GetLayerCulling())
+				{
+
+					com->SetLayerCulling(layer, true);
+
+				}
+
+
+
+			}
+			if (typeName == typeid(DirectionalLightComponent).name())
+			{
+				DirectionalLightComponent* com = this->AddComponent<DirectionalLightComponent>();
+				DirectionalLightComponent* occom = static_cast<DirectionalLightComponent*>(ocom);
+
+				com->SetDiffuse(occom->GetLightParam().m_Diffuse);
+				com->SetAmbient(occom->GetLightParam().m_Ambient);
+				com->SetEnable(occom->GetLightParam().m_Enable);
+			}
+			if (typeName == typeid(PointLightComponent).name())
+			{
+				PointLightComponent* com = this->AddComponent<PointLightComponent>();
+				PointLightComponent* occom = static_cast<PointLightComponent*>(ocom);
+
+				POINT_LIGHT_PARAM lParam = occom->GetLightParam();
+				com->SetLightParam(lParam);
+			}
+			if (typeName == typeid(MeshComponent).name())
+			{
+				MeshComponent* com = this->AddComponent<MeshComponent>();
+				MeshComponent* occom = static_cast<MeshComponent*>(ocom);
+
+				com->SetHasShadow(occom->GetHasShadow());
+				com->SetDrawShadow(occom->GetDrawShadow());
+				com->SetAlphaTest(occom->GetAlphaTest());
+				com->SetIsFrustumCulling(occom->GetIsFrustumCulling());
+				com->SetCullingMode(occom->GetCullingMode());
+
+				if (occom->GetMaterial())
+				{
+					com->SetMaterial(occom->GetMaterial());
+				}
+
+				if (occom->GetShadowMaterial())
+				{
+					com->SetShadowMaterial(occom->GetShadowMaterial());
+				}
+
+				com->SetMeshData(occom->GetMeshData());
+			}
+			if (typeName == typeid(SkinMeshLinkerComponent).name())
+			{
+				SkinMeshLinkerComponent* com = this->AddComponent<SkinMeshLinkerComponent>();
+				SkinMeshLinkerComponent* occom = static_cast<SkinMeshLinkerComponent*>(ocom);
+
+
+				com->SetBoneCount(occom->GetBoneCount());
+			}
+			if (typeName == typeid(BoneComponent).name())
+			{
+				BoneComponent* com = this->AddComponent<BoneComponent>();
+				BoneComponent* occom = static_cast<BoneComponent*>(ocom);
+				SkinMeshLinkerComponent* linker;
+				if (linker = this->GetParent()->GetComponent<SkinMeshLinkerComponent>())
+				{
+
+				}
+				else
+				{
+					linker = this->GetParent()->GetComponent<BoneComponent>()->GetLinker();
+				}
+
+				com->SetBone(occom->GetBoneData()->GetSkinMeshTree()->GetPath(), occom->GetBoneData()->GetIndex(), linker);
+				com->SetIsPhysics(occom->GetIsPhysics());
+				com->SetJoint(occom->GetJoint());
+				com->SetMass(occom->GetMass());
+				com->SetTension(occom->GetTension());
+				com->SetResistance(occom->GetResistance());
+			}
+
+			if (typeName == typeid(SkinMeshComponent).name())
+			{
+				SkinMeshComponent* com = this->AddComponent<SkinMeshComponent>();
+				SkinMeshComponent* occom = static_cast<SkinMeshComponent*>(ocom);
+
+				com->SetHasShadow(occom->GetHasShadow());
+				com->SetDrawShadow(occom->GetDrawShadow());
+				com->SetAlphaTest(occom->GetAlphaTest());
+				com->SetIsFrustumCulling(occom->GetIsFrustumCulling());
+				com->SetCullingMode(occom->GetCullingMode());
+
+				if (occom->GetMaterial())
+				{
+					com->SetMaterial(occom->GetMaterial());
+				}
+
+				if (occom->GetShadowMaterial())
+				{
+					com->SetShadowMaterial(occom->GetShadowMaterial());
+				}
+				SkinMeshLinkerComponent* linker;
+				if (linker = this->GetParent()->GetComponent<SkinMeshLinkerComponent>())
+				{
+
+				}
+				else
+				{
+					linker = this->GetParent()->GetComponent<SkinMeshComponent>()->GetLinker();
+				}
+
+				com->SetLinker(linker);
+
+				com->SetSkinMeshData(occom->GetSkinMeshData()->GetSkinMeshTree()->GetPath(), occom->GetSkinMeshData()->GetIndex(), linker);
+			}
+
+			if (typeName == typeid(TerrainComponent).name())
+			{
+				TerrainComponent* com = this->AddComponent<TerrainComponent>();
+				TerrainComponent* occom = static_cast<TerrainComponent*>(ocom);
+
+				com->SetHasShadow(occom->GetHasShadow());
+				com->SetDrawShadow(occom->GetDrawShadow());
+				com->SetAlphaTest(occom->GetAlphaTest());
+				com->SetIsFrustumCulling(occom->GetIsFrustumCulling());
+				com->SetCullingMode(occom->GetCullingMode());
+
+				com->SetMaterial(occom->GetMaterial());
+				com->SetShadowMaterial(occom->GetShadowMaterial());
+
+				com->LoadHeightMap(occom->GetHeightMapPath());
+				com->CreateVertexBuffer(occom->GetResolution(), occom->GetHW());
+			}
+			if (typeName == typeid(BoxColliderComponent).name())
+			{
+				BoxColliderComponent* com = this->AddComponent<BoxColliderComponent>();
+				BoxColliderComponent* occom = static_cast<BoxColliderComponent*>(ocom);
+
+				com->SetShape(occom->GetShape());
+				com->SetPivot(occom->GetPivot());
+				com->SetCheckRadius(occom->GetCheckRadius());
+				com->SetIsRigid(occom->GetIsRigid());
+				com->SetBox(occom->GetSize());
+
+				if (occom->GetEnable())
+				{
+					com->OnCollider();
+				}
+			}
+
+			if (typeName == typeid(CapsuleColliderComponent).name())
+			{
+				CapsuleColliderComponent* com = this->AddComponent<CapsuleColliderComponent>();
+				CapsuleColliderComponent* occom = static_cast<CapsuleColliderComponent*>(ocom);
+
+				com->SetShape(occom->GetShape());
+				com->SetPivot(occom->GetPivot());
+				com->SetCheckRadius(occom->GetCheckRadius());
+				com->SetIsRigid(occom->GetIsRigid());
+				com->SetCapsule(occom->GetStart(), occom->GetEnd(), occom->GetRadius());
+
+				if (occom->GetEnable())
+				{
+					com->OnCollider();
+				}
+			}
+
+			if (typeName == typeid(LineColliderComponent).name())
+			{
+				LineColliderComponent* com = this->AddComponent<LineColliderComponent>();
+				LineColliderComponent* occom = static_cast<LineColliderComponent*>(ocom);
+
+				com->SetShape(occom->GetShape());
+				com->SetPivot(occom->GetPivot());
+				com->SetCheckRadius(occom->GetCheckRadius());
+				com->SetIsRigid(occom->GetIsRigid());
+
+				if (occom->GetEnable())
+				{
+					com->OnCollider();
+				}
+			}
+
+			if (typeName == typeid(PointColliderComponent).name())
+			{
+				PointColliderComponent* com = this->AddComponent<PointColliderComponent>();
+				PointColliderComponent* occom = static_cast<PointColliderComponent*>(ocom);
+
+				com->SetShape(occom->GetShape());
+				com->SetPivot(occom->GetPivot());
+				com->SetCheckRadius(occom->GetCheckRadius());
+				com->SetIsRigid(occom->GetIsRigid());
+
+				if (occom->GetEnable())
+				{
+					com->OnCollider();
+				}
+			}
+
+			if (typeName == typeid(RotBoxColliderComponent).name())
+			{
+				RotBoxColliderComponent* com = this->AddComponent<RotBoxColliderComponent>();
+				RotBoxColliderComponent* occom = static_cast<RotBoxColliderComponent*>(ocom);
+
+				com->SetShape(occom->GetShape());
+				com->SetPivot(occom->GetPivot());
+				com->SetCheckRadius(occom->GetCheckRadius());
+				com->SetIsRigid(occom->GetIsRigid());
+				com->SetRotBox(occom->GetSize());
+
+				if (occom->GetEnable())
+				{
+					com->OnCollider();
+				}
+			}
+
+			if (typeName == typeid(SphereColliderComponent).name())
+			{
+				SphereColliderComponent* com = this->AddComponent<SphereColliderComponent>();
+				SphereColliderComponent* occom = static_cast<SphereColliderComponent*>(ocom);
+
+				com->SetShape(occom->GetShape());
+				com->SetPivot(occom->GetPivot());
+				com->SetCheckRadius(occom->GetCheckRadius());
+				com->SetIsRigid(occom->GetIsRigid());
+				com->SetRadius(occom->GetCheckRadius());
+
+				if (occom->GetEnable())
+				{
+					com->OnCollider();
+				}
+			}
+
+			if (typeName == typeid(TerrainColliderComponent).name())
+			{
+				TerrainColliderComponent* com = this->AddComponent<TerrainColliderComponent>();
+				TerrainColliderComponent* occom = static_cast<TerrainColliderComponent*>(ocom);
+
+				com->SetShape(occom->GetShape());
+				com->SetPivot(occom->GetPivot());
+				com->SetCheckRadius(occom->GetCheckRadius());
+				com->SetIsRigid(occom->GetIsRigid());
+
+				if (occom->GetEnable())
+				{
+					com->OnCollider();
+				}
+			}
+
+
+			if (typeName == typeid(AnimationControlerComponent).name())
+			{
+				AnimationControlerComponent* com = this->AddComponent<AnimationControlerComponent>();
+				AnimationControlerComponent* occom = static_cast<AnimationControlerComponent*>(ocom);
+
+				int cnt = 0;
+
+				for (AnimationNode* node : occom->GetAnimNodeList())
+				{
+
+
+
+					if (cnt == 0)
+					{
+						com->LoadDefaulAnimation(node);
+					}
+					else
+					{
+						com->LoadAnimation(node);
+
+					}
+
+
+					cnt++;
+
+				}
+				for (pair<AnimParameter, string> condition : occom->GetConditionList())
+				{
+
+					string conditionName = condition.second;
+					AnimParameter para;
+					para.isTrigger = condition.first.isTrigger;
+					para.value = condition.first.value;
+					com->CreateCondition(conditionName, para);
+
+
+				}
+				for (AnimationTransition* transition : occom->GetTransitionList())
+				{
+
+					if (transition->isExit)
+					{
+						float time = transition->GetTransitionTime();
+						com->CreateNotLoopAnimExitTransition(transition->GetBeforeAnimNode()->GetName(), transition->GetAfterAnimNode()->GetName(), time);
+					}
+					else
+					{
+						float time = transition->GetTransitionTime();
+						com->CreateTransition(transition->GetBeforeAnimNode()->GetName(), transition->GetAfterAnimNode()->GetName(), transition->GetNeedConditionName(), transition->GetNeedCondition(), time);
+
+					}
+
+				}
+
+
+
+			}
+			if (typeName == typeid(RigidBodyComponent).name())
+			{
+				RigidBodyComponent* com = this->AddComponent<RigidBodyComponent>();
+				RigidBodyComponent* occom = static_cast<RigidBodyComponent*>(ocom);
+
+				com->SetMass(occom->GetMass());
+				com->SetDrag(occom->GetDrag());
+				com->SetFriction(occom->GetFriction());
+				com->SetAngularDrag(occom->GetAngularDrag());
+				com->SetUseGarvity(occom->GetUseGarvity());
+				com->SetIsKinematic(occom->GetIsKinematic());
+				com->SetIsStatic(occom->GetIsStatic());
+				com->SetIsFixTerrain(occom->GetIsFixTerrain());
+			}
+
+		}
+
+	}
+
+	for (GameObject* child:original->GetChild())
+	{
+		DynamicCreateChildClone(child, this);
+	}
+
+
+
+}
+
+GameObject::GameObject(GameObject* original , GameObject* parent)
+{
+
+	this->parent = parent;
+	this->pScene = original->pScene;
+	this->pWorld = pScene->GetWorld();
+	this->pGameEngine = pScene->GetGameEngine();
+	this->pProjectSetting = pGameEngine->GetProjectSetting();
+
+	tag = original->tag;
+	this->SetName(original->GetName());
+	this->layer = original->layer;
+
+
+	this->transformComponent = new TransformComponent(this);
+	this->componentList.push_back(transformComponent);
+
+
+	for (Component* ocom : original->GetComponentList())
+	{
+		if (TransformComponent* tcom = dynamic_cast<TransformComponent*>(ocom))
+		{
+			this->GetTransFormComponent()->SetLocalMtx(tcom->GetLocalMtx());
+		}
+		else
+		{
+
+			string typeName = ocom->GetTypeName();
+			this->AddComponentByTypeName(typeName);
+
+
+
+
+			if (typeName == typeid(CameraComponent).name())
+			{
+				CameraComponent* com = this->AddComponent<CameraComponent>();
+				CameraComponent* occom = static_cast<CameraComponent*>(ocom);
+				com->SetViewPort(occom->GetViewPort());
+				com->SetAngle(occom->GetAngle());
+				com->SetAspect(occom->GetAspect());
+				com->SetNear(occom->GetNear());
+				com->SetFar(occom->GetFar());
+				com->SetTrackingMode(occom->GetTrackingMode());
+				com->SetClearMode(occom->GetClearMode());
+				com->SetClearColor(occom->GetClearColor());
+				com->SetPostEffectEnable(occom->GetPostEffectEnable());
+				com->SetRenderTargetBackBuffer();
+
+
+				for (string* layer : occom->GetLayerCulling())
+				{
+
+					com->SetLayerCulling(layer, true);
+
+				}
+
+
+
+			}
+			if (typeName == typeid(DirectionalLightComponent).name())
+			{
+				DirectionalLightComponent* com = this->AddComponent<DirectionalLightComponent>();
+				DirectionalLightComponent* occom = static_cast<DirectionalLightComponent*>(ocom);
+
+				com->SetDiffuse(occom->GetLightParam().m_Diffuse);
+				com->SetAmbient(occom->GetLightParam().m_Ambient);
+				com->SetEnable(occom->GetLightParam().m_Enable);
+			}
+			if (typeName == typeid(PointLightComponent).name())
+			{
+				PointLightComponent* com = this->AddComponent<PointLightComponent>();
+				PointLightComponent* occom = static_cast<PointLightComponent*>(ocom);
+
+				POINT_LIGHT_PARAM lParam = occom->GetLightParam();
+				com->SetLightParam(lParam);
+			}
+			if (typeName == typeid(MeshComponent).name())
+			{
+				MeshComponent* com = this->AddComponent<MeshComponent>();
+				MeshComponent* occom = static_cast<MeshComponent*>(ocom);
+
+				com->SetHasShadow(occom->GetHasShadow());
+				com->SetDrawShadow(occom->GetDrawShadow());
+				com->SetAlphaTest(occom->GetAlphaTest());
+				com->SetIsFrustumCulling(occom->GetIsFrustumCulling());
+				com->SetCullingMode(occom->GetCullingMode());
+
+				if (occom->GetMaterial())
+				{
+					com->SetMaterial(occom->GetMaterial());
+				}
+
+				if (occom->GetShadowMaterial())
+				{
+					com->SetShadowMaterial(occom->GetShadowMaterial());
+				}
+
+				com->SetMeshData(occom->GetMeshData());
+			}
+			if (typeName == typeid(SkinMeshLinkerComponent).name())
+			{
+				SkinMeshLinkerComponent* com = this->AddComponent<SkinMeshLinkerComponent>();
+				SkinMeshLinkerComponent* occom = static_cast<SkinMeshLinkerComponent*>(ocom);
+
+
+				com->SetBoneCount(occom->GetBoneCount());
+			}
+			if (typeName == typeid(BoneComponent).name())
+			{
+				BoneComponent* com = this->AddComponent<BoneComponent>();
+				BoneComponent* occom = static_cast<BoneComponent*>(ocom);
+				SkinMeshLinkerComponent* linker;
+				if (linker = this->GetParent()->GetComponent<SkinMeshLinkerComponent>())
+				{
+
+				}
+				else
+				{
+					linker = this->GetParent()->GetComponent<BoneComponent>()->GetLinker();
+				}
+
+				com->SetBone(occom->GetBoneData()->GetSkinMeshTree()->GetPath(), occom->GetBoneData()->GetIndex(), linker);
+				com->SetIsPhysics(occom->GetIsPhysics());
+				com->SetJoint(occom->GetJoint());
+				com->SetMass(occom->GetMass());
+				com->SetTension(occom->GetTension());
+				com->SetResistance(occom->GetResistance());
+			}
+
+			if (typeName == typeid(SkinMeshComponent).name())
+			{
+				SkinMeshComponent* com = this->AddComponent<SkinMeshComponent>();
+				SkinMeshComponent* occom = static_cast<SkinMeshComponent*>(ocom);
+
+				com->SetHasShadow(occom->GetHasShadow());
+				com->SetDrawShadow(occom->GetDrawShadow());
+				com->SetAlphaTest(occom->GetAlphaTest());
+				com->SetIsFrustumCulling(occom->GetIsFrustumCulling());
+				com->SetCullingMode(occom->GetCullingMode());
+
+				if (occom->GetMaterial())
+				{
+					com->SetMaterial(occom->GetMaterial());
+				}
+
+				if (occom->GetShadowMaterial())
+				{
+					com->SetShadowMaterial(occom->GetShadowMaterial());
+				}
+				SkinMeshLinkerComponent* linker;
+				if (linker = this->GetParent()->GetComponent<SkinMeshLinkerComponent>())
+				{
+
+				}
+				else
+				{
+					linker = this->GetParent()->GetComponent<SkinMeshComponent>()->GetLinker();
+				}
+
+				com->SetLinker(linker);
+
+				com->SetSkinMeshData(occom->GetSkinMeshData()->GetSkinMeshTree()->GetPath(), occom->GetSkinMeshData()->GetIndex(), linker);
+			}
+
+			if (typeName == typeid(TerrainComponent).name())
+			{
+				TerrainComponent* com = this->AddComponent<TerrainComponent>();
+				TerrainComponent* occom = static_cast<TerrainComponent*>(ocom);
+
+				com->SetHasShadow(occom->GetHasShadow());
+				com->SetDrawShadow(occom->GetDrawShadow());
+				com->SetAlphaTest(occom->GetAlphaTest());
+				com->SetIsFrustumCulling(occom->GetIsFrustumCulling());
+				com->SetCullingMode(occom->GetCullingMode());
+
+				com->SetMaterial(occom->GetMaterial());
+				com->SetShadowMaterial(occom->GetShadowMaterial());
+
+				com->LoadHeightMap(occom->GetHeightMapPath());
+				com->CreateVertexBuffer(occom->GetResolution(), occom->GetHW());
+			}
+			if (typeName == typeid(BoxColliderComponent).name())
+			{
+				BoxColliderComponent* com = this->AddComponent<BoxColliderComponent>();
+				BoxColliderComponent* occom = static_cast<BoxColliderComponent*>(ocom);
+
+				com->SetShape(occom->GetShape());
+				com->SetPivot(occom->GetPivot());
+				com->SetCheckRadius(occom->GetCheckRadius());
+				com->SetIsRigid(occom->GetIsRigid());
+				com->SetBox(occom->GetSize());
+
+				if (occom->GetEnable())
+				{
+					com->OnCollider();
+				}
+			}
+
+			if (typeName == typeid(CapsuleColliderComponent).name())
+			{
+				CapsuleColliderComponent* com = this->AddComponent<CapsuleColliderComponent>();
+				CapsuleColliderComponent* occom = static_cast<CapsuleColliderComponent*>(ocom);
+
+				com->SetShape(occom->GetShape());
+				com->SetPivot(occom->GetPivot());
+				com->SetCheckRadius(occom->GetCheckRadius());
+				com->SetIsRigid(occom->GetIsRigid());
+				com->SetCapsule(occom->GetStart(), occom->GetEnd(), occom->GetRadius());
+
+				if (occom->GetEnable())
+				{
+					com->OnCollider();
+				}
+			}
+
+			if (typeName == typeid(LineColliderComponent).name())
+			{
+				LineColliderComponent* com = this->AddComponent<LineColliderComponent>();
+				LineColliderComponent* occom = static_cast<LineColliderComponent*>(ocom);
+
+				com->SetShape(occom->GetShape());
+				com->SetPivot(occom->GetPivot());
+				com->SetCheckRadius(occom->GetCheckRadius());
+				com->SetIsRigid(occom->GetIsRigid());
+
+				if (occom->GetEnable())
+				{
+					com->OnCollider();
+				}
+			}
+
+			if (typeName == typeid(PointColliderComponent).name())
+			{
+				PointColliderComponent* com = this->AddComponent<PointColliderComponent>();
+				PointColliderComponent* occom = static_cast<PointColliderComponent*>(ocom);
+
+				com->SetShape(occom->GetShape());
+				com->SetPivot(occom->GetPivot());
+				com->SetCheckRadius(occom->GetCheckRadius());
+				com->SetIsRigid(occom->GetIsRigid());
+
+				if (occom->GetEnable())
+				{
+					com->OnCollider();
+				}
+			}
+
+			if (typeName == typeid(RotBoxColliderComponent).name())
+			{
+				RotBoxColliderComponent* com = this->AddComponent<RotBoxColliderComponent>();
+				RotBoxColliderComponent* occom = static_cast<RotBoxColliderComponent*>(ocom);
+
+				com->SetShape(occom->GetShape());
+				com->SetPivot(occom->GetPivot());
+				com->SetCheckRadius(occom->GetCheckRadius());
+				com->SetIsRigid(occom->GetIsRigid());
+				com->SetRotBox(occom->GetSize());
+
+				if (occom->GetEnable())
+				{
+					com->OnCollider();
+				}
+			}
+
+			if (typeName == typeid(SphereColliderComponent).name())
+			{
+				SphereColliderComponent* com = this->AddComponent<SphereColliderComponent>();
+				SphereColliderComponent* occom = static_cast<SphereColliderComponent*>(ocom);
+
+				com->SetShape(occom->GetShape());
+				com->SetPivot(occom->GetPivot());
+				com->SetCheckRadius(occom->GetCheckRadius());
+				com->SetIsRigid(occom->GetIsRigid());
+				com->SetRadius(occom->GetCheckRadius());
+
+				if (occom->GetEnable())
+				{
+					com->OnCollider();
+				}
+			}
+
+			if (typeName == typeid(TerrainColliderComponent).name())
+			{
+				TerrainColliderComponent* com = this->AddComponent<TerrainColliderComponent>();
+				TerrainColliderComponent* occom = static_cast<TerrainColliderComponent*>(ocom);
+
+				com->SetShape(occom->GetShape());
+				com->SetPivot(occom->GetPivot());
+				com->SetCheckRadius(occom->GetCheckRadius());
+				com->SetIsRigid(occom->GetIsRigid());
+
+				if (occom->GetEnable())
+				{
+					com->OnCollider();
+				}
+			}
+
+
+			if (typeName == typeid(AnimationControlerComponent).name())
+			{
+				AnimationControlerComponent* com = this->AddComponent<AnimationControlerComponent>();
+				AnimationControlerComponent* occom = static_cast<AnimationControlerComponent*>(ocom);
+
+				int cnt = 0;
+
+				for (AnimationNode* node : occom->GetAnimNodeList())
+				{
+
+
+
+					if (cnt == 0)
+					{
+						com->LoadDefaulAnimation(node);
+					}
+					else
+					{
+						com->LoadAnimation(node);
+
+					}
+
+
+					cnt++;
+
+				}
+				for (pair<AnimParameter, string> condition : occom->GetConditionList())
+				{
+
+					string conditionName = condition.second;
+					AnimParameter para;
+					para.isTrigger = condition.first.isTrigger;
+					para.value = condition.first.value;
+					com->CreateCondition(conditionName, para);
+
+
+				}
+				for (AnimationTransition* transition : occom->GetTransitionList())
+				{
+
+					if (transition->isExit)
+					{
+						float time = transition->GetTransitionTime();
+						com->CreateNotLoopAnimExitTransition(transition->GetBeforeAnimNode()->GetName(), transition->GetAfterAnimNode()->GetName(), time);
+					}
+					else
+					{
+						float time = transition->GetTransitionTime();
+						com->CreateTransition(transition->GetBeforeAnimNode()->GetName(), transition->GetAfterAnimNode()->GetName(), transition->GetNeedConditionName(), transition->GetNeedCondition(), time);
+
+					}
+
+				}
+
+
+
+			}
+			if (typeName == typeid(RigidBodyComponent).name())
+			{
+				RigidBodyComponent* com = this->AddComponent<RigidBodyComponent>();
+				RigidBodyComponent* occom = static_cast<RigidBodyComponent*>(ocom);
+
+				com->SetMass(occom->GetMass());
+				com->SetDrag(occom->GetDrag());
+				com->SetFriction(occom->GetFriction());
+				com->SetAngularDrag(occom->GetAngularDrag());
+				com->SetUseGarvity(occom->GetUseGarvity());
+				com->SetIsKinematic(occom->GetIsKinematic());
+				com->SetIsStatic(occom->GetIsStatic());
+				com->SetIsFixTerrain(occom->GetIsFixTerrain());
+			}
+
+		}
+
+	}
+
+	for (GameObject* child : original->GetChild())
+	{
+		GameObject* newObj = new GameObject(child, this);
+		newObj->Awake();
+		newObj->InitAllComponent();
+		AddChild(newObj);
+	}
+
+}
+
 
 //GameObject::GameObject(GameObject* parent)
 //{
@@ -62,15 +863,15 @@ GameObject::~GameObject()
 
 void GameObject::Awake(void)
 {
-	this->pWorld = pScene->GetWorld();
-
-	this->pGameEngine = pScene->GetGameEngine();
-	this->pProjectSetting = pGameEngine->GetProjectSetting();
 	this->isActive = TRUE;
 	this->transformComponent->Awake();
 	notAnim = FALSE;
 	type = Type::GameObject;
-	
+	this->pWorld = pScene->GetWorld();
+	this->pGameEngine = pScene->GetGameEngine();
+	this->pProjectSetting = pGameEngine->GetProjectSetting();
+
+
 	this->tag = pProjectSetting->GetTag("Default");
 	this->layer = pProjectSetting->GetLayer("Default");
 
@@ -132,7 +933,7 @@ void GameObject::Destroy(void)
 
 	this->childList.clear();
 
-	
+	pScene->SetNotUseID(this->GetID());
 }
 
 void GameObject::DynamicDestroy(void)
@@ -155,6 +956,16 @@ void GameObject::DynamicDestroy(void)
 	this->childList.clear();
 	pScene->RemoveAllGameObjectList(this);
 	pScene->RemoveGameObject(this);
+	pScene->SetNotUseID(this->GetID());
+
+}
+
+void GameObject::RemoveComponent(Component* com)
+{
+	com->Uninit();
+	componentList.remove(com);
+	delete com;
+
 }
 
 void GameObject::DeleteChild(GameObject* gameObject)
@@ -432,6 +1243,13 @@ GameObject* GameObject::DynamicCreateChildByTypeName(string typeName)
 	AddChild(newObj);
 	return newObj;
 
+}
+
+GameObject* GameObject::DynamicCreateChildClone(GameObject* gameObject,GameObject* parent)
+{
+	GameObject* newObj = pProjectSetting->DynamicCroneGameObject(gameObject,parent);
+	AddChild(newObj);
+	return newObj;
 }
 
 void GameObject::AddChild(GameObject* child)

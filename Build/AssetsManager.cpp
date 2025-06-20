@@ -29,7 +29,7 @@
 
 #define MESH_PATH "data/MODEL/mesh/"
 #define SKINMESH_PATH "data/MODEL/skinmesh/"
-
+#define ANIM_PATH "data/Animation/"
 
 
 AssetsManager::AssetsManager()
@@ -102,11 +102,11 @@ void AssetsManager::Uninit(void)
 	}
 	ComputeShaderList.clear();
 
-	for (Material* data:MaterialArray)
+	for (Material* data:MaterialList)
 	{
 		if (data) delete data;
 	}
-	MaterialArray.clear();
+	MaterialList.clear();
 
 
 	for (RenderTexture* data : RenderTextureList)
@@ -153,6 +153,23 @@ MeshData* AssetsManager::LoadMeshFileFbx(string fileName)
 	return meshdata;
 }
 
+AnimationData* AssetsManager::GetAnimationData(string name)
+{
+	for (AnimationData* data : AnimDataList)
+	{
+
+		string aName = data->GetName();
+		if (name == aName)
+		{
+			return data;
+		}
+	}
+
+
+	return nullptr;
+}
+
+
 AnimationData* AssetsManager::LoadAnimationData(string fileName)
 {
 
@@ -171,6 +188,8 @@ AnimationData* AssetsManager::LoadAnimationData(string fileName)
 	string path = fileName;
 	animdata->LoadAnimation(path, this);
 	this->AnimDataList.push_back(animdata);
+	this->assetsList.push_back(animdata);
+
 	return animdata;
 }
 
@@ -193,6 +212,8 @@ AnimationData* AssetsManager::LoadAnimationData(string fileName1,string fileName
 	string path2 = fileName2;
 	animdata->LoadAnimation(path1, path2, this);
 	this->AnimDataList.push_back(animdata);
+	this->assetsList.push_back(animdata);
+
 	return animdata;
 }
 
@@ -223,6 +244,8 @@ AnimationData* AssetsManager::LoadAnimationData(string fileName1, string fileNam
 	string path4 = fileName4;
 	animdata->LoadAnimation(path1, path2, path3, path4, this);
 	this->AnimDataList.push_back(animdata);
+	this->assetsList.push_back(animdata);
+
 	return animdata;
 }
 
@@ -246,7 +269,7 @@ SkinMeshTreeData* AssetsManager::LoadSkinMeshFileFbx(string fileName)
 	//既にロードしているデータか調べる
 	for (SkinMeshTreeData* skinMesh : SkinMeshTreeDataList)
 	{
-		string filePath = skinMesh->GetFileName();
+		string filePath = skinMesh->GetPath();
 		if ((SKINMESH_PATH + fileName) == filePath)
 		{
 			return skinMesh;
@@ -342,12 +365,12 @@ void AssetsManager::CreateDefaultMaterial(void)
 {
 	UIMaterial* uiMat = new UIMaterial(this);
 	uiMat->SetName("UIMaterial");
-	MaterialArray.push_back(uiMat);
+	MaterialList.push_back(uiMat);
 	assetsList.push_back(uiMat);
 
 	StandardMaterial* standard = new StandardMaterial(this);
 	standard->SetName("StandardMaterial");
-	MaterialArray.push_back(standard);
+	MaterialList.push_back(standard);
 	assetsList.push_back(standard);
 }
 
@@ -535,15 +558,20 @@ void AssetsManager::AddLoadAssets(Assets* assets)
 
 }
 
+list<Material*>& AssetsManager::GetMaterialList(void)
+{
+	return MaterialList;
+}
+
 
 
 Material* AssetsManager::LoadMaterial(Material* material)
 {
 	if (material->GetName().empty())
 	{
-		material->SetName("Material");
+		material->SetName(0);
 	}
-	for (Material* mat : MaterialArray)
+	for (Material* mat : MaterialList)
 	{
 		if (mat->GetName() == material->GetName())
 		{
@@ -555,7 +583,7 @@ Material* AssetsManager::LoadMaterial(Material* material)
 
 
 
-	this->MaterialArray.push_back(material);
+	this->MaterialList.push_back(material);
 	this->assetsList.push_back(material);
 	return material;
 }
@@ -584,7 +612,7 @@ Material* AssetsManager::LoadShadowMaterial(Material* material)
 
 Material* AssetsManager::GetMaterial(string name)
 {
-	for (Material* mat : MaterialArray)
+	for (Material* mat : MaterialList)
 	{
 		if (mat->GetName() == name)
 		{

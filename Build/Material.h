@@ -17,7 +17,7 @@ public:
 	~Material();
 
 	virtual void SetName(string name);
-
+	void SetName(unsigned int count);
 	void SetShaderRenderer(void);
 
 	virtual void SetBufferMaterial(void) = 0;

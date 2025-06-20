@@ -18,7 +18,7 @@
 #include "Material.h"
 #include "World.h"
 #include "DirectionalLightComponent.h"
-
+#include "EditerCamera.h"
 
 ShadowMap::ShadowMap(World* world)
 {
@@ -116,23 +116,36 @@ void ShadowMap::ShadowMapping(void)
 	CameraComponent* mainCam = pWorld->GetMainCamera();
 	DirectionalLightComponent* mainLight = pWorld->GetLightmanager()->GetMainLight();
 
-	if (mainCam)
+	if (pGameEngine->GetEditerMode())
 	{
-		camv = XMVector3TransformNormal(pWorld->GetMainCamera()->GetTransFormComponent()->GetAxisZ(), pWorld->GetMainCamera()->GetTransFormComponent()->GetWorldMtx());
+		camv = pWorld->GetEditerCamera()->GetAxisZ();
 		camv.m128_f32[1] = 0.0f;
 		camv = XMVector3Normalize(camv);
 
-		camPos = XMLoadFloat3(&pWorld->GetMainCamera()->GetWorldPos());
-		if (pWorld->GetMainCamera()->GetTrackingMode() != CameraComponent::TrackingMode::NONE)
-		{
-			camPos = XMLoadFloat3(&pWorld->GetMainCamera()->GetAtPos());
-		}
+		camPos = pWorld->GetEditerCamera()->GetPosition();
 
 	}
 	else
 	{
-		camPos = XMVectorZero();
-		camv = zonevec();
+		if (mainCam)
+		{
+			camv = XMVector3TransformNormal(pWorld->GetMainCamera()->GetTransFormComponent()->GetAxisZ(), pWorld->GetMainCamera()->GetTransFormComponent()->GetWorldMtx());
+			camv.m128_f32[1] = 0.0f;
+			camv = XMVector3Normalize(camv);
+
+			camPos = XMLoadFloat3(&pWorld->GetMainCamera()->GetWorldPos());
+			if (pWorld->GetMainCamera()->GetTrackingMode() != CameraComponent::TrackingMode::NONE)
+			{
+				camPos = XMLoadFloat3(&pWorld->GetMainCamera()->GetAtPos());
+			}
+
+		}
+		else
+		{
+			camPos = XMVectorZero();
+			camv = zonevec();
+		}
+
 	}
 
 	if (mainLight)

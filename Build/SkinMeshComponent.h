@@ -46,7 +46,7 @@ public:
 
 
 	void SetSkinMeshData(SkinMeshData* data,SkinMeshLinkerComponent* linker);
-	void SetSkinMeshData(string fileName, unsigned int index);
+	void SetSkinMeshData(string path, unsigned int index, SkinMeshLinkerComponent* linker);
 
 	void CreateVertexArray(int n, SkinMeshVertex* vertexArray);
 

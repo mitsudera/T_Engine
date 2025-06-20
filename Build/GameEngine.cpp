@@ -38,23 +38,17 @@ void GameEngine::Awake()
 	this->windowSize.x = screenWidth;
 	this->windowSize.y = screenHeight;
 
-
 	this->projectSetting = new ProjectSetting(this);
 
 	this->renderer = new Renderer(this);
 	this->renderer->InitRenderer(*main->GetInstanceHandle(), main->GetWindowHangle(), true);
 
-
 	this->soundEngine = new SoundEngine(this);
 
 	this->cBufferManager = new CBufferManager(this);
 
-
-
 	this->assetsManager = new AssetsManager(this);
 	this->assetsManager->Awake();
-
-
 
 	this->wicFactory = new WicFactory(this);
 
@@ -64,9 +58,6 @@ void GameEngine::Awake()
 
 	this->debugUtility = new DebugUtility(this);
 	
-
-
-
 	this->saveSystem = new SaveSystem(this);
 
 	this->world = new World(this);
@@ -81,6 +72,7 @@ void GameEngine::Awake()
 		this->world->GetSceneManager()->CreateNewScene("default");
 	}
 	this->world->GetEditerCamera()->Init();
+
 }
 
 void GameEngine::Update()
@@ -108,10 +100,6 @@ void GameEngine::Update()
 
 
 	this->LateUpdate();
-
-
-
-
 
 }
 
@@ -298,6 +286,15 @@ void GameEngine::SetEditerMode(BOOL b)
 
 void GameEngine::TestPlay(void)
 {
+	if (testMode)
+	{
+
+	}
+	else
+	{
+
+	}
+
 	testMode = TRUE;
 	world->TestPlay();
 

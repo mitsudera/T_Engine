@@ -25,7 +25,11 @@ void AnimationControlerComponent::Awake(void)
 {
 	Component::Awake();
 	fTransition = new AnimationForceTransition(this);
-	loadFileName = "";
+	loadFileName[0] = "";
+	loadFileName[1] = "";
+	loadFileName[2] = "";
+	loadFileName[3] = "";
+	createConditionName = "";
 	TypeName = typeid(AnimationControlerComponent).name();;
 
 }
@@ -74,12 +78,41 @@ void AnimationControlerComponent::LoadDefaulAnimation(string fileName, string na
 	AnimNodeList.push_back(node);
 }
 
+void AnimationControlerComponent::LoadDefaulAnimationAssets(string assetsName, string name)
+{
+	AnimationNode* node = new AnimationNode(this);
+	node->CreateNode(assetsName, name, FALSE, AnimationNode::Blend::None);
+	defaultNode = node;
+	activeAnim = node;
+
+	AnimNodeList.push_back(node);
+
+}
+
+void AnimationControlerComponent::LoadDefaulAnimation(AnimationNode* node)
+{
+	AnimationNode* newnode = new AnimationNode(this);
+	newnode->CreateNode(node);
+	defaultNode = newnode;
+	activeAnim = newnode;
+	AnimNodeList.push_back(newnode);
+
+}
+
 void AnimationControlerComponent::LoadAnimation(string fileName, string name, BOOL loop)
 {
 	AnimationNode* node = new AnimationNode(this);
 	node->CreateNode(fileName, name, loop);
 	AnimNodeList.push_back(node);
 	
+}
+
+void AnimationControlerComponent::LoadAnimation(string animName, string name, BOOL loop, AnimationNode::Blend blend)
+{
+	AnimationNode* node = new AnimationNode(this);
+	node->CreateNode(animName, name, loop, blend);
+	AnimNodeList.push_back(node);
+
 }
 
 void AnimationControlerComponent::LoadAnimation(string fileName1, string fileName2, string name, BOOL loop)
@@ -95,6 +128,39 @@ void AnimationControlerComponent::LoadAnimation(string fileNameFront, string fil
 	AnimationNode* node = new AnimationNode(this);
 	node->CreateNode(fileNameFront, fileNameRight, fileNameBack, fileNameLeft, name, loop);
 	AnimNodeList.push_back(node);
+
+}
+
+void AnimationControlerComponent::LoadAnimation(bool loop)
+{
+	if (loadFileName[0].empty())
+		return;
+
+	LoadAnimation(loadFileName[0], loadFileName[0], loop);
+}
+
+void AnimationControlerComponent::LoadAnimation2(bool loop)
+{
+	if (loadFileName[0].empty()|| loadFileName[1].empty())
+		return;
+
+	LoadAnimation(loadFileName[0], loadFileName[1], loadFileName[0] + "blend", loop);
+}
+
+void AnimationControlerComponent::LoadAnimation4(bool loop)
+{
+	if (loadFileName[0].empty() || loadFileName[1].empty()||loadFileName[2].empty() || loadFileName[3].empty())
+		return;
+
+	LoadAnimation(loadFileName[0], loadFileName[1],loadFileName[2], loadFileName[3], loadFileName[0] + "blend", loop);
+
+}
+
+void AnimationControlerComponent::LoadAnimation(AnimationNode* node)
+{
+	AnimationNode* newnode = new AnimationNode(this);
+	newnode->CreateNode(node);
+	AnimNodeList.push_back(newnode);
 
 }
 
@@ -136,6 +202,10 @@ void AnimationControlerComponent::CreateTransition(
 	AnimationTransition* transition = new AnimationTransition(this);
 	transition->CreateTransition(beforeNode, afterNode, transitionTime, conditionName, needCondition);
 	beforeNode->AddTransition(transition);
+	transition->isExit = false;
+
+	transitionList.push_back(transition);
+
 }
 
 void AnimationControlerComponent::CreateTransition(string beforeAnimName, string afterAnimName, string conditionName, BOOL needCondition, int transitionFrame)
@@ -172,6 +242,9 @@ void AnimationControlerComponent::CreateTransition(string beforeAnimName, string
 	AnimationTransition* transition = new AnimationTransition(this);
 	transition->CreateTransition(beforeNode, afterNode, transitionTime, conditionName, needCondition);
 	beforeNode->AddTransition(transition);
+	transition->isExit = false;
+
+	transitionList.push_back(transition);
 
 }
 
@@ -208,6 +281,9 @@ void AnimationControlerComponent::CreateTransition(string beforeAnimName, string
 	AnimationTransition* transition = new AnimationTransition(this);
 	transition->CreateTransition(beforeNode, afterNode, 0.25f, conditionName, needCondition);
 	beforeNode->AddTransition(transition);
+	transition->isExit = false;
+
+	transitionList.push_back(transition);
 
 }
 
@@ -247,6 +323,9 @@ void AnimationControlerComponent::CreateNotLoopAnimExitTransition(
 	AnimationTransition* transition = new AnimationTransition(this);
 	transition->CreateExitTransition(beforeNode, afterNode, transitionTime);
 	beforeNode->SetNotLoopExitTransition(transition);
+	transition->isExit = true;
+
+	transitionList.push_back(transition);
 
 }
 
@@ -283,6 +362,9 @@ void AnimationControlerComponent::CreateNotLoopAnimExitTransition(string beforeA
 	AnimationTransition* transition = new AnimationTransition(this);
 	transition->CreateExitTransition(beforeNode, afterNode, transitionTime);
 	beforeNode->SetNotLoopExitTransition(transition);
+	transition->isExit = true;
+
+	transitionList.push_back(transition);
 
 }
 
@@ -318,6 +400,8 @@ void AnimationControlerComponent::CreateNotLoopAnimExitTransition(string beforeA
 	AnimationTransition* transition = new AnimationTransition(this);
 	transition->CreateExitTransition(beforeNode, afterNode, 0.25f);
 	beforeNode->SetNotLoopExitTransition(transition);
+	transition->isExit = true;
+	transitionList.push_back(transition);
 
 }
 
@@ -411,14 +495,32 @@ list<pair<AnimParameter, string>>& AnimationControlerComponent::GetConditionList
 	return conditionList;
 }
 
-string AnimationControlerComponent::GetLoadFileName(void)
+list<AnimationTransition*>& AnimationControlerComponent::GetTransitionList(void)
 {
-	return loadFileName;
+	return transitionList;
 }
 
-void AnimationControlerComponent::SetLoadFileName(string fName)
+
+
+string AnimationControlerComponent::GetLoadFileName(int slot)
 {
-	loadFileName = fName;
+	if (slot >= 4 || slot < 0)
+	{
+		return "";
+	}
+
+	return loadFileName[slot];
+}
+
+void AnimationControlerComponent::SetLoadFileName(string fName, int slot)
+{
+	if (slot >= 4 || slot < 0)
+	{
+		return;
+	}
+
+
+	loadFileName[slot] = fName;
 }
 
 AnimationNode* AnimationControlerComponent::GetDefaultNode(void)
@@ -481,6 +583,18 @@ BOOL AnimationControlerComponent::GetCondition(string name)
 		}
 	}
 	return 0;
+}
+
+void AnimationControlerComponent::SetIsTrigger(string name, BOOL b)
+{
+	for (pair<AnimParameter, string>& condition : conditionList)
+	{
+		if (condition.second == name)
+		{
+			condition.first.isTrigger = b;
+		}
+	}
+
 }
 
 
@@ -590,6 +704,36 @@ void AnimationTransition::StartTransition(float beforeAnimCnt, float afterAnimCn
 
 }
 
+string AnimationTransition::GetNeedConditionName(void)
+{
+	return this->needConditionName;
+}
+
+BOOL AnimationTransition::GetNeedCondition(void)
+{
+	return this->needCondition;
+}
+
+void AnimationTransition::SetNeedConditionName(string name)
+{
+	this->needConditionName = name;
+}
+
+void AnimationTransition::SetNeedCondition(BOOL b)
+{
+	this->needCondition = b;
+}
+
+AnimationNode* AnimationTransition::GetBeforeAnimNode(void)
+{
+	return beforeAnimNode;
+}
+
+AnimationNode* AnimationTransition::GetAfterAnimNode(void)
+{
+	return afterAnimNode;
+}
+
 void AnimationTransition::UpdateMtx(MtxNode* node1, MtxNode* node2 , GameObject* gameObject)
 {
 
@@ -690,11 +834,12 @@ AnimationNode::AnimationNode(AnimationControlerComponent* controler)
 
 AnimationNode::~AnimationNode()
 {
-	for (AnimationTransition* tra : transitionArray)
+	for (AnimationTransition* tra : transitionList)
 	{
 		delete tra;
 	}
 }
+
 
 void AnimationNode::UpdateAnimation(GameObject* gameObject)
 {
@@ -735,7 +880,7 @@ void AnimationNode::UpdateAnimation(GameObject* gameObject)
 
 
 	}
-	for (AnimationTransition* transition : transitionArray)
+	for (AnimationTransition* transition : transitionList)
 	{
 
 		if (transition->CheckCondition())
@@ -792,6 +937,45 @@ void AnimationNode::CreateNode(string fileName1, string fileName2, string fileNa
 
 }
 
+void AnimationNode::CreateNode(AnimationData* animData, string name, BOOL loop, Blend blend)
+{
+	this->animData = animData;
+	this->name = name;
+	this->loop = loop;
+	this->endTime = ((float)animData->GetFrameNum() - 1) / 60.0f;
+	exitTime = endTime;
+	animEnd = FALSE;
+
+	this->blend = blend;
+
+}
+
+void AnimationNode::CreateNode(AnimationNode* node)
+{
+	this->animData = node->animData;
+	this->name = node->name;
+	this->loop = node->loop;
+	this->endTime = node->endTime;
+	this->exitTime = node->exitTime;
+	this->animEnd = node->animEnd;
+
+	this->blend = node->blend;
+
+}
+
+void AnimationNode::CreateNode(string animName, string name, BOOL loop, Blend blend)
+{
+	this->animData = pAssetsManager->GetAnimationData(animName);
+	this->name = name;
+	this->loop = loop;
+	this->endTime = ((float)animData->GetFrameNum() - 1) / 60.0f;
+	exitTime = endTime;
+	animEnd = FALSE;
+
+	this->blend = blend;
+
+}
+
 
 void AnimationNode::SetLoop(BOOL loop)
 {
@@ -805,7 +989,7 @@ AnimationData* AnimationNode::GetAnimData(void)
 
 void AnimationNode::AddTransition(AnimationTransition* transition)
 {
-	this->transitionArray.push_back(transition);
+	this->transitionList.push_back(transition);
 }
 
 void AnimationNode::SetNotLoopExitTransition(AnimationTransition* transition)
@@ -824,6 +1008,21 @@ void AnimationNode::StartAnimation(float startTime)
 AnimationNode::Blend AnimationNode::GetBlend(void)
 {
 	return blend;
+}
+
+list<AnimationTransition*>& AnimationNode::GetTransitionList(void)
+{
+	return transitionList;
+}
+
+AnimationTransition* AnimationNode::GetExitTransition(void)
+{
+	return exitTransition;
+}
+
+BOOL AnimationNode::GetLoop(void)
+{
+	return loop;
 }
 
 void AnimationNode::UpdateMtx(MtxNode* node, GameObject* gameObject)

@@ -83,7 +83,7 @@ void SkinMeshComponent::Draw(void)
 
 	skinMeshData->BufferSetIndex();
 
-
+	linker->SetBoneBuffer();
 
 	XMMATRIX world = XMMatrixIdentity();
 	world = GetTransFormComponent()->GetWorldMtx(world);
@@ -108,6 +108,7 @@ void SkinMeshComponent::ShadowMapping(void)
 	}
 
 
+	linker->SetBoneBuffer();
 
 	this->pRenderer->SetCullingMode((CULL_MODE)cullMode);
 	// 頂点バッファ設定
@@ -148,7 +149,6 @@ void SkinMeshComponent::SetSkinMeshData(SkinMeshData* data, SkinMeshLinkerCompon
 
 
 	this->material = data->GetMaterial();
-	this->linker->SetMaterial(this->material);
 
 	this->shadowMaterial = data->GetShadowMaterial();
 	this->GetTransFormComponent()->SetPosition(data->GetPosOffset());
@@ -161,9 +161,21 @@ void SkinMeshComponent::SetSkinMeshData(SkinMeshData* data, SkinMeshLinkerCompon
 
 }
 
-void SkinMeshComponent::SetSkinMeshData(string fileName, unsigned int index)
+void SkinMeshComponent::SetSkinMeshData(string path, unsigned int index, SkinMeshLinkerComponent* linker)
 {
+	string fileName = path;
+	// 最後の '/' の位置を見つける
+	size_t pos = fileName.rfind('/');
+
+	// 最後の '/' が見つかった場合
+	if (pos != string::npos) {
+		// '/' より後の部分を切り出す
+		fileName = fileName.substr(pos + 1);
+	}
+
 	skinMeshData = dynamic_cast<SkinMeshData*>(pAssetsManager->GetSkinMeshTreeNode(fileName, index));
+
+	SetSkinMeshData(skinMeshData, linker);
 }
 
 void SkinMeshComponent::CreateVertexArray(int n, SkinMeshVertex* vertexArray)

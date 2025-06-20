@@ -2,6 +2,7 @@
 #include "math.h"
 #include"gameobject.h"
 #include "Scene.h"
+#include "RigidBodyComponent.h"
 
 TransformComponent::TransformComponent()
 {
@@ -226,6 +227,10 @@ void TransformComponent::SetPosition(XMFLOAT3 pos)
 void TransformComponent::SetPosition(float x, float y, float z)
 {
 	this->pos = XMFLOAT3(x, y, z);
+	if (RigidBodyComponent* rb = GetComponent<RigidBodyComponent>())
+	{
+		rb->SetWorldPos(pos);
+	}
 	this->mtxpos = XMMatrixTranslation(pos.x, pos.y, pos.z);
 
 }
@@ -340,6 +345,8 @@ void TransformComponent::SetWorldMtx(XMMATRIX mtx)
 		SetLocalMtx(mtx);
 	}
 
+
+
 }
 
 void TransformComponent::SetLocalMtx(XMMATRIX mtx)
@@ -363,6 +370,10 @@ void TransformComponent::SetLocalMtx(XMMATRIX mtx)
 	this->SetRotation(rot);
 	this->mtxpos = XMMatrixTranslation(this->pos.x, this->pos.y, this->pos.z);
 
+	if (RigidBodyComponent* rb = GetComponent<RigidBodyComponent>())
+	{
+		rb->SetWorldPos(GetWorldPos());
+	}
 
 	
 }
@@ -728,4 +739,9 @@ void TransformComponent::RotQuaternion(XMVECTOR qton)
 XMMATRIX TransformComponent::GetLastLocalMtx(void)
 {
 	return lastLocalMtx;
+}
+
+void TransformComponent::Reset(void)
+{
+	SetLocalMtx(XMMatrixIdentity());
 }

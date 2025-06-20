@@ -23,8 +23,45 @@ Material::~Material()
 
 void Material::SetName(string name)
 {
+
+
+
 	Object::SetName(name);
 }
+
+void Material::SetName(unsigned int count)
+{
+	string name;
+	if (count == 0)
+	{
+
+		name = "Material";
+
+
+
+	}
+	else
+	{
+		name = "Material" + to_string(count);
+
+
+	}
+
+	for (Material* mat: pAssetsManager->GetMaterialList())
+	{
+		if (mat->GetName() == name)
+		{
+			SetName(count + 1);
+			return;
+		}
+
+	}
+	
+	Object::SetName(name);
+
+
+}
+
 
 
 void Material::SetShaderRenderer(void)

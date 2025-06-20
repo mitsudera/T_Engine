@@ -59,6 +59,23 @@ void CapsuleColliderComponent::SetCapsule(XMFLOAT3 start, XMFLOAT3 end, float ra
 	this->radius = radius;
 }
 
+void CapsuleColliderComponent::SetStart(XMFLOAT3 start)
+{
+	SetCapsule(start, lEndPoint, radius);
+}
+
+void CapsuleColliderComponent::SetEnd(XMFLOAT3 end)
+{
+	SetCapsule(lStartPoint, end, radius);
+
+}
+
+void CapsuleColliderComponent::SetRadius(float radius)
+{
+	SetCapsule(lStartPoint, lEndPoint, radius);
+
+}
+
 XMFLOAT3 CapsuleColliderComponent::GetStart(void)
 {
 	return this->startPoint;
@@ -67,6 +84,16 @@ XMFLOAT3 CapsuleColliderComponent::GetStart(void)
 XMFLOAT3 CapsuleColliderComponent::GetEnd(void)
 {
 	return this->endPoint;
+}
+
+XMFLOAT3 CapsuleColliderComponent::GetLStart(void)
+{
+	return lStartPoint;
+}
+
+XMFLOAT3 CapsuleColliderComponent::GetLEnd(void)
+{
+	return lEndPoint;
 }
 
 float CapsuleColliderComponent::GetRadius(void)

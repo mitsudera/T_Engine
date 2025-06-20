@@ -5,7 +5,7 @@ class BoneComponent;
 class Renderer;
 class CBufferManager;
 
-class SkinMeshLinkerComponent :public PrimitiveComponent
+class SkinMeshLinkerComponent :public Component
 {
 public:
 	SkinMeshLinkerComponent(GameObject* gameObject);
@@ -14,8 +14,10 @@ public:
 	virtual void Awake(void) override;
 	virtual void Update(void) override;
 	virtual void LateUpdate(void) override;
-	virtual void Draw(void) override;
-	virtual void ShadowMapping(void) override;
+	//virtual void Draw(void) override;
+	//virtual void ShadowMapping(void) override;
+
+	void SetBoneBuffer(void);
 
 	virtual void Uninit(void) override;
 

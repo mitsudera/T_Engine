@@ -6,6 +6,7 @@
 #include "GameEngine.h"
 #include "DebugUtility.h"
 #include "CBufferManager.h"
+#include "AssetsManager.h"
 
 constexpr XMFLOAT3 gravity = XMFLOAT3(0.0f, -981.0f, 0.0f); // 標準重力
 
@@ -21,8 +22,10 @@ void BoneComponent::Awake(void)
 	Component::Awake();
 	isPhysics = FALSE;
 	joint = Joint::Standard;
-	TypeName = typeid(BoneComponent).name();;
-
+	TypeName = typeid(BoneComponent).name();
+	mass = 20.0f;
+	tension = 15000.0f;
+	resistance = 400.0;
 
 }
 void BoneComponent::Init(void)
@@ -49,8 +52,8 @@ void BoneComponent::FixedUpdate(void)
 			velocity += dragForce * pGameEngine->GetFixedDeltaTime();
 
 
-			
-			
+
+
 			XMFLOAT3 pos = transform->GetWorldPos();
 
 			XMVECTOR posv = XMLoadFloat3(&pos);
@@ -88,11 +91,11 @@ void BoneComponent::FixedUpdate(void)
 		}
 		case BoneComponent::Joint::Spring:
 		{
-			XMFLOAT3 zero= XMFLOAT3(0.0f, 0.0f, 0.0f);
+			XMFLOAT3 zero = XMFLOAT3(0.0f, 0.0f, 0.0f);
 			XMVECTOR force = XMLoadFloat3(&zero);
 			XMVECTOR accel = XMLoadFloat3(&zero);
 
-			XMVECTOR dPos = XMVector3Transform(defaultLength,parentBone->GetWorldMtx());
+			XMVECTOR dPos = XMVector3Transform(defaultLength, parentBone->GetWorldMtx());
 			XMVECTOR lenv = wpv - dPos;
 			lenv.m128_f32[3] = 0.0f;
 
@@ -113,7 +116,7 @@ void BoneComponent::FixedUpdate(void)
 			velocity += accel * pGameEngine->GetFixedDeltaTime();
 
 			wpv += velocity * pGameEngine->GetFixedDeltaTime();
-			
+
 			XMFLOAT3 resPos;
 
 			XMStoreFloat3(&resPos, wpv);
@@ -122,6 +125,11 @@ void BoneComponent::FixedUpdate(void)
 
 			break;
 
+		}
+		case BoneComponent::Joint::Hair:
+		{
+
+			break;
 		}
 
 
@@ -151,6 +159,7 @@ XMMATRIX BoneComponent::GetInitMtxInverse(void)
 }
 void BoneComponent::SetBone(BoneData* data, SkinMeshLinkerComponent* linker)
 {
+	boneData = data;
 	rigName = data->GetName();
 
 	this->GetTransFormComponent()->SetLocalMtx(data->GetLocalOffset());
@@ -169,6 +178,7 @@ void BoneComponent::SetBone(BoneData* data, SkinMeshLinkerComponent* linker)
 		isRoot = TRUE;
 		XMFLOAT3 zero = XMFLOAT3(0.0f, 0.0f, 0.0f);
 		defaultLength = XMLoadFloat3(&zero);
+		fdl = 0.0f;
 		XMFLOAT3 wpos = GetWorldPos();
 		wpv = XMLoadFloat3(&wpos);
 		this->parentBone = nullptr;
@@ -179,6 +189,7 @@ void BoneComponent::SetBone(BoneData* data, SkinMeshLinkerComponent* linker)
 		isRoot = TRUE;
 		XMFLOAT3 zero = XMFLOAT3(0.0f, 0.0f, 0.0f);
 		defaultLength = XMLoadFloat3(&zero);
+		fdl = 0.0f;
 		XMFLOAT3 wpos = GetWorldPos();
 		wpv = XMLoadFloat3(&wpos);
 
@@ -190,6 +201,10 @@ void BoneComponent::SetBone(BoneData* data, SkinMeshLinkerComponent* linker)
 		isRoot = FALSE;
 		this->parentBone = pGameObject->GetParent()->GetComponent<BoneComponent>();
 		defaultLength = XMLoadFloat3(&GetTransFormComponent()->GetPosition());
+		XMVECTOR fdlv = XMVector3Length(defaultLength);
+
+		XMStoreFloat(&fdl, fdlv);
+
 		XMFLOAT3 wpos = GetWorldPos();
 		wpv = XMLoadFloat3(&wpos);
 
@@ -201,6 +216,23 @@ void BoneComponent::SetBone(BoneData* data, SkinMeshLinkerComponent* linker)
 
 	linker->AddBone(this);
 
+}
+
+void BoneComponent::SetBone(string path, unsigned int index, SkinMeshLinkerComponent* linker)
+{
+	string fileName = path;
+	// 最後の '/' の位置を見つける
+	size_t pos = fileName.rfind('/');
+
+	// 最後の '/' が見つかった場合
+	if (pos != string::npos) {
+		// '/' より後の部分を切り出す
+		fileName = fileName.substr(pos + 1);
+	}
+
+	boneData = dynamic_cast<BoneData*>(pGameEngine->GetAssetsManager()->LoadSkinMeshFileFbx(fileName)->GetNode(index));
+
+	SetBone(boneData, linker);
 }
 
 XMMATRIX& BoneComponent::GetBoneMtx(void)
@@ -216,6 +248,24 @@ XMMATRIX& BoneComponent::GetBoneMtx(void)
 void BoneComponent::SetIsPhysics(BOOL b)
 {
 	isPhysics = b;
+	if (b)
+	{
+		pGameObject->SetNotAnim(TRUE);
+		velocity = XMVectorZero();
+	}
+	else
+	{
+		pGameObject->SetNotAnim(FALSE);
+
+	}
+
+	for (GameObject* go : pGameObject->GetChild())
+	{
+		go->GetComponent<BoneComponent>()->SetIsPhysics(b);
+	}
+
+
+
 }
 
 BOOL BoneComponent::GetIsPhysics(void)
@@ -226,6 +276,12 @@ BOOL BoneComponent::GetIsPhysics(void)
 void BoneComponent::SetJoint(Joint j)
 {
 	joint = j;
+
+	for (GameObject* go : pGameObject->GetChild())
+	{
+		go->GetComponent<BoneComponent>()->SetJoint(j);
+	}
+
 }
 
 void BoneComponent::SetIsRoot(BOOL b)
@@ -261,5 +317,50 @@ void BoneComponent::SetSpringPhysics(float mass, float tension, float resistance
 string BoneComponent::GetRigName(void)
 {
 	return rigName;
+}
+
+BoneComponent::Joint BoneComponent::GetJoint(void)
+{
+	return joint;
+}
+
+float BoneComponent::GetMass(void)
+{
+	return mass;
+}
+
+float BoneComponent::GetTension(void)
+{
+	return tension;
+}
+
+float BoneComponent::GetResistance(void)
+{
+	return resistance;
+}
+
+void BoneComponent::SetMass(float mass)
+{
+	this->mass = mass;
+}
+
+void BoneComponent::SetTension(float tention)
+{
+	this->tension = tention;
+}
+
+void BoneComponent::SetResistance(float resistance)
+{
+	this->resistance = resistance;
+}
+
+BoneData* BoneComponent::GetBoneData(void)
+{
+	return boneData;
+}
+
+SkinMeshLinkerComponent* BoneComponent::GetLinker(void)
+{
+	return linker;
 }
 

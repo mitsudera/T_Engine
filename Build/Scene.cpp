@@ -106,7 +106,9 @@ void Scene::Update()
 	{
 		if (!com->GetActive())
 			continue;
-
+		if (com == nullptr)
+			continue;
+		
 		com->Update();
 
 	}
@@ -195,6 +197,13 @@ void Scene::CreateDefaultObject(void)
 GameObject* Scene::DynamicCreateGameObjectByTypeName(string typeName)
 {
 	GameObject* newObj= pProjectSetting->DynamicCreateGameObjectByTypeName(typeName,this);
+	AddGameObject(newObj);
+	return newObj;
+}
+
+GameObject* Scene::DynamicCroneGameObject(GameObject* gameObject)
+{
+	GameObject* newObj = pProjectSetting->DynamicCroneGameObject(gameObject);
 	AddGameObject(newObj);
 	return newObj;
 }
@@ -390,6 +399,11 @@ void Scene::RemoveScenePrimitiveComponent(PrimitiveComponent* com)
 void Scene::RemoveSceneRigidBodyComponent(RigidBodyComponent* com)
 {
 	allRigidBodyComponent.remove(com);
+}
+
+void Scene::RemoveCameraList(CameraComponent* com)
+{
+	cameraList.remove(com);
 }
 
 

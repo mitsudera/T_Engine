@@ -37,7 +37,6 @@
 //*****************************************************************************
 // グローバル変数
 //*****************************************************************************
-static int				ViewPortType = TYPE_FULL_SCREEN;
 
 
 CameraComponent::CameraComponent()
@@ -127,7 +126,7 @@ void CameraComponent::Update(void)
 void CameraComponent::Uninit(void)
 {
 	Component::Uninit();
-
+	pScene->RemoveCameraList(this);
 	pGameEngine->GetAssetsManager()->DeleteRenderTexture(renderTexture);
 	this->cameraBuffer->Release();
 }
@@ -344,14 +343,14 @@ void CameraComponent::Render(void)
 	}
 
 #ifdef _DEBUG
-	pGameEngine->GetDebugUtility()->SetDebugLineShader();
+	//pGameEngine->GetDebugUtility()->SetDebugLineShader();
 
-	for (Component* com : pGameObject->GetScene()->GetAllComponent())
-	{
-		if (!com->GetActive())
-			continue;
-		com->DebugDraw();
-	}
+	//for (Component* com : pGameObject->GetScene()->GetAllComponent())
+	//{
+	//	if (!com->GetActive())
+	//		continue;
+	//	com->DebugDraw();
+	//}
 
 #endif
 
@@ -483,6 +482,13 @@ void CameraComponent::SetDepthStencilView(ID3D11DepthStencilView* dsv)
 	this->depthTarget = dsv;
 }
 
+void CameraComponent::SetRenderTargetBackBuffer(void)
+{
+	rt = -1;
+	SetRenderTarget(pRenderer->GetBackBuffer());
+	SetDepthStencilView(pRenderer->GetBackBufferDSV());
+}
+
 void CameraComponent::SetClearMode(ClearMode mode)
 {
 	this->clearMode = mode;
@@ -492,6 +498,7 @@ void CameraComponent::SetClearColor(XMFLOAT4 color)
 {
 	this->clearColor = color;
 }
+
 
 void CameraComponent::SetMainCamera(void)
 {
@@ -516,6 +523,11 @@ void CameraComponent::SetTrackingMode(TrackingMode mode)
 CameraComponent::TrackingMode CameraComponent::GetTrackingMode(void)
 {
 	return this->mode;
+}
+
+CameraComponent::ClearMode CameraComponent::GetClearMode(void)
+{
+	return this->clearMode;
 }
 
 XMFLOAT3 CameraComponent::GetAtPos(void)
@@ -637,6 +649,64 @@ void CameraComponent::SetLayerCulling(string layer, bool b)
 
 }
 
+float CameraComponent::GetAngle(void)
+{
+	return angle;
+}
+
+float CameraComponent::GetAspect(void)
+{
+	return aspect;
+}
+
+float CameraComponent::GetNear(void)
+{
+	return this->nearZ;
+}
+
+float CameraComponent::GetFar(void)
+{
+	return this->farZ;
+}
+
+void CameraComponent::SetAngle(float angle)
+{
+	this->angle = angle;
+	SetProjectionMtx();
+}
+
+void CameraComponent::SetAspect(float aspect)
+{
+	this->aspect = aspect;
+	SetProjectionMtx();
+
+}
+
+GameObject* CameraComponent::GetLookObject(void)
+{
+	return lookObject;
+}
+
+int CameraComponent::GetPostEffectIndex(void)
+{
+	return postEffectIndex;
+}
+
+BOOL CameraComponent::GetPostEffectEnable(void)
+{
+	return postEffectEnable;
+}
+
+int CameraComponent::GetRT(void)
+{
+	return rt;
+}
+
+XMFLOAT4 CameraComponent::GetClearColor(void)
+{
+	return clearColor;
+}
+
 void CameraComponent::SetFrustumPlanes(void)
 {
 	
@@ -679,13 +749,13 @@ void CameraComponent::SetFrustumCorners(void)
 void CameraComponent::SetViewPort(int m_type)
 {
 
-	ViewPortType = m_type;
+	viewPortType = m_type;
 
 	XMFLOAT2 screenSize = GetGameObject()->GetScene()->GetGameEngine()->GetWindowSize();
 
 
 	// ビューポート設定
-	switch (ViewPortType)
+	switch (viewPortType)
 	{
 	case TYPE_FULL_SCREEN:
 		vp.Width = (FLOAT)screenSize.x;
@@ -742,13 +812,13 @@ void CameraComponent::SetViewPort(int m_type)
 	}
 }
 
-
-
-
-int CameraComponent::GetViewPortType(void)
+int CameraComponent::GetViewPort(void)
 {
-	return ViewPortType;
+	return viewPortType;
 }
+
+
+
 
 
 void CameraComponent::SetLookObject(GameObject* gameObject)

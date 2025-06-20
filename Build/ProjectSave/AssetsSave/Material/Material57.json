@@ -1,0 +1,45 @@
+{
+    "ID": 0,
+    "ambient": [
+        0.20000000298023224,
+        0.20000000298023224,
+        0.20000000298023224,
+        1.0
+    ],
+    "difPath": "data/texture/aerial_rocks_dif.png",
+    "diffuse": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+    ],
+    "edgeFacter": 16.0,
+    "emission": [
+        0.0,
+        0.0,
+        0.0,
+        0.0
+    ],
+    "heightFacter": 500.0,
+    "insideFacter": 16.0,
+    "mapUVScaleX": 1.0,
+    "mapUVScaleY": 1.0,
+    "matType": "class TerrainMaterial",
+    "name": "Material57",
+    "nodiftex": 0,
+    "nonortex": 0,
+    "norPath": "data/texture/aerial_rocks_nor.png",
+    "nospetex": 1,
+    "path": "",
+    "shininess": 20.0,
+    "spePath": "",
+    "specular": [
+        0.10000000149011612,
+        0.10000000149011612,
+        0.10000000149011612,
+        1.0
+    ],
+    "type": 0,
+    "uvScaleX": 10.0,
+    "uvScaleY": 10.0
+}

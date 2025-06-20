@@ -24,6 +24,9 @@ public:
 	XMMATRIX GetProjectionMatrix(void);
 	XMMATRIX GetViewMatrix(void);
 
+	XMVECTOR GetAxisZ(void);
+		
+	XMVECTOR GetPosition(void);
 private:
 	World* pWorld;
 	Renderer* pRenderer;

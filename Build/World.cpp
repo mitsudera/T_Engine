@@ -9,6 +9,7 @@
 #include "ShadowMap.h"
 #include "GUI.h"
 #include "EditerCamera.h"
+#include "input.h"
 World::World(GameEngine* gameEngine)
 {
 	pGameEngine = gameEngine;
@@ -26,6 +27,7 @@ World::World(GameEngine* gameEngine)
 		this->gui = new GUI(this);
 
 	}
+	showGui = TRUE;
 }
 
 World::~World()
@@ -82,6 +84,14 @@ void World::Update()
 		scene->Update();
 	}
 	
+	if (pGameEngine->GetInput()->GetKeyboardTrigger(DIK_H))
+	{
+		HideGui();
+	}
+	else if(pGameEngine->GetInput()->GetKeyboardTrigger(DIK_G))
+	{
+		ShowGui();
+	}
 }
 
 void World::LateUpdate()
@@ -97,7 +107,12 @@ void World::LateUpdate()
 	{
 		editerCamera->Update();
 
-		gui->Update();
+
+		if (showGui)
+		{
+			gui->Update();
+
+		}
 	}
 
 }
@@ -135,7 +150,12 @@ void World::Draw()
 			editerCamera->Render();
 
 		}
-		gui->Draw();
+
+		if (showGui)
+		{
+			gui->Draw();
+
+		}
 
 	}
 	
@@ -219,5 +239,20 @@ void World::TestPlay(void)
 		scene->Init();
 	}
 
+}
+
+void World::ShowGui(void)
+{
+	showGui = TRUE;
+}
+
+void World::HideGui(void)
+{
+	showGui = FALSE;
+}
+
+BOOL World::GetShowGui(void)
+{
+	return showGui;
 }
 

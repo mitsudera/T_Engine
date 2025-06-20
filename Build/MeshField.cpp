@@ -29,7 +29,7 @@ void MeshField::Awake(void)
 
 
 
-	meshField->CreateVetexBuffer(XMINT2(65, 65), XMFLOAT2(1024.0f * 16.0f, 1024.0f * 16.0f));
+	meshField->CreateVertexBuffer(XMINT2(65, 65), XMFLOAT2(1024.0f * 16.0f, 1024.0f * 16.0f));
 	TerrainMaterial* mat = new TerrainMaterial(pScene->GetGameEngine()->GetAssetsManager());
 	//PhongMaterial* mat = new PhongMaterial(pScene->GetGameEngine()->GetAssetsManager());
 	mat->LoadDiffuseTex("data/texture/aerial_rocks_dif.png");

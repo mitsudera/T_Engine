@@ -71,7 +71,11 @@ public:
 
 	SkinMeshTreeNode* GetSkinMeshTreeNode(string fileName, int index);
 
+	AnimationData* GetAnimationData(string name);
+
 	AnimationData* LoadAnimationData(string fileName);
+
+
 
 	AnimationData* LoadAnimationData(string fileName1, string fileName2);
 
@@ -134,6 +138,7 @@ public:
 	void AddAssets(Assets* assets);
 	void AddLoadAssets(Assets* assets);
 
+	list<Material*>& GetMaterialList(void);
 private:
 
 	GameEngine* pGameEngine;
@@ -150,7 +155,7 @@ private:
 	list<PostEffectShader*> PostEffectShaderList;
 	list<ComputeShader*> ComputeShaderList;
 	list<SkinMeshTreeData*> SkinMeshTreeDataList;
-	list<Material*> MaterialArray;
+	list<Material*> MaterialList;
 	list<Material*> ShadowMaterialArray;
 	list<DX11Texture*> TextureList;
 

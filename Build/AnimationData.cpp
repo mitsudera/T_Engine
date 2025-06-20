@@ -202,6 +202,8 @@ string MtxNode::GetName(void)
 
 AnimationData::AnimationData()
 {
+	this->assetsType = AssetsType::AnimationData;
+
 }
 
 AnimationData::~AnimationData()
@@ -255,6 +257,7 @@ MtxNode* AnimationData::GetMtxTreeRoot(void)
 
 void AnimationData::LoadAnimation(string fileName, AssetsManager* assetsManager)
 {
+	this->pAssetsManager = assetsManager;
 	fileNum = 1;
 	this->fileName = fileName;
 	
@@ -337,12 +340,13 @@ void AnimationData::LoadAnimation(string fileName, AssetsManager* assetsManager)
 
 void AnimationData::LoadAnimation(string fileName1, string fileName2, AssetsManager* assetsManager)
 {
+	pAssetsManager = assetsManager;
+
 	this->fileName = fileName1;
 	this->fileNameSecond = fileName2;
 
 	fileNum = 2;
 	SetName("blend" + fileName1 + "&" + fileName2);
-	pAssetsManager = assetsManager;
 
 	AnimationData* animData1 = pAssetsManager->LoadAnimationData(fileName1);
 	AnimationData* animData2 = pAssetsManager->LoadAnimationData(fileName2);
@@ -361,6 +365,8 @@ void AnimationData::LoadAnimation(string fileName1, string fileName2, AssetsMana
 
 void AnimationData::LoadAnimation(string fileName1, string fileName2, string fileName3, string fileName4, AssetsManager* assetsManager)
 {
+	pAssetsManager = assetsManager;
+
 	this->fileName = fileName1;
 	this->fileNameSecond = fileName2;
 	this->fileName3 = fileName3;
@@ -370,7 +376,6 @@ void AnimationData::LoadAnimation(string fileName1, string fileName2, string fil
 	SetName("blend" + fileName1 + "&" + fileName2 + "&" + fileName3 + "&" + fileName4);
 
 
-	pAssetsManager = assetsManager;
 
 	AnimationData* animData1 = pAssetsManager->LoadAnimationData(fileName1);
 	AnimationData* animData2 = pAssetsManager->LoadAnimationData(fileName2);

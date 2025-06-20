@@ -35,6 +35,7 @@ public:
 	void CreateDefaultObject(void);
 
 	GameObject* DynamicCreateGameObjectByTypeName(string typeName);
+	GameObject* DynamicCroneGameObject(GameObject* gameObject);
 	GameObject* CreateGameObjectByTypeName(string typeName);
 	GameObject* CreateGameObject(void);
 
@@ -82,7 +83,7 @@ public:
 	void RemoveSceneTransformComponent(TransformComponent* com);
 	void RemoveScenePrimitiveComponent(PrimitiveComponent* com);
 	void RemoveSceneRigidBodyComponent(RigidBodyComponent* com);
-
+	void RemoveCameraList(CameraComponent* com);
 	virtual void SetName(string name) override;
 	virtual string GetName(void) override;
 

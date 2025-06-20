@@ -27,8 +27,7 @@ void Camera::Awake(void)
 	SetName("Camera");
 	CameraComponent* cameraComponent = AddComponent<CameraComponent>();
 
-	cameraComponent->SetRenderTarget(pScene->GetGameEngine()->GetRenderer()->GetBackBuffer());
-	cameraComponent->SetDepthStencilView(pScene->GetGameEngine()->GetRenderer()->GetBackBufferDSV());
+	cameraComponent->SetRenderTargetBackBuffer();
 
 
 

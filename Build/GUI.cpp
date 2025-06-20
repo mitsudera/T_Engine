@@ -3,22 +3,49 @@
 #include "renderer.h"
 #include "World.h"
 #include "gameobject.h"
-#include "component.h"
 #include "Scene.h"
-#include "transformcomponent.h"
-#include "CameraComponent.h"
 #include "ProjectSetting.h"
 #include "AssetsManager.h"
 #include "Assets.h"
 #include "Material.h"
 #include "TerrainMaterial.h"
 #include "DX11Texture.h"
-#include "TerrainComponent.h"
 #include "EditerCamera.h"
-#include "AnimationControlerComponent.h"
 #include "SaveSystem.h"
 #include "SceneManager.h"
 #include "SceneAssetsData.h"
+
+
+//com
+#include "component.h"
+#include "transformcomponent.h"
+#include "CameraComponent.h"
+#include "AnimationControlerComponent.h"
+#include "ColliderComponent.h"
+#include "DirectionalLightComponent.h"
+#include "PointLightComponent.h"
+#include "primitivecomponent.h"
+#include "MeshComponent.h"
+#include "QuadComponent.h"
+#include "SpriteComponent.h"
+#include "TerrainColliderComponent.h"
+#include "TerrainComponent.h"
+#include "TextMeshComponent.h"
+#include "TextWriteComponent.h"
+#include "RigidBodyComponent.h"
+#include "SkinMeshLinkerComponent.h"
+#include "SkinMeshComponent.h"
+#include "BoneComponent.h"
+#include "SpriteComponent.h"
+#include "SoundSpeakerComponent.h"
+#include "TerrainColliderComponent.h"
+#include "PointColliderComponent.h"
+#include "LineColliderComponent.h"
+#include "SphereColliderComponent.h"
+#include "BoxColliderComponent.h"
+#include "CapsuleColliderComponent.h"
+#include "RotBoxColliderComponent.h"
+
 
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND g_hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
@@ -58,6 +85,7 @@ GUI::GUI(World* world)
     clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
 
     gizmoOperation = ImGuizmo::TRANSLATE;	// ギズモの初期モードのセット
+    lastSelectSceneOrGameObject = nullptr;
 }
 
 GUI::~GUI()
@@ -342,6 +370,7 @@ void GUI::UpdateInspectorWindow(void)
     if (selectedObject->GetType() == Object::Type::Scene)
     {
         Scene* scene = static_cast<Scene*>(selectedObject);
+        lastSelectSceneOrGameObject = scene;
 
         if (ImGui::BeginMenuBar()) {
 
@@ -361,6 +390,8 @@ void GUI::UpdateInspectorWindow(void)
     if (selectedObject->GetType() == Object::Type::GameObject)
     {
         GameObject* gameObject = static_cast<GameObject*>(selectedObject);
+        lastSelectSceneOrGameObject = gameObject;
+
         bool active = gameObject->GetActive();
 
         ImGui::Text("Active:");
@@ -372,7 +403,18 @@ void GUI::UpdateInspectorWindow(void)
 
         }
 
+        bool notAnim = gameObject->GetNotAnim();
 
+        ImGui::Text("NotAnim:");
+        ImGui::SameLine();
+
+        if (ImGui::Checkbox("##NotAnim", &notAnim))
+        {
+            gameObject->SetNotAnim(notAnim);
+
+        }
+
+        remCom = nullptr;
         for (Component* com : gameObject->GetComponentList())
         {
 
@@ -383,6 +425,10 @@ void GUI::UpdateInspectorWindow(void)
 
 
 
+        }
+        if (remCom)
+        {
+            gameObject->RemoveComponent(remCom);
         }
 
 
@@ -428,7 +474,7 @@ void GUI::UpdateInspectorWindow(void)
                     showName.erase(0, removeName.size() - 1);
                     if (ImGui::MenuItem(showName.c_str()))
                     {
-                        gameObject->AddComponentByTypeName(typeName);
+                        gameObject->DynamicAddComponentByTypeName(typeName);
                     }
 
                 }
@@ -444,6 +490,11 @@ void GUI::UpdateInspectorWindow(void)
                 gameObject->GetScene()->DynamicDeleteGameObject(gameObject);
                 selectedObject = nullptr;
 
+
+            }
+            if (ImGui::MenuItem("Clone"))
+            {
+                gameObject->GetScene()->DynamicCroneGameObject(gameObject);
 
             }
             ImGui::EndMenuBar();
@@ -557,6 +608,22 @@ void GUI::UpdateAssetsWindow(void)
 
             }
         }
+
+
+        //if (ImGui::BeginMenuBar()) {
+
+        //    if (ImGui::Button("CreateOnScene"))
+        //    {
+
+        //        if (Scene* scene = dynamic_cast<Scene*>(lastSelectSceneOrGameObject))
+        //        {
+        //            scene->DynamicCreateGameObjectByTypeName(typeid(GameObject).name())->LoadFbxFileMesh()
+        //        }
+        //    }
+
+
+        //    ImGui::EndMenuBar();
+        //}
 
         ImGui::EndTabItem();
     }
@@ -709,66 +776,76 @@ void GUI::ShowObject(Object* object)
 
 void GUI::ShowComponent(Component* com)
 {
+
     string removeName = "class ";
 
-
+    string showName = com->GetTypeName();
+    showName.erase(0, removeName.size() - 1);
     ImGui::SetNextItemOpen(true, ImGuiCond_Once);//初期状態を開いた状態にする
-    if (TransformComponent* transformCom = dynamic_cast<TransformComponent*>(com))
-    {
-        string showName = typeid(TransformComponent).name();
-        showName.erase(0, removeName.size() - 1);
 
-        if (ImGui::TreeNode(showName.c_str()))
+
+    if (ImGui::TreeNode(showName.c_str()))
+    {
+        if (ImGui::Button("Remove"))
         {
-            ShowTransformCom(transformCom);
-            ImGui::TreePop();
+            remCom = com;
         }
 
-    }
 
-    if (CameraComponent* camCom = dynamic_cast<CameraComponent*>(com))
-    {
-        string showName = typeid(CameraComponent).name();
-        showName.erase(0, removeName.size() - 1);
+        bool active = com->GetActive();
 
-        if (ImGui::TreeNode(showName.c_str()))
+
+
+        ImGui::Text("Active:");
+        ImGui::SameLine();
+        if (ImGui::Checkbox("##Active", &active))
+        {
+            com->SetActive(active);
+
+        }
+
+
+        if (TransformComponent* transformCom = dynamic_cast<TransformComponent*>(com))
+        {
+            ShowTransformCom(transformCom);
+
+        }
+
+        if (CameraComponent* camCom = dynamic_cast<CameraComponent*>(com))
         {
 
             ShowCamCom(camCom);
-            ImGui::TreePop();
-
         }
-    }
 
-    if (TerrainComponent* terCom = dynamic_cast<TerrainComponent*>(com))
-    {
-        string showName = typeid(TerrainComponent).name();
-        showName.erase(0, removeName.size() - 1);
-
-        if (ImGui::TreeNode(showName.c_str()))
+        if (TerrainComponent* terCom = dynamic_cast<TerrainComponent*>(com))
         {
+
             ShowTerrainComponent(terCom);
-            ImGui::TreePop();
-
         }
-    }
 
-    if (AnimationControlerComponent* aniCom = dynamic_cast<AnimationControlerComponent*>(com))
-    {
-        string showName = typeid(AnimationControlerComponent).name();
-        showName.erase(0, removeName.size() - 1);
-
-        if (ImGui::TreeNode(showName.c_str()))
+        if (AnimationControlerComponent* aniCom = dynamic_cast<AnimationControlerComponent*>(com))
         {
+
             ShowAnimationControlerComponent(aniCom);
-            ImGui::TreePop();
-
         }
-    }
+        if (ColliderComponent* cCom = dynamic_cast<ColliderComponent*>(com))
+        {
+            ShowColliderComponent(cCom);
+        }
+        if (RigidBodyComponent* rCom = dynamic_cast<RigidBodyComponent*>(com))
+        {
+            ShowRigidBodyComponent(rCom);
+        }
+        if (BoneComponent * bCom = dynamic_cast<BoneComponent*>(com))
+        {
+            ShowBoneComponent(bCom);
+        }
 
+
+        ImGui::TreePop();
+    }
 
 }
-
 void GUI::ShowTransformCom(TransformComponent* com)
 {
     XMFLOAT2 screen = pGameEngine->GetWindowSize();
@@ -781,11 +858,17 @@ void GUI::ShowTransformCom(TransformComponent* com)
 
     XMFLOAT3 rot = com->GetRotation();
 
-    float fRot[3] = { XMConvertToDegrees(rot.x),XMConvertToDegrees(rot.y),XMConvertToDegrees(rot.z)};
+    float fRot[3] = { XMConvertToDegrees(rot.x),XMConvertToDegrees(rot.y),XMConvertToDegrees(rot.z) };
 
     XMFLOAT3 scl = com->GetScale();
     float fScl[3] = { scl.x,scl.y,scl.z };
 
+
+    if (ImGui::Button("Reset"))
+    {
+        com->Reset();
+
+    }
     // 位置の編集
     ImGui::Text("Pos");
     if (ImGui::DragFloat3("##Pos", (float*)&fPos))
@@ -797,7 +880,7 @@ void GUI::ShowTransformCom(TransformComponent* com)
     ImGui::Text("Rot");
     if (ImGui::DragFloat3("##Rot", (float*)&fRot))
     {
-        com->SetRotation(XMConvertToRadians(fRot[0]),XMConvertToRadians(fRot[1]),XMConvertToRadians(fRot[2]));
+        com->SetRotation(XMConvertToRadians(fRot[0]), XMConvertToRadians(fRot[1]), XMConvertToRadians(fRot[2]));
     }
 
     // スケールの編集
@@ -811,34 +894,473 @@ void GUI::ShowTransformCom(TransformComponent* com)
 
 
 }
+
+void GUI::ShowColliderComponent(ColliderComponent* com)
+{
+
+    bool enable = com->GetEnable();
+    
+    XMFLOAT3 pivot;
+    XMStoreFloat3(&pivot, com->GetPivot());
+    float fPivot[3] = { pivot.x,pivot.y,pivot.z };
+
+    ImGui::Text("enable");
+
+    if (ImGui::Checkbox("##enable", &enable))
+    {
+        if (enable)
+        {
+            com->OnCollider();
+
+        }
+        else
+        {
+            com->OffCollider();
+        }
+    }
+
+    // 位置の編集
+    ImGui::Text("Pivot");
+    if (ImGui::DragFloat3("##Pivot", (float*)&fPivot))
+    {
+        com->SetPivot(XMFLOAT3(fPivot[0], fPivot[1], fPivot[2]));
+    }
+
+
+
+    if (PointColliderComponent* pCom = dynamic_cast<PointColliderComponent*>(com))
+    {
+        // PointColliderComponent用のコード
+    }
+    else if (LineColliderComponent* lCom = dynamic_cast<LineColliderComponent*>(com))
+    {
+        // LineColliderComponent用のコード
+    }
+    else if (SphereColliderComponent* sCom = dynamic_cast<SphereColliderComponent*>(com))
+    {
+        float rad = sCom->GetCheckRadius();
+
+        ImGui::Text("Radius");
+        if (ImGui::DragFloat("##Radius", &rad))
+        {
+            sCom->SetRadius(rad);
+        }
+
+
+    }
+    else if (BoxColliderComponent* bCom = dynamic_cast<BoxColliderComponent*>(com))
+    {
+        XMFLOAT3 size = bCom->GetSize();
+        float fSize[3] = { size.x,size.y,size.z };
+        ImGui::Text("Size");
+        if (ImGui::DragFloat3("##Size", (float*)&fSize))
+        {
+            bCom->SetBox(XMFLOAT3(fSize[0], fSize[1], fSize[2]));
+        }
+
+
+    }
+    else if (CapsuleColliderComponent* cCom = dynamic_cast<CapsuleColliderComponent*>(com))
+    {
+        XMFLOAT3 start = cCom->GetStart();
+        float fStart[3] = { start.x,start.y,start.z };
+
+        XMFLOAT3 end = cCom->GetEnd();
+        float fEnd[3] = { end.x,end.y,end.z };
+
+        float rad = cCom->GetRadius();
+        //
+        ImGui::Text("Start");
+        if (ImGui::DragFloat3("##Start", (float*)&fStart))
+        {
+            cCom->SetStart(XMFLOAT3(fStart[0], fStart[1], fStart[2]));
+        }
+        //
+        ImGui::Text("End");
+        if (ImGui::DragFloat3("##End", (float*)&fEnd))
+        {
+            cCom->SetEnd(XMFLOAT3(fEnd[0], fEnd[1], fEnd[2]));
+        }
+        //
+        ImGui::Text("Radius");
+        if (ImGui::DragFloat("##Radius", &rad))
+        {
+            cCom->SetRadius(rad);
+        }
+
+    }
+    else if (RotBoxColliderComponent* rCom = dynamic_cast<RotBoxColliderComponent*>(com))
+    {
+        XMFLOAT3 size = rCom->GetSize();
+        float fSize[3] = { size.x,size.y,size.z };
+        ImGui::Text("Size");
+        if (ImGui::DragFloat3("##Size", (float*)&fSize))
+        {
+            rCom->SetRotBox(XMFLOAT3(fSize[0], fSize[1], fSize[2]));
+        }
+    }
+}
+
+void GUI::ShowRigidBodyComponent(RigidBodyComponent* com)
+{
+    bool useGravity = com->GetUseGarvity();
+    bool isKinematic = com->GetIsKinematic();
+    bool isStatic = com->GetIsStatic();
+    bool isFixTerrain = com->GetIsFixTerrain();
+
+    float mass = com->GetMass();
+    float drag = com->GetDrag();
+    float friction = com->GetFriction();
+    float angularDrag = com->GetAngularDrag();
+
+    ImGui::Text("UseGravity");
+    if (ImGui::Checkbox("##UseGravity", &useGravity))
+    {
+        com->SetUseGarvity(useGravity);
+    }
+
+    ImGui::Text("IsKinematic");
+    if (ImGui::Checkbox("##IsKinematic", &isKinematic))
+    {
+        com->SetIsKinematic(isKinematic);
+    }
+
+    ImGui::Text("IsStatic");
+    if (ImGui::Checkbox("##IsStatic", &isStatic))
+    {
+        com->SetIsStatic(isStatic);
+    }
+
+    ImGui::Text("IsFixTerrain");
+    if (ImGui::Checkbox("##IsFixTerrain", &isFixTerrain))
+    {
+        com->SetIsFixTerrain(isFixTerrain);
+    }
+
+
+    ImGui::Text("Mass");
+    if (ImGui::DragFloat("##Mass", &mass))
+    {
+        com->SetMass(mass);
+    }
+
+    ImGui::Text("Drag");
+    if (ImGui::DragFloat("##Drag", &drag))
+    {
+        com->SetDrag(drag);
+    }
+
+    ImGui::Text("Friction");
+    if (ImGui::DragFloat("##Friction", &friction))
+    {
+        com->SetFriction(friction);
+    }
+
+    ImGui::Text("AngularDrag");
+    if (ImGui::DragFloat("##AngularDrag", &angularDrag))
+    {
+        com->SetAngularDrag(angularDrag);
+    }
+
+    float oy = com->offsetY;
+
+    ImGui::Text("OffSetY");
+    if (ImGui::DragFloat("##OffSetY", &oy))
+    {
+        com->offsetY = oy;
+    }
+
+
+
+}
+
+void GUI::ShowBoneComponent(BoneComponent* com)
+{
+    bool isPhysics = com->GetIsPhysics();
+
+    ImGui::Text("IsPhysics");
+    if (ImGui::Checkbox("##IsPhysics", &isPhysics))
+    {
+        com->SetIsPhysics(isPhysics);
+    }
+
+
+
+
+
+
+    if (isPhysics)
+    {
+        // メニュー項目を保持するベクトル
+        vector<string> items = { "Standard", "Spring" ,"Hair"};
+        BoneComponent::Joint joint = com->GetJoint();
+
+        // ドロップダウンメニューを表示
+        if (ImGui::BeginCombo("Joint", items[(int)joint].c_str()))
+        {
+            for (int i = 0; i < items.size(); i++)
+            {
+                bool isSelected = ((int)joint == i);
+                if (ImGui::Selectable(items[i].c_str(), isSelected))
+                {
+                    joint = (BoneComponent::Joint)i;
+                    com->SetJoint(joint);
+                }
+                // 既に選択されている項目にフォーカスする
+                if (isSelected)
+                    ImGui::SetItemDefaultFocus();
+            }
+            ImGui::EndCombo();
+        }
+
+
+        float mass = com->GetMass();
+        float tention = com->GetTension();
+        float resist = com->GetResistance();
+
+        ImGui::Text("Mass");
+        ImGui::SameLine();
+        if (ImGui::DragFloat("##Mass", &mass))
+        {
+            com->SetMass(mass);
+        }
+
+        ImGui::Text("Tention");
+        ImGui::SameLine();
+        if (ImGui::DragFloat("##Tention", &tention,100.0f))
+        {
+            com->SetTension(tention);
+        }
+
+        ImGui::Text("Resistance");
+        ImGui::SameLine();
+        if (ImGui::DragFloat("##Resistance", &resist))
+        {
+            com->SetResistance(resist);
+        }
+
+
+
+    }
+}
+
+
+
 void GUI::ShowAnimationControlerComponent(AnimationControlerComponent* com)
 {
+    float blendWeight = com->GetBlendWeight();
+    ImGui::Text("BlendWeight");
+    ImGui::SameLine();
+    if (ImGui::DragFloat("##BlendWeight", &blendWeight, 0.01f, 0.0f, 1.0f))
     {
-        string text = com->GetLoadFileName();
-        vector<char> inputText(text.begin(), text.end());
-        inputText.resize(128);
+        com->SetBlendWeight(blendWeight);
+    }
 
-        if (ImGui::InputText("##FileName", inputText.data(), inputText.size()))
+
+    float angle = com->GetAngle();
+    ImGui::Text("Angle");
+    ImGui::SameLine();
+    if (ImGui::DragFloat("##Angle", &angle, 0.01f))
+    {
+        com->SetAngle(angle);
+    }
+
+
+    if (AnimationNode* dNode = com->GetDefaultNode())
+    {
+
+        for (int i = 0; i < 4; i++)
         {
-            text = inputText.data();
-            com->SetLoadFileName(text);
+            string text = com->GetLoadFileName(i);
+            vector<char> inputText(text.begin(), text.end());
+            inputText.resize(128);
+
+            string tag = "##FileName" + to_string(i);
+
+            if (ImGui::InputText(tag.c_str(), inputText.data(), inputText.size()))
+            {
+                text = inputText.data();
+                com->SetLoadFileName(text, i);
+            }
+
+        }
+
+        if (ImGui::Button("LoadAnim"))
+        {
+            com->LoadAnimation(TRUE);
+        }
+        if (ImGui::Button("LoadAnim2"))
+        {
+            com->LoadAnimation2(TRUE);
+        }
+        if (ImGui::Button("LoadAnim4"))
+        {
+            com->LoadAnimation4(TRUE);
+        }
+
+    }
+    else
+    {
+        {
+            string text = com->GetLoadFileName(0);
+            vector<char> inputText(text.begin(), text.end());
+            inputText.resize(128);
+
+            if (ImGui::InputText("##FileName", inputText.data(), inputText.size()))
+            {
+                text = inputText.data();
+                com->SetLoadFileName(text,0);
+            }
+
+        }
+
+        if (ImGui::Button("LoadDefaultAnim"))
+        {
+            com->LoadDefaulAnimation(com->GetLoadFileName(0), com->GetLoadFileName(0));
+            com->SetLoadFileName("",0);
         }
 
     }
 
-    if (ImGui::MenuItem("LoadDefaultAnim"))
+
+    for (pair<AnimParameter, string> condition : com->GetConditionList())
     {
-        com->LoadDefaulAnimation(com->GetLoadFileName(), com->GetLoadFileName());
-        com->SetLoadFileName("");
+
+        bool value = condition.first.value;
+        bool isTrigger = condition.first.isTrigger;
+
+
+        if (ImGui::TreeNode(condition.second.c_str()))
+        {
+
+            if (ImGui::Checkbox("Value",&value))
+            {
+                com->SetCondition(condition.second, value);
+            }
+
+            if (ImGui::Checkbox("IsTrigger",&isTrigger))
+            {
+                com->SetIsTrigger(condition.second, isTrigger);
+            }
+
+            ImGui::TreePop();
+        }
     }
 
 
+    string text = com->createConditionName;
+    vector<char> inputText(text.begin(), text.end());
+    inputText.resize(128);
+
+    string tag = "##CreateConditionName";
+
+    if (ImGui::InputText(tag.c_str(), inputText.data(), inputText.size()))
+    {
+        text = inputText.data();
+        com->createConditionName = text;
+    }
+
+    if (ImGui::Button("CreateCondition"))
+    {
+        AnimParameter para;
+        para.isTrigger = FALSE;
+        para.value = FALSE;
+        com->CreateCondition(com->createConditionName, para);
+    }
+
     for (AnimationNode* node : com->GetAnimNodeList())
     {
+
         if (ImGui::TreeNode(node->GetName().c_str()))
         {
 
+            if (ImGui::TreeNode("Create"))
+            {
 
+                for (AnimationNode* anode : com->GetAnimNodeList())
+                {
+                    if (anode == node)
+                        continue;
+
+
+
+
+                    if (ImGui::TreeNode(anode->GetName().c_str()))
+                    {
+
+                        if (ImGui::Button("CreateExitTransition"))
+                        {
+
+                            com->CreateNotLoopAnimExitTransition(node->GetName(), anode->GetName());
+
+                        }
+
+
+                        for (pair<AnimParameter, string> condition : com->GetConditionList())
+                        {
+                            if (ImGui::TreeNode(condition.second.c_str()))
+                            {
+
+                                if (ImGui::Button("CreateTransition"))
+                                {
+
+                                    com->CreateTransition(node->GetName(), anode->GetName(), condition.second, TRUE);
+
+                                }
+
+                                ImGui::TreePop();
+                            }
+
+                        }
+
+                        ImGui::TreePop();
+
+                    }
+
+
+                }
+
+                ImGui::TreePop();
+
+            }
+
+            if (ImGui::TreeNode("Edit"))
+            {
+
+
+
+                for (AnimationTransition* transition : node->GetTransitionList())
+                {
+                    if (ImGui::TreeNode(transition->GetName().c_str()))
+                    {
+                        string text = transition->GetNeedConditionName();
+                        vector<char> inputText(text.begin(), text.end());
+                        inputText.resize(128);
+
+                        string tag = "##NeedConditionNam";
+
+                        if (ImGui::InputText(tag.c_str(), inputText.data(), inputText.size()))
+                        {
+                            text = inputText.data();
+                            transition->SetNeedConditionName(text);
+                        }
+
+                        bool needCon = transition->GetNeedCondition();
+
+                        if (ImGui::Checkbox("NeedCondition", &needCon))
+                        {
+                            transition->SetNeedCondition(needCon);
+                        }
+
+
+                        ImGui::TreePop();
+
+                    }
+
+                }
+                ImGui::TreePop();
+
+            }
 
             ImGui::TreePop();
 
@@ -952,7 +1474,7 @@ void GUI::ShowMaterial(Material* mat)
 
         }
         ImGui::SameLine();
-        if (ImGui::Button("LoadTexture"))
+        if (ImGui::Button("LoadDiffuseTexture"))
         {
             mat->LoadDiffuseTex(mat->GetDifPath());
         }
@@ -975,7 +1497,7 @@ void GUI::ShowMaterial(Material* mat)
 
         }
         ImGui::SameLine();
-        if (ImGui::Button("LoadTexture"))
+        if (ImGui::Button("LoadNormalTexture"))
         {
             mat->LoadNormalTex(mat->GetNorPath());
         }
@@ -998,7 +1520,7 @@ void GUI::ShowMaterial(Material* mat)
 
         }
         ImGui::SameLine();
-        if (ImGui::Button("LoadTexture"))
+        if (ImGui::Button("LoadSpeculerTexture"))
         {
             mat->LoadSpeculerTex(mat->GetSpePath());
         }
@@ -1083,6 +1605,87 @@ void GUI::ShowTerrainComponent(TerrainComponent* com)
 }
 void GUI::ShowCamCom(CameraComponent* com)
 {
+
+    string clearMode;
+
+    if (pWorld->GetMainCamera() != com)
+    {
+        if (ImGui::Button("SetMainCamera"))
+        {
+            com->SetMainCamera();
+        }
+
+    }
+
+
+
+    CameraComponent::ClearMode cm = com->GetClearMode();
+
+    switch (cm)
+    {
+    case CameraComponent::ClearMode::None:
+        clearMode = "NONE";
+        break;
+    case CameraComponent::ClearMode::Color:
+        clearMode = "Color";
+
+        break;
+    case CameraComponent::ClearMode::SkySphere:
+        clearMode = "Sky";
+
+        break;
+    default:
+        break;
+    }
+
+    string str = "ClearMode::" + clearMode;
+
+    if (ImGui::BeginMenu(str.c_str()))
+    {
+
+        if (ImGui::MenuItem("NONE"))
+        {
+            com->SetClearMode(CameraComponent::ClearMode::None);
+        }
+        if (ImGui::MenuItem("Color"))
+        {
+            com->SetClearMode(CameraComponent::ClearMode::Color);
+        }
+        if (ImGui::MenuItem("Sky"))
+        {
+            com->SetClearMode(CameraComponent::ClearMode::SkySphere);
+        }
+
+
+        ImGui::EndMenu();
+
+    }
+
+
+    float angle = com->GetAngle() * radianToDegree;
+    float nearz = com->GetNear();
+    float farz = com->GetFar();
+    // 視野角の編集
+    ImGui::Text("Angle");
+    if (ImGui::DragFloat("##Angle", &angle))
+    {
+        com->SetAngle(angle * degreeToRadian);
+    }
+    // nearの編集
+    ImGui::Text("Near");
+    if (ImGui::DragFloat("##Near", &nearz))
+    {
+        com->SetNear(nearz);
+    }
+    // farの編集
+    ImGui::Text("Far");
+    if (ImGui::DragFloat("##Far", &farz))
+    {
+        com->SetFar(farz);
+    }
+
+
+
     if (ImGui::TreeNode("LayerCulling"))
     {
 

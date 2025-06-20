@@ -14,7 +14,7 @@ public:
 	virtual void Draw(void) override;
 
 
-	void CreateVetexBuffer(XMINT2 resolution, XMFLOAT2 size);
+	void CreateVertexBuffer(XMINT2 resolution, XMFLOAT2 size);
 
 	void LoadHeightMap(string path);
 

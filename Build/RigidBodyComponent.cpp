@@ -35,7 +35,7 @@ void RigidBodyComponent::Awake(void)
 	isStatic = FALSE;
 	isFixTerrain = TRUE;
 	TypeName = typeid(RigidBodyComponent).name();;
-
+	offsetY = 0.0f;
 }
 
 void RigidBodyComponent::Init(void)
@@ -292,6 +292,58 @@ void RigidBodyComponent::SetIsKinematic(BOOL b)
 	isKinematic = b;
 }
 
+void RigidBodyComponent::SetIsStatic(BOOL b)
+{
+	isStatic = b;
+}
+
+void RigidBodyComponent::SetIsFixTerrain(BOOL b)
+{
+	isFixTerrain = b;
+}
+
+float RigidBodyComponent::GetMass(void)
+{
+	return mass;
+}
+
+float RigidBodyComponent::GetDrag(void)
+{
+	return drag;
+}
+
+float RigidBodyComponent::GetFriction(void)
+{
+	return friction;
+}
+
+float RigidBodyComponent::GetAngularDrag(void)
+{
+	return angularDrag;
+}
+
+BOOL RigidBodyComponent::GetUseGarvity(void)
+{
+	return useGravity;
+}
+
+BOOL RigidBodyComponent::GetIsKinematic(void)
+{
+	return isKinematic;
+}
+
+BOOL RigidBodyComponent::GetIsStatic(void)
+{
+	return isStatic;
+}
+
+BOOL RigidBodyComponent::GetIsFixTerrain(void)
+{
+	return isFixTerrain;
+}
+
+
+
 void RigidBodyComponent::AddForce(XMVECTOR force)
 {
 	velocity += force;
@@ -331,12 +383,8 @@ BOOL RigidBodyComponent::GetOnGround(void)
 	return this->onGround;
 }
 
-void RigidBodyComponent::SetIsStatic(BOOL b)
+void RigidBodyComponent::SetWorldPos(XMFLOAT3 pos)
 {
-	isStatic = b;
+	this->worldPos = XMLoadFloat3(&pos);
 }
 
-void RigidBodyComponent::SetIsFixTerrain(BOOL b)
-{
-	isFixTerrain = b;
-}
